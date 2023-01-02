@@ -92,53 +92,53 @@ class RtCore private constructor() {
 }
 
 
-fun main() {
-    RtCore.instance.run(RtConfig(), object : RtCoreListener {
-            override fun onStatusChange(status: RtCoreListener.Status) {
-            }
-
-            override fun onClientIn(client: Client) {
-                "onClientIn:$client".logInfo()
-                client.listen(object :ClientListener{
-                    override fun onRtHeartbeatIn(client: Client, message: ClientMessage) {
-                        "onRtHeartbeatIn:$message".logInfo()
-                    }
-
-                    override fun onMessage(client: Client, message: ClientMessage, data: MutableList<ByteArray>) {
-                        "onMessage:$message".logInfo()
-                        if (message.protocol.url=="/favicon.ico"){
-                            val responseWrite = client.getResponseWrite(ByteResponseWriter::class)
-                            val file = FileInputStream("C:\\Users\\10720\\Downloads\\8a8vgd.jpg")
-
-                            responseWrite?.writeFirstLine(message.protocol.protocol,200,"success")
-                            responseWrite?.writeHeader("Content-Type","image/jpeg")
-                            responseWrite?.writeHeader("Content-Length",file.available())
-                            responseWrite?.writeBody(file.readAllBytes())
-                            responseWrite?.endWrite()
-                        }else{
-                            val responseWrite = client.getResponseWrite(ByteResponseWriter::class)
-                            val file = FileInputStream("C:\\Users\\10720\\Downloads\\2020030823074369.png")
-
-                            responseWrite?.writeFirstLine(message.protocol.protocol,200,"success")
-                            responseWrite?.writeHeader("Content-Type","image/png")
-                            responseWrite?.writeHeader("Content-Length",file.available())
-                            responseWrite?.writeBody(file.readAllBytes())
-                            responseWrite?.endWrite()
-                        }
-                    }
-
-                    override fun onInputStreamIn(client: Client, inputStream: InputStream) {
-                        "onInputStreamIn:$client".logInfo()
-
-                    }
-                })
-            }
-
-            override fun onClientOut(client: Client) {
-                "onClientOut:$client".logInfo()
-            }
-        })
-
-
-    RtCore.instance.stopAfter(Duration.ofMinutes(5))
-}
+//fun main() {
+//    RtCore.instance.run(RtConfig(), object : RtCoreListener {
+//            override fun onStatusChange(status: RtCoreListener.Status) {
+//            }
+//
+//            override fun onClientIn(client: Client) {
+//                "onClientIn:$client".logInfo()
+//                client.listen(object :ClientListener{
+//                    override fun onRtHeartbeatIn(client: Client, message: ClientMessage) {
+//                        "onRtHeartbeatIn:$message".logInfo()
+//                    }
+//
+//                    override fun onMessage(client: Client, message: ClientMessage, data: MutableList<ByteArray>) {
+//                        "onMessage:$message".logInfo()
+//                        if (message.protocol.url=="/favicon.ico"){
+//                            val responseWrite = client.getResponseWrite(ByteResponseWriter::class)
+//                            val file = FileInputStream("C:\\Users\\10720\\Downloads\\8a8vgd.jpg")
+//
+//                            responseWrite?.writeFirstLine(message.protocol.protocol,200,"success")
+//                            responseWrite?.writeHeader("Content-Type","image/jpeg")
+//                            responseWrite?.writeHeader("Content-Length",file.available())
+//                            responseWrite?.writeBody(file.readAllBytes())
+//                            responseWrite?.endWrite()
+//                        }else{
+//                            val responseWrite = client.getResponseWrite(ByteResponseWriter::class)
+//                            val file = FileInputStream("C:\\Users\\10720\\Downloads\\2020030823074369.png")
+//
+//                            responseWrite?.writeFirstLine(message.protocol.protocol,200,"success")
+//                            responseWrite?.writeHeader("Content-Type","image/png")
+//                            responseWrite?.writeHeader("Content-Length",file.available())
+//                            responseWrite?.writeBody(file.readAllBytes())
+//                            responseWrite?.endWrite()
+//                        }
+//                    }
+//
+//                    override fun onInputStreamIn(client: Client, inputStream: InputStream) {
+//                        "onInputStreamIn:$client".logInfo()
+//
+//                    }
+//                })
+//            }
+//
+//            override fun onClientOut(client: Client) {
+//                "onClientOut:$client".logInfo()
+//            }
+//        })
+//
+//
+//    RtCore.instance.stopAfter(Duration.ofMinutes(5))
+//}
