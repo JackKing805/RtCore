@@ -6,8 +6,10 @@ plugins {
     `maven-publish`
 }
 
+val vv = "0.0.4"
+
 group = "com.jerry"
-version = "0.0.3"
+version = vv
 
 repositories {
     mavenCentral()
@@ -30,4 +32,16 @@ tasks.withType<KotlinCompile> {
 
 application {
     mainClass.set("MainKt")
+}
+
+
+publishing{
+    publications{
+        create("maven_public",MavenPublication::class){
+            groupId = "com.jerry"
+            artifactId = "RtCore"
+            version = vv
+            from(components.getByName("java"))
+        }
+    }
 }
