@@ -1,7 +1,8 @@
 package com.jerry.rt.core.http.interfaces
 
 import com.jerry.rt.core.http.Client
-import com.jerry.rt.core.http.pojo.ClientMessage
+import com.jerry.rt.core.http.pojo.Request
+import com.jerry.rt.core.http.pojo.Response
 import java.io.InputStream
 
 /**
@@ -11,9 +12,9 @@ import java.io.InputStream
  * @date: 2023/1/2:13:19
  **/
 interface ClientListener {
-    fun onRtHeartbeatIn(client: Client,message: ClientMessage)
+    fun onRtHeartbeatIn(client: Client)
 
-    fun onMessage(client: Client,message: ClientMessage, data:MutableList<ByteArray>)
+    fun onMessage(client: Client,request: Request,response: Response)
 
     fun onInputStreamIn(client: Client,inputStream: InputStream)
 }

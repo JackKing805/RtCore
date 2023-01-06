@@ -2,31 +2,8 @@ package com.jerry.rt.core.http
 
 import com.jerry.rt.core.Context
 import com.jerry.rt.core.http.interfaces.ClientListener
-import com.jerry.rt.core.http.pojo.ClientMessage
-import com.jerry.rt.core.http.pojo.Protocol
-import com.jerry.rt.core.http.response.ResponseWriter
-import com.jerry.rt.core.http.protocol.Header
-import com.jerry.rt.core.http.protocol.RtContentType
-import com.jerry.rt.core.http.protocol.RtMethod
-import com.jerry.rt.core.http.protocol.RtProtocol
 import com.jerry.rt.core.http.request.ClientRequest
-import com.jerry.rt.core.http.response.impl.StringResponseWriter
-import com.jerry.rt.core.thread.Looper
-import com.jerry.rt.extensions.*
-import com.jerry.rt.extensions.logInfo
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.DataInputStream
-import java.io.InputStream
-import java.io.OutputStream
-import java.lang.Thread.sleep
 import java.net.Socket
-import java.net.SocketException
-import kotlin.concurrent.thread
-import kotlin.jvm.Throws
-import kotlin.reflect.KClass
 
 /**
  * @className: Client
@@ -60,8 +37,6 @@ class Client(private val context: Context) {
     fun close() {
         clientRequest.tryClose()
     }
-
-    fun <T:ResponseWriter<*>> getResponseWrite(clazz:KClass<T>) = clientRequest.getResponseWrite(clazz)
 
     fun getClientId() = clientId
 

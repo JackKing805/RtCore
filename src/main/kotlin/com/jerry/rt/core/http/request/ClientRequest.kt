@@ -3,8 +3,8 @@ package com.jerry.rt.core.http.request
 import com.jerry.rt.core.Context
 import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.interfaces.ClientListener
-import com.jerry.rt.core.http.pojo.ClientMessage
-import com.jerry.rt.core.http.pojo.Protocol
+import com.jerry.rt.core.http.pojo.Request
+import com.jerry.rt.core.http.pojo.Response
 import com.jerry.rt.core.http.protocol.Header
 import com.jerry.rt.core.http.protocol.RtContentType
 import com.jerry.rt.core.http.protocol.RtMethod
@@ -20,11 +20,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.DataInputStream
 import java.io.InputStream
-import java.io.OutputStream
 import java.net.Socket
 import java.net.SocketException
 import kotlin.jvm.Throws
-import kotlin.reflect.KClass
 
 /**
  * @className: ClientRequest
@@ -32,7 +30,7 @@ import kotlin.reflect.KClass
  * @author: Jerry
  * @date: 2023/1/2:13:27
  **/
-class ClientRequest(private val context: Context,private val client: Client) {
+internal class ClientRequest(private val context: Context,private val client: Client) {
     private var isAlive = false
     private var isInit = false
     private lateinit var socket: Socket
@@ -40,29 +38,30 @@ class ClientRequest(private val context: Context,private val client: Client) {
     private var clientListener: ClientListener? = null
     private var localMessageListener: MessageListener = object : MessageListener {
         override fun ifRtConnectHeartbeat(rtProtocol: MessageListener.MessageRtProtocol) {
-            clientListener?.onRtHeartbeatIn(client,rtProtocol.toClientMessage())
+            clientListener?.onRtHeartbeatIn(client)
         }
 
 
         override fun onMessage(rtProtocol: MessageListener.MessageRtProtocol, data: MutableList<ByteArray>) {
+            val response = Response(socket.getOutputStream())
             if(rtProtocol.isRtConnect()){
                 checkHeartbeat()
                 if (rtProtocol.getContentType().rtContentTypeIsHeartbeat()) {
                     //心跳包
                     receiverHeartbeatTime = System.currentTimeMillis()
-                    val responseWrite = getResponseWrite(StringResponseWriter::class)
-                    responseWrite?.writeFirstLine(RtMethod.RT.content,200,"success")
-                    responseWrite?.writeHeader("Content-Type", RtContentType.RT_HEARTBEAT.content)
-                    responseWrite?.writeHeader("Content-Length",0)
-                    responseWrite?.endWrite()
+                    val responseWrite = response.getResponseWrite(StringResponseWriter::class)
+                    responseWrite.writeFirstLine(RtMethod.RT.content,200,"success")
+                    responseWrite.writeHeader("Content-Type", RtContentType.RT_HEARTBEAT.content)
+                    responseWrite.writeHeader("Content-Length",0)
+                    responseWrite.endWrite()
                     ifRtConnectHeartbeat(rtProtocol)
                     return
                 }
                 //普通rt 信道
-                dealProtocol(rtProtocol,data)
+                dealProtocol(rtProtocol,data,response)
             }else{
                 //其他类型协议
-                dealProtocol(rtProtocol,data)
+                dealProtocol(rtProtocol,data,response)
                 tryClose()
             }
         }
@@ -72,8 +71,8 @@ class ClientRequest(private val context: Context,private val client: Client) {
             tryClose()
         }
 
-        private fun dealProtocol(rtProtocol: MessageListener.MessageRtProtocol,data: MutableList<ByteArray>){
-            clientListener?.onMessage(client,rtProtocol.toClientMessage(), data)
+        private fun dealProtocol(rtProtocol: MessageListener.MessageRtProtocol,data: MutableList<ByteArray>,response: Response){
+            clientListener?.onMessage(client, Request(Request.Protocol(rtProtocol.method,rtProtocol.url,rtProtocol.protocolString),rtProtocol.header,rtProtocol.isRtConnect(),data), response)
         }
     }
 
@@ -205,10 +204,6 @@ class ClientRequest(private val context: Context,private val client: Client) {
         }
     }
 
-    fun <T: ResponseWriter<*>> getResponseWrite(clazz: KClass<T>) = if (isAlive) {
-        val constructor = clazz.java.getConstructor(OutputStream::class.java)
-        constructor.newInstance(socket.getOutputStream())
-    }  else null
 
     internal fun isAlive(): Boolean = isAlive
 
@@ -249,14 +244,6 @@ class ClientRequest(private val context: Context,private val client: Client) {
 
             override fun toString(): String {
                 return "MessageRtProtocol(method='$method', url='$url', protocolString='$protocolString', header=$header)"
-            }
-
-            fun toClientMessage(): ClientMessage {
-                return ClientMessage(
-                    Protocol(method,url,protocolString),
-                    header,
-                    isRtConnect()
-                )
             }
         }
     }
