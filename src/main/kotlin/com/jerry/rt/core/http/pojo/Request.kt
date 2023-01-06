@@ -12,6 +12,10 @@ data class Request(
     val isRtConnect: Boolean,
     private val data: MutableList<ByteArray>
 ) {
+
+    fun isRt() = isRtConnect
+
+    fun headers() = header
     fun getHeaderValue(key: String,default:String=""): String {
         return ((header[key] as? String) ?: default).trim()
     }
@@ -39,6 +43,12 @@ data class Request(
 
     //获取cookie
     fun getCookie() = getHeaderValue("Cookie","")
+
+    fun getMethod() = protocol.method
+
+    fun getProtocol() = protocol.protocol
+
+    fun getUrl() = protocol.url
 
     data class Protocol(
         val method:String,
