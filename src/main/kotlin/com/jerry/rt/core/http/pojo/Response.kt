@@ -97,7 +97,7 @@ class Response(private val context: Context,private val protocolPackage: Protoco
             val contentType = getElse(file.name.getMimeType(),"application/octet-stream")
             val fileInputStream = FileInputStream(file)
             fileInputStream.use {
-                write(it.readAllBytes(),contentType,it.available())
+                write(it.readBytes(),contentType,it.available())
             }
         }
     }
