@@ -16,9 +16,11 @@ interface RtCoreListener {
         STOPPED
     }
 
-    fun onStatusChange(status: Status)
+    fun onStatusChange(status: Status){}
 
-    fun onClientIn(client: Client)
+    fun onClientIn(client: Client){}
 
-    fun onClientOut(client: Client)
+    fun onClientOut(client: Client){}
+
+    fun onRtCoreException(exception: Exception){}
 }

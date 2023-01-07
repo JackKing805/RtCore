@@ -3,6 +3,7 @@ package com.jerry.rt.core.http
 import com.jerry.rt.core.Context
 import com.jerry.rt.core.http.interfaces.ClientListener
 import com.jerry.rt.core.http.request.ClientRequest
+import java.lang.Exception
 import java.net.Socket
 
 /**
@@ -39,8 +40,4 @@ class Client(private val context: Context) {
     }
 
     fun getClientId() = clientId
-
-    override fun toString(): String {
-        return "Client(clientId='$clientId')"
-    }
 }

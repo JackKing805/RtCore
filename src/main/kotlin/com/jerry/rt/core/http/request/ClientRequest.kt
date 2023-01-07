@@ -3,14 +3,12 @@ package com.jerry.rt.core.http.request
 import com.jerry.rt.core.Context
 import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.interfaces.ClientListener
+import com.jerry.rt.core.http.pojo.ProtocolPackage
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
 import com.jerry.rt.core.http.protocol.Header
 import com.jerry.rt.core.http.protocol.RtContentType
-import com.jerry.rt.core.http.protocol.RtMethod
 import com.jerry.rt.core.http.protocol.RtProtocol
-import com.jerry.rt.core.http.response.ResponseWriter
-import com.jerry.rt.core.http.response.impl.StringResponseWriter
 import com.jerry.rt.extensions.connectIsRtConnect
 import com.jerry.rt.extensions.createStandCoroutineScope
 import com.jerry.rt.extensions.readLength
@@ -34,7 +32,9 @@ internal class ClientRequest(private val context: Context,private val client: Cl
     private var isAlive = false
     private var isInit = false
     private lateinit var socket: Socket
-    private val scope = createStandCoroutineScope()
+    private val scope = createStandCoroutineScope{
+        clientListener?.onException(it)
+    }
     private var clientListener: ClientListener? = null
     private var localMessageListener: MessageListener = object : MessageListener {
         override fun ifRtConnectHeartbeat(rtProtocol: MessageListener.MessageRtProtocol) {
@@ -43,25 +43,23 @@ internal class ClientRequest(private val context: Context,private val client: Cl
 
 
         override fun onMessage(rtProtocol: MessageListener.MessageRtProtocol, data: MutableList<ByteArray>) {
-            val response = Response(socket.getOutputStream())
+            val protocolPackage = ProtocolPackage(client.getClientId(),rtProtocol.method,rtProtocol.url,rtProtocol.protocolString,rtProtocol.header)
+            val response = Response(context,protocolPackage,socket.getOutputStream())
             if(rtProtocol.isRtConnect()){
                 checkHeartbeat()
                 if (rtProtocol.getContentType().rtContentTypeIsHeartbeat()) {
                     //心跳包
                     receiverHeartbeatTime = System.currentTimeMillis()
-                    val responseWrite = response.getResponseWrite(StringResponseWriter::class)
-                    responseWrite.writeFirstLine(RtMethod.RT.content,200,"success")
-                    responseWrite.writeHeader("Content-Type", RtContentType.RT_HEARTBEAT.content)
-                    responseWrite.writeHeader("Content-Length",0)
-                    responseWrite.endWrite()
+                    response.setContentType(RtContentType.RT_HEARTBEAT.content)
+                    response.sendHeader()
                     ifRtConnectHeartbeat(rtProtocol)
                     return
                 }
                 //普通rt 信道
-                dealProtocol(rtProtocol,data,response)
+                dealProtocol(rtProtocol,protocolPackage,data,response)
             }else{
                 //其他类型协议
-                dealProtocol(rtProtocol,data,response)
+                dealProtocol(rtProtocol,protocolPackage,data,response)
                 tryClose()
             }
         }
@@ -71,9 +69,10 @@ internal class ClientRequest(private val context: Context,private val client: Cl
             tryClose()
         }
 
-        private fun dealProtocol(rtProtocol: MessageListener.MessageRtProtocol,data: MutableList<ByteArray>,response: Response){
-            clientListener?.onMessage(client, Request(Request.Protocol(rtProtocol.method,rtProtocol.url,rtProtocol.protocolString),rtProtocol.header,rtProtocol.isRtConnect(),data), response)
+        private fun dealProtocol(rtProtocol: MessageListener.MessageRtProtocol,protocolPackage: ProtocolPackage,data: MutableList<ByteArray>,response: Response){
+            clientListener?.onMessage(client, Request(context,protocolPackage,data), response)
         }
+
     }
 
     fun init(s:Socket){
@@ -82,23 +81,28 @@ internal class ClientRequest(private val context: Context,private val client: Cl
         }
         isInit = true
         isAlive = true
-        this.socket = s
-        if(context.getRtConfig().customerParse){
-            socket.getInputStream().use {
-                localMessageListener.ifCustomInputStream(it)
-            }
-        }else{
-            val dataInputStream = DataInputStream(socket.getInputStream())
-            while (isAlive){
-                try {
-                    onPre(dataInputStream)
-                }catch (e:Exception){
-                    e.printStackTrace()
-                    break
+        try {
+            this.socket = s
+            if(context.getRtConfig().customerParse){
+                socket.getInputStream().use {
+                    localMessageListener.ifCustomInputStream(it)
+                }
+            }else{
+                val dataInputStream = DataInputStream(socket.getInputStream())
+                while (isAlive){
+                    try {
+                        onPre(dataInputStream)
+                    }catch (e:Exception){
+                        e.printStackTrace()
+                        break
+                    }
                 }
             }
+        }catch (e:Exception){
+            clientListener?.onException(e)
+        }finally {
+            tryClose()
         }
-        tryClose()
     }
 
     fun listen(clientListener: ClientListener) {

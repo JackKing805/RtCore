@@ -4,6 +4,7 @@ import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
 import java.io.InputStream
+import java.lang.Exception
 
 /**
  * @className: ClientListener
@@ -17,4 +18,6 @@ interface ClientListener {
     fun onMessage(client: Client,request: Request,response: Response)
 
     fun onInputStreamIn(client: Client,inputStream: InputStream)
+
+    fun onException(exception: Exception)
 }

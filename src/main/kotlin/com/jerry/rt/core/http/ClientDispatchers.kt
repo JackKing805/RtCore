@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.net.Socket
+import java.util.Collections
 import java.util.UUID
 
 /**
@@ -16,9 +17,10 @@ import java.util.UUID
  * @date: 2022/12/31:16:41
  **/
 internal class ClientDispatchers(private val context: Context,private val rtCoreListener: RtCoreListener) {
-    private val scope = createStandCoroutineScope()
-    private val clients = mutableListOf<Client>()
-
+    private val scope = createStandCoroutineScope(){
+        rtCoreListener.onRtCoreException(it)
+    }
+    private val clients = Collections.synchronizedList(mutableListOf<Client>())
 
 
     private fun generateClientId():String{

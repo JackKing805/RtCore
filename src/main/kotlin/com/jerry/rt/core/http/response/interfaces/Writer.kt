@@ -8,10 +8,7 @@ package com.jerry.rt.core.http.response.interfaces
  **/
 interface Writer<T> {
     fun writeLine(line:String)
-
     fun writeFirstLine(protocol:String,code:Int,msg:String)
-
     fun writeHeader(key:String,value:Any)
-
     fun writeBody(content: T)
 }

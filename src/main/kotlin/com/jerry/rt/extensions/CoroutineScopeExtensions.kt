@@ -12,6 +12,12 @@ import kotlinx.coroutines.SupervisorJob
  * @date: 2022/12/31:16:39
  **/
 
-internal fun createStandCoroutineScope() = CoroutineScope(Dispatchers.Default + SupervisorJob() + CoroutineExceptionHandler { coroutineContext, throwable ->
+internal fun createStandCoroutineScope(onException: ((Exception)->Unit)?=null) = CoroutineScope(Dispatchers.Default + SupervisorJob() + CoroutineExceptionHandler { coroutineContext, throwable ->
     throwable.printStackTrace()
+    onException?.invoke(RuntimeException(throwable))
+})
+
+internal fun createExceptionCoroutineScope(onException: ((Exception)->Unit)?=null) = CoroutineScope(Dispatchers.Default + CoroutineExceptionHandler { coroutineContext, throwable ->
+    throwable.printStackTrace()
+    onException?.invoke(RuntimeException(throwable))
 })
