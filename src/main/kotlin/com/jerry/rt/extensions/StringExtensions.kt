@@ -1,9 +1,5 @@
 package com.jerry.rt.extensions
 
-import java.io.ByteArrayOutputStream
-import java.io.IOException
-import java.io.OutputStreamWriter
-import java.nio.charset.Charset
 
 /**
  * @className: StringExtensions

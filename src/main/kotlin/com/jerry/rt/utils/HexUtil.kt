@@ -1,148 +1,127 @@
-package com.jerry.rt.utils;
+package com.jerry.rt.utils
 
-import java.awt.*;
-import java.math.BigInteger;
-import java.nio.charset.Charset;
+import java.awt.Color
+import java.math.BigInteger
 
 /**
  * @className: HexUtil
  * @description:
  * @author: Jerry
  * @date: 2023/1/8:12:26
- **/
+ */
+object HexUtil {
+    private val DIGITS_LOWER =
+        charArrayOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f')
+    private val DIGITS_UPPER =
+        charArrayOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F')
 
-public class HexUtil {
-    private static final char[] DIGITS_LOWER = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-    private static final char[] DIGITS_UPPER = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-
-    public HexUtil() {
-    }
-
-    public static boolean isHexNumber(String value) {
-        int index = value.startsWith("-") ? 1 : 0;
-        if (!value.startsWith("0x", index) && !value.startsWith("0X", index) && !value.startsWith("#", index)) {
-            return false;
+    fun isHexNumber(value: String): Boolean {
+        val index = if (value.startsWith("-")) 1 else 0
+        return if (!value.startsWith("0x", index) && !value.startsWith("0X", index) && !value.startsWith("#", index)) {
+            false
         } else {
             try {
-                Long.decode(value);
-                return true;
-            } catch (NumberFormatException var3) {
-                return false;
+                java.lang.Long.decode(value)
+                true
+            } catch (var3: NumberFormatException) {
+                false
             }
         }
     }
 
-    public static char[] encodeHex(byte[] data) {
-        return encodeHex(data, true);
+    @JvmOverloads
+    fun encodeHex(data: ByteArray, toLowerCase: Boolean = true): CharArray {
+        return encodeHex(data, if (toLowerCase) DIGITS_LOWER else DIGITS_UPPER)
     }
 
-    public static char[] encodeHex(byte[] data, boolean toLowerCase) {
-        return encodeHex(data, toLowerCase ? DIGITS_LOWER : DIGITS_UPPER);
+    @JvmOverloads
+    fun encodeHexStr(data: ByteArray, toLowerCase: Boolean = true): String {
+        return encodeHexStr(data, if (toLowerCase) DIGITS_LOWER else DIGITS_UPPER)
     }
 
-    public static String encodeHexStr(byte[] data) {
-        return encodeHexStr(data, true);
-    }
-
-    public static String encodeHexStr(byte[] data, boolean toLowerCase) {
-        return encodeHexStr(data, toLowerCase ? DIGITS_LOWER : DIGITS_UPPER);
-    }
-
-
-
-    public static String encodeColor(Color color) {
-        return encodeColor(color, "#");
-    }
-
-    public static String encodeColor(Color color, String prefix) {
-        StringBuilder builder = new StringBuilder(prefix);
-        String colorHex = Integer.toHexString(color.getRed());
-        if (1 == colorHex.length()) {
-            builder.append('0');
+    @JvmOverloads
+    fun encodeColor(color: Color, prefix: String? = "#"): String {
+        val builder = StringBuilder(prefix)
+        var colorHex = Integer.toHexString(color.red)
+        if (1 == colorHex.length) {
+            builder.append('0')
         }
-
-        builder.append(colorHex);
-        colorHex = Integer.toHexString(color.getGreen());
-        if (1 == colorHex.length()) {
-            builder.append('0');
+        builder.append(colorHex)
+        colorHex = Integer.toHexString(color.green)
+        if (1 == colorHex.length) {
+            builder.append('0')
         }
-
-        builder.append(colorHex);
-        colorHex = Integer.toHexString(color.getBlue());
-        if (1 == colorHex.length()) {
-            builder.append('0');
+        builder.append(colorHex)
+        colorHex = Integer.toHexString(color.blue)
+        if (1 == colorHex.length) {
+            builder.append('0')
         }
-
-        builder.append(colorHex);
-        return builder.toString();
+        builder.append(colorHex)
+        return builder.toString()
     }
 
-    public static Color decodeColor(String hexColor) {
-        return Color.decode(hexColor);
+    fun decodeColor(hexColor: String?): Color {
+        return Color.decode(hexColor)
     }
 
-    public static String toUnicodeHex(int value) {
-        StringBuilder builder = new StringBuilder(6);
-        builder.append("\\u");
-        String hex = toHex(value);
-        int len = hex.length();
+    fun toUnicodeHex(value: Int): String {
+        val builder = StringBuilder(6)
+        builder.append("\\u")
+        val hex = toHex(value)
+        val len = hex.length
         if (len < 4) {
-            builder.append("0000", 0, 4 - len);
+            builder.append("0000", 0, 4 - len)
         }
-
-        builder.append(hex);
-        return builder.toString();
+        builder.append(hex)
+        return builder.toString()
     }
 
-    public static String toUnicodeHex(char ch) {
-        return "\\u" + DIGITS_LOWER[ch >> 12 & 15] + DIGITS_LOWER[ch >> 8 & 15] + DIGITS_LOWER[ch >> 4 & 15] + DIGITS_LOWER[ch & 15];
+    fun toUnicodeHex(ch: Char): String {
+        return "\\u" + DIGITS_LOWER[ch.code shr 12 and 15] + DIGITS_LOWER[ch.code shr 8 and 15] + DIGITS_LOWER[ch.code shr 4 and 15] + DIGITS_LOWER[ch.code and 15]
     }
 
-    public static String toHex(int value) {
-        return Integer.toHexString(value);
+    fun toHex(value: Int): String {
+        return Integer.toHexString(value)
     }
 
-    public static int hexToInt(String value) {
-        return Integer.parseInt(value, 16);
+    fun hexToInt(value: String): Int {
+        return value.toInt(16)
     }
 
-    public static String toHex(long value) {
-        return Long.toHexString(value);
+    fun toHex(value: Long): String {
+        return java.lang.Long.toHexString(value)
     }
 
-    public static long hexToLong(String value) {
-        return Long.parseLong(value, 16);
+    fun hexToLong(value: String): Long {
+        return value.toLong(16)
     }
 
-    public static void appendHex(StringBuilder builder, byte b, boolean toLowerCase) {
-        char[] toDigits = toLowerCase ? DIGITS_LOWER : DIGITS_UPPER;
-        int high = (b & 240) >>> 4;
-        int low = b & 15;
-        builder.append(toDigits[high]);
-        builder.append(toDigits[low]);
+    fun appendHex(builder: StringBuilder, b: Byte, toLowerCase: Boolean) {
+        val toDigits = if (toLowerCase) DIGITS_LOWER else DIGITS_UPPER
+        val high = b.toInt() and 240 ushr 4
+        val low = b.toInt() and 15
+        builder.append(toDigits[high])
+        builder.append(toDigits[low])
     }
 
-    public static BigInteger toBigInteger(String hexStr) {
-        return null == hexStr ? null : new BigInteger(hexStr, 16);
+    fun toBigInteger(hexStr: String?): BigInteger? {
+        return if (null == hexStr) null else BigInteger(hexStr, 16)
     }
 
-
-
-    private static String encodeHexStr(byte[] data, char[] toDigits) {
-        return new String(encodeHex(data, toDigits));
+    private fun encodeHexStr(data: ByteArray, toDigits: CharArray): String {
+        return String(encodeHex(data, toDigits))
     }
 
-    private static char[] encodeHex(byte[] data, char[] toDigits) {
-        int len = data.length;
-        char[] out = new char[len << 1];
-        int i = 0;
-
-        for(int j = 0; i < len; ++i) {
-            out[j++] = toDigits[(240 & data[i]) >>> 4];
-            out[j++] = toDigits[15 & data[i]];
+    private fun encodeHex(data: ByteArray, toDigits: CharArray): CharArray {
+        val len = data.size
+        val out = CharArray(len shl 1)
+        var i = 0
+        var j = 0
+        while (i < len) {
+            out[j++] = toDigits[240 and data[i].toInt() ushr 4]
+            out[j++] = toDigits[15 and data[i].toInt()]
+            ++i
         }
-
-        return out;
+        return out
     }
-
 }

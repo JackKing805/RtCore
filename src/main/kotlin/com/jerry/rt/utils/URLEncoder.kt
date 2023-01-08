@@ -1,182 +1,173 @@
-package com.jerry.rt.utils;
+package com.jerry.rt.utils
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Serializable;
-import java.nio.charset.Charset;
-import java.util.BitSet;
+import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.io.OutputStreamWriter
+import java.io.Serializable
+import java.nio.charset.Charset
+import java.util.*
 
 /**
  * @className: URLEncoder
  * @description:
  * @author: Jerry
  * @date: 2023/1/8:12:25
- **/
+ */
+class URLEncoder private constructor(private val safeCharacters: BitSet) : Serializable {
+    private var encodeSpaceAsPlus = false
 
-public class URLEncoder implements Serializable {
-    private static final long serialVersionUID = 1L;
-    public static final URLEncoder DEFAULT = createDefault();
-    public static final URLEncoder PATH_SEGMENT = createPathSegment();
-    public static final URLEncoder FRAGMENT = createFragment();
-    public static final URLEncoder QUERY = createQuery();
-    public static final URLEncoder ALL = createAll();
-    private final BitSet safeCharacters;
-    private boolean encodeSpaceAsPlus;
-
-    public static URLEncoder createDefault() {
-        URLEncoder encoder = new URLEncoder();
-        encoder.addSafeCharacter('-');
-        encoder.addSafeCharacter('.');
-        encoder.addSafeCharacter('_');
-        encoder.addSafeCharacter('~');
-        addSubDelims(encoder);
-        encoder.addSafeCharacter(':');
-        encoder.addSafeCharacter('@');
-        encoder.addSafeCharacter('/');
-        return encoder;
+    constructor() : this(BitSet(256)) {
+        addAlpha()
+        addDigit()
     }
 
-    public static URLEncoder createPathSegment() {
-        URLEncoder encoder = new URLEncoder();
-        encoder.addSafeCharacter('-');
-        encoder.addSafeCharacter('.');
-        encoder.addSafeCharacter('_');
-        encoder.addSafeCharacter('~');
-        addSubDelims(encoder);
-        encoder.addSafeCharacter('@');
-        return encoder;
+    fun addSafeCharacter(c: Char) {
+        safeCharacters.set(c.code)
     }
 
-    public static URLEncoder createFragment() {
-        URLEncoder encoder = new URLEncoder();
-        encoder.addSafeCharacter('-');
-        encoder.addSafeCharacter('.');
-        encoder.addSafeCharacter('_');
-        encoder.addSafeCharacter('~');
-        addSubDelims(encoder);
-        encoder.addSafeCharacter(':');
-        encoder.addSafeCharacter('@');
-        encoder.addSafeCharacter('/');
-        encoder.addSafeCharacter('?');
-        return encoder;
+    fun removeSafeCharacter(c: Char) {
+        safeCharacters.clear(c.code)
     }
 
-    public static URLEncoder createQuery() {
-        URLEncoder encoder = new URLEncoder();
-        encoder.setEncodeSpaceAsPlus(true);
-        encoder.addSafeCharacter('*');
-        encoder.addSafeCharacter('-');
-        encoder.addSafeCharacter('.');
-        encoder.addSafeCharacter('_');
-        encoder.addSafeCharacter('=');
-        encoder.addSafeCharacter('&');
-        return encoder;
+    fun setEncodeSpaceAsPlus(encodeSpaceAsPlus: Boolean) {
+        this.encodeSpaceAsPlus = encodeSpaceAsPlus
     }
 
-    public static URLEncoder createAll() {
-        URLEncoder encoder = new URLEncoder();
-        encoder.addSafeCharacter('*');
-        encoder.addSafeCharacter('-');
-        encoder.addSafeCharacter('.');
-        encoder.addSafeCharacter('_');
-        return encoder;
-    }
-
-    public URLEncoder() {
-        this(new BitSet(256));
-        this.addAlpha();
-        this.addDigit();
-    }
-
-    private URLEncoder(BitSet safeCharacters) {
-        this.encodeSpaceAsPlus = false;
-        this.safeCharacters = safeCharacters;
-    }
-
-    public void addSafeCharacter(char c) {
-        this.safeCharacters.set(c);
-    }
-
-    public void removeSafeCharacter(char c) {
-        this.safeCharacters.clear(c);
-    }
-
-    public void setEncodeSpaceAsPlus(boolean encodeSpaceAsPlus) {
-        this.encodeSpaceAsPlus = encodeSpaceAsPlus;
-    }
-
-    public String encode(String path, Charset charset) {
-        if (null != charset && !path.isEmpty()) {
-            StringBuilder rewrittenPath = new StringBuilder(path.length());
-            ByteArrayOutputStream buf = new ByteArrayOutputStream();
-            OutputStreamWriter writer = new OutputStreamWriter(buf, charset);
-
-            for(int i = 0; i < path.length(); ++i) {
-                int c = path.charAt(i);
-                if (this.safeCharacters.get(c)) {
-                    rewrittenPath.append((char)c);
-                } else if (this.encodeSpaceAsPlus && c == ' ') {
-                    rewrittenPath.append('+');
+    fun encode(path: String, charset: Charset?): String {
+        return if (null != charset && !path.isEmpty()) {
+            val rewrittenPath = StringBuilder(path.length)
+            val buf = ByteArrayOutputStream()
+            val writer = OutputStreamWriter(buf, charset)
+            for (i in 0 until path.length) {
+                val c = path[i].code
+                if (safeCharacters[c]) {
+                    rewrittenPath.append(c.toChar())
+                } else if (encodeSpaceAsPlus && c == ' '.code) {
+                    rewrittenPath.append('+')
                 } else {
                     try {
-                        writer.write((char)c);
-                        writer.flush();
-                    } catch (IOException var13) {
-                        buf.reset();
-                        continue;
+                        writer.write(c.toChar().code)
+                        writer.flush()
+                    } catch (var13: IOException) {
+                        buf.reset()
+                        continue
                     }
-
-                    byte[] ba = buf.toByteArray();
-                    byte[] var9 = ba;
-                    int var10 = ba.length;
-
-                    for(int var11 = 0; var11 < var10; ++var11) {
-                        byte toEncode = var9[var11];
-                        rewrittenPath.append('%');
-                        HexUtil.appendHex(rewrittenPath, toEncode, false);
+                    val ba = buf.toByteArray()
+                    val var10 = ba.size
+                    for (var11 in 0 until var10) {
+                        val toEncode = ba[var11]
+                        rewrittenPath.append('%')
+                        HexUtil.appendHex(rewrittenPath, toEncode, false)
                     }
-
-                    buf.reset();
+                    buf.reset()
                 }
             }
-
-            return rewrittenPath.toString();
+            rewrittenPath.toString()
         } else {
-            return path;
+            path
         }
     }
 
-    private void addAlpha() {
-        char i;
-        for(i = 'a'; i <= 'z'; ++i) {
-            this.addSafeCharacter(i);
+    private fun addAlpha() {
+        var i: Char
+        i = 'a'
+        while (i <= 'z') {
+            addSafeCharacter(i)
+            ++i
         }
-
-        for(i = 'A'; i <= 'Z'; ++i) {
-            this.addSafeCharacter(i);
+        i = 'A'
+        while (i <= 'Z') {
+            addSafeCharacter(i)
+            ++i
         }
-
     }
 
-    private void addDigit() {
-        for(char i = '0'; i <= '9'; ++i) {
-            this.addSafeCharacter(i);
+    private fun addDigit() {
+        var i = '0'
+        while (i <= '9') {
+            addSafeCharacter(i)
+            ++i
         }
-
     }
 
-    private static void addSubDelims(URLEncoder encoder) {
-        encoder.addSafeCharacter('!');
-        encoder.addSafeCharacter('$');
-        encoder.addSafeCharacter('&');
-        encoder.addSafeCharacter('\'');
-        encoder.addSafeCharacter('(');
-        encoder.addSafeCharacter(')');
-        encoder.addSafeCharacter('*');
-        encoder.addSafeCharacter('+');
-        encoder.addSafeCharacter(',');
-        encoder.addSafeCharacter(';');
-        encoder.addSafeCharacter('=');
+    companion object {
+        private const val serialVersionUID = 1L
+        val DEFAULT = createDefault()
+        val PATH_SEGMENT = createPathSegment()
+        val FRAGMENT = createFragment()
+        val QUERY = createQuery()
+        val ALL = createAll()
+        fun createDefault(): URLEncoder {
+            val encoder = URLEncoder()
+            encoder.addSafeCharacter('-')
+            encoder.addSafeCharacter('.')
+            encoder.addSafeCharacter('_')
+            encoder.addSafeCharacter('~')
+            addSubDelims(encoder)
+            encoder.addSafeCharacter(':')
+            encoder.addSafeCharacter('@')
+            encoder.addSafeCharacter('/')
+            return encoder
+        }
+
+        fun createPathSegment(): URLEncoder {
+            val encoder = URLEncoder()
+            encoder.addSafeCharacter('-')
+            encoder.addSafeCharacter('.')
+            encoder.addSafeCharacter('_')
+            encoder.addSafeCharacter('~')
+            addSubDelims(encoder)
+            encoder.addSafeCharacter('@')
+            return encoder
+        }
+
+        fun createFragment(): URLEncoder {
+            val encoder = URLEncoder()
+            encoder.addSafeCharacter('-')
+            encoder.addSafeCharacter('.')
+            encoder.addSafeCharacter('_')
+            encoder.addSafeCharacter('~')
+            addSubDelims(encoder)
+            encoder.addSafeCharacter(':')
+            encoder.addSafeCharacter('@')
+            encoder.addSafeCharacter('/')
+            encoder.addSafeCharacter('?')
+            return encoder
+        }
+
+        fun createQuery(): URLEncoder {
+            val encoder = URLEncoder()
+            encoder.setEncodeSpaceAsPlus(true)
+            encoder.addSafeCharacter('*')
+            encoder.addSafeCharacter('-')
+            encoder.addSafeCharacter('.')
+            encoder.addSafeCharacter('_')
+            encoder.addSafeCharacter('=')
+            encoder.addSafeCharacter('&')
+            return encoder
+        }
+
+        fun createAll(): URLEncoder {
+            val encoder = URLEncoder()
+            encoder.addSafeCharacter('*')
+            encoder.addSafeCharacter('-')
+            encoder.addSafeCharacter('.')
+            encoder.addSafeCharacter('_')
+            return encoder
+        }
+
+        private fun addSubDelims(encoder: URLEncoder) {
+            encoder.addSafeCharacter('!')
+            encoder.addSafeCharacter('$')
+            encoder.addSafeCharacter('&')
+            encoder.addSafeCharacter('\'')
+            encoder.addSafeCharacter('(')
+            encoder.addSafeCharacter(')')
+            encoder.addSafeCharacter('*')
+            encoder.addSafeCharacter('+')
+            encoder.addSafeCharacter(',')
+            encoder.addSafeCharacter(';')
+            encoder.addSafeCharacter('=')
+        }
     }
 }

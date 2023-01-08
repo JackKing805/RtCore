@@ -2,17 +2,22 @@ package com.jerry.rt.core.http.pojo
 
 import com.jerry.rt.core.Context
 import com.jerry.rt.core.http.protocol.RtCode
+import com.jerry.rt.core.http.protocol.RtContentType
 import com.jerry.rt.core.http.protocol.RtHeader
 import com.jerry.rt.core.http.response.impl.ByteResponseWriter
 import com.jerry.rt.extensions.getElse
 import com.jerry.rt.extensions.getMimeType
+import com.jerry.rt.extensions.readLength
+import com.jerry.rt.jva.StreamUtils
 import com.jerry.rt.utils.URLEncodeUtil
 import sun.net.util.URLUtil
 import java.io.File
 import java.io.FileInputStream
+import java.io.InputStream
 import java.io.OutputStream
 import java.io.PrintWriter
 import java.net.URLEncoder
+import java.nio.charset.Charset
 
 /**
  * @className: Response
@@ -22,7 +27,7 @@ import java.net.URLEncoder
  **/
 class Response(private val context: Context,private val protocolPackage: ProtocolPackage, private val output:OutputStream) {
     private val byteResponseWriter = ByteResponseWriter(output)
-    private val charset = Charsets.UTF_8
+    private var charset = Charsets.UTF_8
 
     private val header = mutableMapOf<String,String>()
     private var isSendResponse = false
@@ -31,6 +36,10 @@ class Response(private val context: Context,private val protocolPackage: Protoco
     fun getPackage() = protocolPackage
 
     fun getContext() = context
+
+    fun setCharset(charset: Charset){
+        this.charset = charset
+    }
 
     fun setHeader(key:String,value:String){
         header[key] = value
@@ -41,12 +50,16 @@ class Response(private val context: Context,private val protocolPackage: Protoco
     }
 
     fun setContentType(contentType: String){
-        val result=if (contentType.contains(";")){
-            contentType
+        val result=if (contentType.startsWith("text")){
+            if (contentType.contains(";")){
+                contentType
+            }else{
+                contentType+";"+charset.name()
+            }
         }else{
-            contentType+";"+charset.name()
+            contentType
         }
-        header["Content-Type"] = result
+        header[RtHeader.CONTENT_TYPE.content] = result
     }
 
     fun setStatusCode(code:Int){
@@ -54,7 +67,7 @@ class Response(private val context: Context,private val protocolPackage: Protoco
     }
 
     fun setContentLength(length:Int){
-        header["Content-Length"] = length.toString()
+        header[RtHeader.CONTENT_LENGTH.content] = length.toString()
     }
 
     fun sendHeader(){
@@ -67,10 +80,10 @@ class Response(private val context: Context,private val protocolPackage: Protoco
         }
         isSendResponse = true
 
-        if (!header.contains("Content-Type")){
+        if (!header.contains(RtHeader.CONTENT_TYPE.content)){
             setContentType(contentType)
         }
-        if (!header.contains("Content-Length")){
+        if (!header.contains(RtHeader.CONTENT_LENGTH.content)){
             setContentLength(length)
         }
         byteResponseWriter.writeFirstLine(protocolPackage.protocol,statusCode, RtCode.match(statusCode).message)
@@ -88,11 +101,11 @@ class Response(private val context: Context,private val protocolPackage: Protoco
     }
 
     fun write(body:String){
-        val contentType = header["Content-Type"] ?: throw IllegalStateException("Please provider Content-Type")
+        val contentType = header[RtHeader.CONTENT_TYPE.content] ?: throw IllegalStateException("Please provider Content-Type")
         write(body.toByteArray(),contentType,body.length)
     }
 
-    fun write(file: File,contentType: String?=null){
+    fun writeFile(file: File,contentType: String?=null){
         val fileSize = file.length()
         if (fileSize > 2147483647L) {
             throw IllegalArgumentException("File size is too bigger than 2147483647")
@@ -101,16 +114,23 @@ class Response(private val context: Context,private val protocolPackage: Protoco
             if (!rcontentType.startsWith("text/")) {
                 setHeader(
                     RtHeader.CONTENT_DISPOSITION.content,
-                    "attachment;filename=${URLEncodeUtil.encode(file.name,charset)}}"
+                    "attachment;filename=${URLEncodeUtil.encode(file.name,charset)}"
                 )
             }
 
             val fileInputStream = FileInputStream(file)
             fileInputStream.use {
-                write(it.readBytes(),rcontentType,it.available())
+                write(it.readBytes(),rcontentType, fileSize.toInt())
             }
         }
     }
+
+    fun writeFile(path: String,contentType: String?=null){
+        writeFile(File(path),contentType)
+    }
+
+//    fun writeInputStream(inputStream: InputStream,length:Int,contentType: String){
+//    }
 
     fun getPrintWriter() = PrintWriter(output)
 }
