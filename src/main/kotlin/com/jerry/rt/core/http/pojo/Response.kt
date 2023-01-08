@@ -2,14 +2,17 @@ package com.jerry.rt.core.http.pojo
 
 import com.jerry.rt.core.Context
 import com.jerry.rt.core.http.protocol.RtCode
+import com.jerry.rt.core.http.protocol.RtHeader
 import com.jerry.rt.core.http.response.impl.ByteResponseWriter
 import com.jerry.rt.extensions.getElse
 import com.jerry.rt.extensions.getMimeType
-import java.io.BufferedInputStream
+import com.jerry.rt.utils.URLEncodeUtil
+import sun.net.util.URLUtil
 import java.io.File
 import java.io.FileInputStream
 import java.io.OutputStream
 import java.io.PrintWriter
+import java.net.URLEncoder
 
 /**
  * @className: Response
@@ -89,15 +92,22 @@ class Response(private val context: Context,private val protocolPackage: Protoco
         write(body.toByteArray(),contentType,body.length)
     }
 
-    fun write(file: File){
+    fun write(file: File,contentType: String?=null){
         val fileSize = file.length()
         if (fileSize > 2147483647L) {
             throw IllegalArgumentException("File size is too bigger than 2147483647")
         } else {
-            val contentType = getElse(file.name.getMimeType(),"application/octet-stream")
+            val rcontentType = contentType?:getElse(file.name.getMimeType(),"application/octet-stream")
+            if (!rcontentType.startsWith("text/")) {
+                setHeader(
+                    RtHeader.CONTENT_DISPOSITION.content,
+                    "attachment;filename=${URLEncodeUtil.encode(file.name,charset)}}"
+                )
+            }
+
             val fileInputStream = FileInputStream(file)
             fileInputStream.use {
-                write(it.readBytes(),contentType,it.available())
+                write(it.readBytes(),rcontentType,it.available())
             }
         }
     }
