@@ -93,7 +93,7 @@ internal class ClientRequest(private val context: Context,private val client: Cl
                     try {
                         onPre(dataInputStream)
                     }catch (e:Exception){
-                        e.printStackTrace()
+                        clientListener?.onException(e)
                         break
                     }
                 }

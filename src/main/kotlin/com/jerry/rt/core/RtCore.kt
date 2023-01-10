@@ -118,47 +118,47 @@ class RtCore private constructor() {
     }
 }
 
-fun main(){
-    RtCore.instance.run(RtConfig(),object :RtCoreListener{
-        override fun onStatusChange(status: RtCoreListener.Status) {
-            println("status:$status")
-        }
-
-        override fun onClientIn(client: Client) {
-            println("onClientIn:")
-            client.listen(object :ClientListener{
-                override fun onRtHeartbeatIn(client: Client) {
-                    println("onRtHeartbeatIn:")
-                }
-
-                override fun onMessage(client: Client, request: Request, response: Response) {
-                    println("onMessage:")
-                    if (request.getPackage().url=="/favicon.ico"){
-                        response.writeFile(File("C:\\Users\\10720\\Downloads\\2020030823074369.png"),"image/x-icon")
-                    }else{
-                        response.writeFile(File("C:\\Users\\10720\\Downloads\\90e21ab0c5125006927d212c8377f0c8.webp"))
-                    }
-                }
-
-                override fun onInputStreamIn(client: Client, inputStream: InputStream) {
-
-                }
-
-                override fun onException(exception: java.lang.Exception) {
-
-                }
-            })
-        }
-
-        override fun onClientOut(client: Client) {
-            println("onClientOut:")
-
-        }
-
-        override fun onRtCoreException(exception: Exception) {
-            println("onRtCoreException:$exception")
-
-        }
-
-    })
-}
+//fun main(){
+//    RtCore.instance.run(RtConfig(),object :RtCoreListener{
+//        override fun onStatusChange(status: RtCoreListener.Status) {
+//            println("status:$status")
+//        }
+//
+//        override fun onClientIn(client: Client) {
+//            println("onClientIn:")
+//            client.listen(object :ClientListener{
+//                override fun onRtHeartbeatIn(client: Client) {
+//                    println("onRtHeartbeatIn:")
+//                }
+//
+//                override fun onMessage(client: Client, request: Request, response: Response) {
+//                    println("onMessage:")
+//                    if (request.getPackage().url=="/favicon.ico"){
+//                        response.writeFile(File("C:\\Users\\10720\\Downloads\\2020030823074369.png"),"image/x-icon")
+//                    }else{
+//                        response.writeFile(File("C:\\Users\\10720\\Downloads\\90e21ab0c5125006927d212c8377f0c8.webp"))
+//                    }
+//                }
+//
+//                override fun onInputStreamIn(client: Client, inputStream: InputStream) {
+//
+//                }
+//
+//                override fun onException(exception: java.lang.Exception) {
+//
+//                }
+//            })
+//        }
+//
+//        override fun onClientOut(client: Client) {
+//            println("onClientOut:")
+//
+//        }
+//
+//        override fun onRtCoreException(exception: Exception) {
+//            println("onRtCoreException:$exception")
+//
+//        }
+//
+//    })
+//}

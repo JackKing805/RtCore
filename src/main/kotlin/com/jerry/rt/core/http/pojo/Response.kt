@@ -1,9 +1,7 @@
 package com.jerry.rt.core.http.pojo
 
 import com.jerry.rt.core.Context
-import com.jerry.rt.core.http.protocol.RtCode
-import com.jerry.rt.core.http.protocol.RtContentType
-import com.jerry.rt.core.http.protocol.RtHeader
+import com.jerry.rt.core.http.protocol.*
 import com.jerry.rt.core.http.response.impl.ByteResponseWriter
 import com.jerry.rt.extensions.getElse
 import com.jerry.rt.extensions.getMimeType
@@ -13,11 +11,13 @@ import com.jerry.rt.utils.URLEncodeUtil
 import sun.net.util.URLUtil
 import java.io.File
 import java.io.FileInputStream
+import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.PrintWriter
 import java.net.URLEncoder
 import java.nio.charset.Charset
+import kotlin.jvm.Throws
 
 /**
  * @className: Response
@@ -40,6 +40,8 @@ class Response(private val context: Context,private val protocolPackage: Protoco
     fun setCharset(charset: Charset){
         this.charset = charset
     }
+
+    fun getCharset() = charset
 
     fun setHeader(key:String,value:String){
         header[key] = value
@@ -96,6 +98,11 @@ class Response(private val context: Context,private val protocolPackage: Protoco
         byteResponseWriter.endWrite()
     }
 
+
+    fun write(body:String,contentType: String,length: Int= body.length){
+        write(body.toByteArray(),contentType,length)
+    }
+
     fun write(body:String,contentType: String){
         write(body.toByteArray(),contentType,body.length)
     }
@@ -110,7 +117,7 @@ class Response(private val context: Context,private val protocolPackage: Protoco
         if (fileSize > 2147483647L) {
             throw IllegalArgumentException("File size is too bigger than 2147483647")
         } else {
-            val rcontentType = contentType?:getElse(file.name.getMimeType(),"application/octet-stream")
+            val rcontentType = contentType?: RtMimeType.matchContentType(file.absolutePath).mimeType
             if (!rcontentType.startsWith("text/")) {
                 setHeader(
                     RtHeader.CONTENT_DISPOSITION.content,
@@ -129,8 +136,12 @@ class Response(private val context: Context,private val protocolPackage: Protoco
         writeFile(File(path),contentType)
     }
 
-//    fun writeInputStream(inputStream: InputStream,length:Int,contentType: String){
-//    }
+    @Throws(IOException::class)
+    fun writeInputStream(inputStream: InputStream,contentType: String,length:Int){
+        val byteArray = ByteArray(length)
+        inputStream.read(byteArray)
+        write(byteArray,contentType,length)
+    }
 
     fun getPrintWriter() = PrintWriter(output)
 }
