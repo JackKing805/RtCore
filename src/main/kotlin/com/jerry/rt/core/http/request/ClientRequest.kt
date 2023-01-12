@@ -9,6 +9,7 @@ import com.jerry.rt.core.http.pojo.Response
 import com.jerry.rt.core.http.protocol.Header
 import com.jerry.rt.core.http.protocol.RtContentType
 import com.jerry.rt.core.http.protocol.RtProtocol
+import com.jerry.rt.core.thread.Looper
 import com.jerry.rt.extensions.connectIsRtConnect
 import com.jerry.rt.extensions.createStandCoroutineScope
 import com.jerry.rt.extensions.readLength
@@ -37,12 +38,16 @@ internal class ClientRequest(private val context: Context,private val client: Cl
     }
     private var clientListener: ClientListener? = null
     private var localMessageListener: MessageListener = object : MessageListener {
-        override fun ifRtConnectHeartbeat(rtProtocol: MessageListener.MessageRtProtocol) {
-            clientListener?.onRtHeartbeatIn(client)
+        override suspend fun ifRtConnectHeartbeat(rtProtocol: MessageListener.MessageRtProtocol) {
+            try{
+                clientListener?.onRtHeartbeatIn(client)
+            }catch (e:Exception){
+                clientListener?.onException(e)
+            }
         }
 
 
-        override fun onMessage(rtProtocol: MessageListener.MessageRtProtocol, data: MutableList<ByteArray>) {
+        override suspend  fun onMessage(rtProtocol: MessageListener.MessageRtProtocol, data: MutableList<ByteArray>) {
             val protocolPackage = ProtocolPackage(client.getClientId(),rtProtocol.method,rtProtocol.url,rtProtocol.protocolString,rtProtocol.header)
             val response = Response(context,protocolPackage,socket.getOutputStream())
             if(rtProtocol.isRtConnect()){
@@ -64,45 +69,59 @@ internal class ClientRequest(private val context: Context,private val client: Cl
             }
         }
 
-        override fun ifCustomInputStream(inputStream: InputStream) {
-            clientListener?.onInputStreamIn(client,inputStream)
+        override suspend  fun ifCustomInputStream(inputStream: InputStream) {
+            try {
+                clientListener?.onInputStreamIn(client,inputStream)
+            }catch (e:Exception){
+                clientListener?.onException(e)
+            }
             tryClose()
         }
 
-        private fun dealProtocol(rtProtocol: MessageListener.MessageRtProtocol,protocolPackage: ProtocolPackage,data: MutableList<ByteArray>,response: Response){
-            clientListener?.onMessage(client, Request(context,protocolPackage,data), response)
+        private suspend fun dealProtocol(rtProtocol: MessageListener.MessageRtProtocol,protocolPackage: ProtocolPackage,data: MutableList<ByteArray>,response: Response){
+            try {
+                clientListener?.onMessage(client, Request(context,protocolPackage,data), response)
+            }catch (e:Exception){
+                clientListener?.onException(e)
+            }
         }
 
     }
 
     fun init(s:Socket){
-        if (isInit){
-            return
-        }
-        isInit = true
-        isAlive = true
-        try {
-            this.socket = s
-            if(context.getRtConfig().customerParse){
-                socket.getInputStream().use {
-                    localMessageListener.ifCustomInputStream(it)
-                }
-            }else{
-                val dataInputStream = DataInputStream(socket.getInputStream())
-                while (isAlive){
-                    try {
-                        onPre(dataInputStream)
-                    }catch (e:Exception){
-                        clientListener?.onException(e)
-                        break
+        val looper = Looper()
+        looper.prepare()
+        scope.launch(Dispatchers.IO) {
+            if (isInit){
+                return@launch
+            }
+            isInit = true
+            isAlive = true
+            try {
+                this@ClientRequest.socket = s
+                if(context.getRtConfig().customerParse){
+                    socket.getInputStream().use {
+                        localMessageListener.ifCustomInputStream(it)
+                    }
+                }else{
+                    val dataInputStream = DataInputStream(socket.getInputStream())
+                    while (isAlive){
+                        try {
+                            onPre(dataInputStream)
+                        }catch (e:Exception){
+                            clientListener?.onException(e)
+                            break
+                        }
                     }
                 }
+            }catch (e:Exception){
+                clientListener?.onException(e)
+            }finally {
+                tryClose()
+                looper.stop()
             }
-        }catch (e:Exception){
-            clientListener?.onException(e)
-        }finally {
-            tryClose()
         }
+        looper.loop()
     }
 
     fun listen(clientListener: ClientListener) {
@@ -113,7 +132,7 @@ internal class ClientRequest(private val context: Context,private val client: Cl
     }
 
     @Throws(SocketException::class)
-    private fun onPre(inputStream: DataInputStream) {
+    private suspend fun onPre(inputStream: DataInputStream) {
         var isProtocolLine = true
         val rtProtocol = RtProtocol()
         while (isAlive) {
@@ -212,17 +231,17 @@ internal class ClientRequest(private val context: Context,private val client: Cl
     internal fun isAlive(): Boolean = isAlive
 
     private interface MessageListener {
-        fun ifRtConnectHeartbeat(rtProtocol: MessageRtProtocol)
+        suspend fun ifRtConnectHeartbeat(rtProtocol: MessageRtProtocol)
 
-        fun onMessage(rtProtocol: MessageRtProtocol, data:MutableList<ByteArray>)
+        suspend fun onMessage(rtProtocol: MessageRtProtocol, data:MutableList<ByteArray>)
 
-        fun ifCustomInputStream(inputStream: InputStream)
+        suspend fun ifCustomInputStream(inputStream: InputStream)
 
         data class MessageRtProtocol(
             var method:String,
             var url:String,
             var protocolString:String,
-            val header: MutableMap<String,Any>,
+            val header: MutableMap<String,String>,
             private val protocol: RtProtocol
         ){
             private fun getValue(key: String,default:String=""): String {

@@ -21,8 +21,8 @@ package com.jerry.rt.core.http.protocol
     val protocol: Protocol = Protocol("","",""),
     val header: MutableList<Header> = mutableListOf()
 ){
-    fun getHeaderMap():MutableMap<String,Any>{
-        val map = mutableMapOf<String,Any>()
+    fun getHeaderMap():MutableMap<String,String>{
+        val map = mutableMapOf<String,String>()
         header.forEach {
             map[it.key] = it.value
         }
@@ -38,5 +38,5 @@ package com.jerry.rt.core.http.protocol
 
  data class Header(
     var key:String,
-    var value:Any
+    var value:String
 )

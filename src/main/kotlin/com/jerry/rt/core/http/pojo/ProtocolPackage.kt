@@ -13,22 +13,28 @@ class ProtocolPackage(
     val method: String,
     val url: String,
     val protocol: String,
-    private val header: MutableMap<String, Any>,
+    private val header: MutableMap<String, String>,
 ) {
     private val requestURI = URI.create(url)
 
-    fun getHeaderValue(key: String, default: String = ""): String {
-        return ((header[key] as? String) ?: default).trim()
+    fun getHeaders() = header
+
+    fun addHeader(key: String,value:String){
+        header[key] = value
     }
 
-    fun getContentType() = getHeaderValue("Content-Type", "none")
+    fun getHeaderValue(key: String, default: String = ""): String {
+        return (header[key] ?: default).trim()
+    }
+
+    fun getContentType() = getHeaderValue("Content-Type", "text/plain")
 
     fun getContentLength() = try {
-        val value = getHeaderValue("Content-Length")
-        if (value.isEmpty()) {
+        val values = getHeaderValue("Content-Length")
+        if (values.isEmpty()) {
             0L
-        } else {
-            value.toLong()
+        }else {
+            values.toLong()
         }
     } catch (e: Exception) {
         0L

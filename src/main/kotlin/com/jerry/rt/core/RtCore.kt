@@ -5,14 +5,14 @@ import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.interfaces.ClientListener
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
+import com.jerry.rt.core.http.protocol.RtContentType
 import com.jerry.rt.core.thread.Looper
 import com.jerry.rt.extensions.createExceptionCoroutineScope
 import com.jerry.rt.extensions.createStandCoroutineScope
 import com.jerry.rt.extensions.logInfo
 import com.jerry.rt.interfaces.RtCoreListener
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.jerry.rt.utils.PlatformUtils
+import kotlinx.coroutines.*
 import java.io.File
 import java.io.InputStream
 import java.time.Duration
@@ -34,6 +34,8 @@ class RtCore private constructor() {
     private var mainJob: Job? = null
 
 
+
+
     fun run(rtConfig: RtConfig, statusListener: RtCoreListener? = null) {
         if (active.get()){
             return
@@ -42,6 +44,23 @@ class RtCore private constructor() {
 
         "RtCore start".logInfo()
 
+        if (PlatformUtils.isAndroid()){
+            runAndroid(rtConfig,statusListener)
+        }else{
+            runJava(rtConfig,statusListener)
+        }
+    }
+
+    private fun runAndroid(rtConfig: RtConfig,statusListener: RtCoreListener?){
+        onException = null
+        mainJob?.cancel()
+        mainJob = null
+        mainJob = scope.launch {
+            runCore(rtConfig,statusListener)
+        }
+    }
+
+    private fun runJava(rtConfig: RtConfig,statusListener: RtCoreListener?){
         val looper = Looper()
         looper.prepare()
 
@@ -50,51 +69,57 @@ class RtCore private constructor() {
         mainJob?.cancel()
         mainJob = null
         mainJob = scope.launch {
-            val mainLooper = Looper()
-            mainLooper.prepare()
-            Looper.setMainLooper(mainLooper)
-
-            val rxLifeListener = object : RtCoreListener {
-                override fun onStatusChange(status: RtCoreListener.Status) {
-                    statusListener?.onStatusChange(status)
-                }
-
-                override fun onClientIn(client: Client) {
-                    statusListener?.onClientIn(client)
-                }
-
-                override fun onClientOut(client: Client) {
-                    statusListener?.onClientOut(client)
-                }
-
-                override fun onRtCoreException(exception: Exception) {
-                    statusListener?.onRtCoreException(exception)
-                }
-            }
-
-            onException = {
-                rxLifeListener.onRtCoreException(it)
-            }
-
-            val rtLife = RtLife(rtConfig, rxLifeListener)
-            statusListener?.onStatusChange(RtCoreListener.Status.INIT)
-            rtLife.onInit()
-            statusListener?.onStatusChange(RtCoreListener.Status.RUNNING)
-            val runningJob = launch {
-                rtLife.onRunning()
-            }
-            while (active.get()) {
-                delay(500)
-            }
-            runningJob.cancel()
-            statusListener?.onStatusChange(RtCoreListener.Status.STOPPING)
-            rtLife.onStop()
-            statusListener?.onStatusChange(RtCoreListener.Status.STOPPED)
-            rtLife.onDestroy()
-            "RtCore end".logInfo()
+            runCore(rtConfig,statusListener)
             looper.stop()
         }
         looper.loop()
+    }
+
+    private suspend fun runCore(rtConfig: RtConfig,statusListener: RtCoreListener?){
+        val mainLooper = Looper()
+        mainLooper.prepare()
+        Looper.setMainLooper(mainLooper)
+
+        val rxLifeListener = object : RtCoreListener {
+            override fun onStatusChange(status: RtCoreListener.Status) {
+                statusListener?.onStatusChange(status)
+            }
+
+            override fun onClientIn(client: Client) {
+                statusListener?.onClientIn(client)
+            }
+
+            override fun onClientOut(client: Client) {
+                statusListener?.onClientOut(client)
+            }
+
+            override fun onRtCoreException(exception: Exception) {
+                statusListener?.onRtCoreException(exception)
+            }
+        }
+
+        onException = {
+            rxLifeListener.onRtCoreException(it)
+        }
+
+        val rtLife = RtLife(rtConfig, rxLifeListener)
+        statusListener?.onStatusChange(RtCoreListener.Status.INIT)
+        rtLife.onInit()
+        statusListener?.onStatusChange(RtCoreListener.Status.RUNNING)
+        val runningJob = withContext(Dispatchers.Default){
+            launch {
+                rtLife.onRunning()
+            }
+        }
+        while (active.get()) {
+            delay(500)
+        }
+        runningJob.cancel()
+        statusListener?.onStatusChange(RtCoreListener.Status.STOPPING)
+        rtLife.onStop()
+        statusListener?.onStatusChange(RtCoreListener.Status.STOPPED)
+        rtLife.onDestroy()
+        "RtCore end".logInfo()
     }
 
     fun stop() {
@@ -118,7 +143,11 @@ class RtCore private constructor() {
     }
 }
 
+
+
 //fun main(){
+//    val isAndroid = PlatformUtils.isAndroid()
+//    println("isAndroid:$isAndroid")
 //    RtCore.instance.run(RtConfig(),object :RtCoreListener{
 //        override fun onStatusChange(status: RtCoreListener.Status) {
 //            println("status:$status")
@@ -127,20 +156,16 @@ class RtCore private constructor() {
 //        override fun onClientIn(client: Client) {
 //            println("onClientIn:")
 //            client.listen(object :ClientListener{
-//                override fun onRtHeartbeatIn(client: Client) {
+//                override suspend fun onRtHeartbeatIn(client: Client) {
 //                    println("onRtHeartbeatIn:")
 //                }
 //
-//                override fun onMessage(client: Client, request: Request, response: Response) {
+//                override suspend fun onMessage(client: Client, request: Request, response: Response) {
 //                    println("onMessage:")
-//                    if (request.getPackage().url=="/favicon.ico"){
-//                        response.writeFile(File("C:\\Users\\10720\\Downloads\\2020030823074369.png"),"image/x-icon")
-//                    }else{
-//                        response.writeFile(File("C:\\Users\\10720\\Downloads\\90e21ab0c5125006927d212c8377f0c8.webp"))
-//                    }
+//                    response.write("ssssss",RtContentType.TEXT_HTML.content)
 //                }
 //
-//                override fun onInputStreamIn(client: Client, inputStream: InputStream) {
+//                override suspend fun onInputStreamIn(client: Client, inputStream: InputStream) {
 //
 //                }
 //

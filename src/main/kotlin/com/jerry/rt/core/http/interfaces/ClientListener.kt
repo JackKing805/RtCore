@@ -13,11 +13,11 @@ import java.lang.Exception
  * @date: 2023/1/2:13:19
  **/
 interface ClientListener {
-    fun onRtHeartbeatIn(client: Client)
+    suspend fun onRtHeartbeatIn(client: Client)
 
-    fun onMessage(client: Client,request: Request,response: Response)
+    suspend fun onMessage(client: Client,request: Request,response: Response)
 
-    fun onInputStreamIn(client: Client,inputStream: InputStream)
+    suspend fun onInputStreamIn(client: Client,inputStream: InputStream)
 
     fun onException(exception: Exception)
 }
