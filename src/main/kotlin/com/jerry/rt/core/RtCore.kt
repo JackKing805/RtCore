@@ -17,6 +17,7 @@ import java.io.File
 import java.io.InputStream
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.concurrent.thread
 
 class RtCore private constructor() {
     companion object {
@@ -76,50 +77,50 @@ class RtCore private constructor() {
     }
 
     private suspend fun runCore(rtConfig: RtConfig,statusListener: RtCoreListener?){
-        val mainLooper = Looper()
-        mainLooper.prepare()
-        Looper.setMainLooper(mainLooper)
+        withContext(Dispatchers.Default) {
+            val mainLooper = Looper()
+            mainLooper.prepare()
+            Looper.setMainLooper(mainLooper)
 
-        val rxLifeListener = object : RtCoreListener {
-            override fun onStatusChange(status: RtCoreListener.Status) {
-                statusListener?.onStatusChange(status)
+            val rxLifeListener = object : RtCoreListener {
+                override fun onStatusChange(status: RtCoreListener.Status) {
+                    statusListener?.onStatusChange(status)
+                }
+
+                override fun onClientIn(client: Client) {
+                    statusListener?.onClientIn(client)
+                }
+
+                override fun onClientOut(client: Client) {
+                    statusListener?.onClientOut(client)
+                }
+
+                override fun onRtCoreException(exception: Exception) {
+                    statusListener?.onRtCoreException(exception)
+                }
             }
 
-            override fun onClientIn(client: Client) {
-                statusListener?.onClientIn(client)
+            onException = {
+                rxLifeListener.onRtCoreException(it)
             }
 
-            override fun onClientOut(client: Client) {
-                statusListener?.onClientOut(client)
-            }
-
-            override fun onRtCoreException(exception: Exception) {
-                statusListener?.onRtCoreException(exception)
-            }
-        }
-
-        onException = {
-            rxLifeListener.onRtCoreException(it)
-        }
-
-        val rtLife = RtLife(rtConfig, rxLifeListener)
-        statusListener?.onStatusChange(RtCoreListener.Status.INIT)
-        rtLife.onInit()
-        statusListener?.onStatusChange(RtCoreListener.Status.RUNNING)
-        val runningJob = withContext(Dispatchers.Default){
-            launch {
+            val rtLife = RtLife(rtConfig, rxLifeListener)
+            statusListener?.onStatusChange(RtCoreListener.Status.INIT)
+            rtLife.onInit()
+            statusListener?.onStatusChange(RtCoreListener.Status.RUNNING)
+            val runningJob = launch {
                 rtLife.onRunning()
             }
+            while (active.get()) {
+                delay(500)
+            }
+            runningJob.cancel()
+            statusListener?.onStatusChange(RtCoreListener.Status.STOPPING)
+            rtLife.onStop()
+            statusListener?.onStatusChange(RtCoreListener.Status.STOPPED)
+            rtLife.onDestroy()
+            "RtCore end".logInfo()
         }
-        while (active.get()) {
-            delay(500)
-        }
-        runningJob.cancel()
-        statusListener?.onStatusChange(RtCoreListener.Status.STOPPING)
-        rtLife.onStop()
-        statusListener?.onStatusChange(RtCoreListener.Status.STOPPED)
-        rtLife.onDestroy()
-        "RtCore end".logInfo()
     }
 
     fun stop() {
@@ -145,45 +146,47 @@ class RtCore private constructor() {
 
 
 
-//fun main(){
-//    val isAndroid = PlatformUtils.isAndroid()
-//    println("isAndroid:$isAndroid")
-//    RtCore.instance.run(RtConfig(),object :RtCoreListener{
-//        override fun onStatusChange(status: RtCoreListener.Status) {
-//            println("status:$status")
-//        }
-//
-//        override fun onClientIn(client: Client) {
-//            println("onClientIn:")
-//            client.listen(object :ClientListener{
-//                override suspend fun onRtHeartbeatIn(client: Client) {
-//                    println("onRtHeartbeatIn:")
-//                }
-//
-//                override suspend fun onMessage(client: Client, request: Request, response: Response) {
-//                    println("onMessage:")
-//                    response.write("ssssss",RtContentType.TEXT_HTML.content)
-//                }
-//
-//                override suspend fun onInputStreamIn(client: Client, inputStream: InputStream) {
-//
-//                }
-//
-//                override fun onException(exception: java.lang.Exception) {
-//
-//                }
-//            })
-//        }
-//
-//        override fun onClientOut(client: Client) {
-//            println("onClientOut:")
-//
-//        }
-//
-//        override fun onRtCoreException(exception: Exception) {
-//            println("onRtCoreException:$exception")
-//
-//        }
-//
-//    })
-//}
+fun main(){
+    thread {
+        RtCore.instance.run(RtConfig(),object :RtCoreListener{
+            override fun onStatusChange(status: RtCoreListener.Status) {
+                println("status:$status")
+            }
+
+            override fun onClientIn(client: Client) {
+                println("onClientIn:")
+                client.listen(object :ClientListener{
+                    override suspend fun onRtHeartbeatIn(client: Client) {
+                        println("onRtHeartbeatIn:")
+                    }
+
+                    override suspend fun onMessage(client: Client, request: Request, response: Response) {
+                        println("onMessage:")
+                        response.write("ssssss",RtContentType.TEXT_HTML.content)
+                    }
+
+                    override suspend fun onInputStreamIn(client: Client, inputStream: InputStream) {
+
+                    }
+
+                    override fun onException(exception: java.lang.Exception) {
+
+                    }
+                })
+            }
+
+            override fun onClientOut(client: Client) {
+                println("onClientOut:")
+
+            }
+
+            override fun onRtCoreException(exception: Exception) {
+                println("onRtCoreException:$exception")
+
+            }
+
+        })
+    }
+
+    RtCore.instance.stopAfter(Duration.ofSeconds(10))
+}

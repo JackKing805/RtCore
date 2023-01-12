@@ -3,6 +3,7 @@ package com.jerry.rt.utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.lang.IllegalStateException
 
 /**
  * @className: PlantformUtils
@@ -15,7 +16,7 @@ object PlatformUtils {
        return try {
            CoroutineScope(Dispatchers.Main).launch {  }
            true
-       }catch (e:Exception){
+       }catch (e: IllegalStateException){
            false
        }
     }
