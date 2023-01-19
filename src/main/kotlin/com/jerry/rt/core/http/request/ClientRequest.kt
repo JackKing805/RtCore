@@ -6,6 +6,7 @@ import com.jerry.rt.core.http.interfaces.ClientListener
 import com.jerry.rt.core.http.pojo.ProtocolPackage
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
+import com.jerry.rt.core.http.pojo.RtResponse
 import com.jerry.rt.core.http.protocol.Header
 import com.jerry.rt.core.http.protocol.RtContentType
 import com.jerry.rt.core.http.protocol.RtProtocol
@@ -37,10 +38,14 @@ internal class ClientRequest(private val context: Context,private val client: Cl
         clientListener?.onException(it)
     }
     private var clientListener: ClientListener? = null
+
+    private var rtResponse:RtResponse?=null
+    private var isRtIn =false
+
     private var localMessageListener: MessageListener = object : MessageListener {
         override suspend fun ifRtConnectHeartbeat(rtProtocol: MessageListener.MessageRtProtocol) {
             try{
-                clientListener?.onRtHeartbeatIn(client)
+                clientListener?.onRtHeartbeat(client)
             }catch (e:Exception){
                 clientListener?.onException(e)
             }
@@ -49,22 +54,43 @@ internal class ClientRequest(private val context: Context,private val client: Cl
 
         override suspend  fun onMessage(rtProtocol: MessageListener.MessageRtProtocol, data: MutableList<ByteArray>) {
             val protocolPackage = ProtocolPackage(client.getClientId(),rtProtocol.method,rtProtocol.url,rtProtocol.protocolString,rtProtocol.header)
-            val response = Response(context,protocolPackage,socket.getOutputStream())
+            val request = Request(context,protocolPackage,data)
             if(rtProtocol.isRtConnect()){
                 checkHeartbeat()
+                if (rtResponse==null){
+                    rtResponse = RtResponse(context,socket.getOutputStream())
+                }
+
                 if (rtProtocol.getContentType().rtContentTypeIsHeartbeat()) {
                     //心跳包
                     receiverHeartbeatTime = System.currentTimeMillis()
-                    response.setContentType(RtContentType.RT_HEARTBEAT.content)
-                    response.sendHeader()
+                    rtResponse!!.setContentType(RtContentType.RT_HEARTBEAT.content)
+                    rtResponse!!.sendHeader()
                     ifRtConnectHeartbeat(rtProtocol)
                     return
                 }
                 //普通rt 信道
-                dealProtocol(rtProtocol,protocolPackage,data,response)
+                if (!isRtIn){
+                    isRtIn = true
+                    try {
+                        clientListener?.onRtClientIn(client,rtResponse!!)
+                    }catch (e:Exception){
+                        clientListener?.onException(e)
+                    }
+                }
+                try {
+                    clientListener?.onRtMessage(request,rtResponse!!)
+                }catch (e:Exception){
+                    clientListener?.onException(e)
+                }
             }else{
+                if (isRtIn){
+                    tryClose()
+                    return
+                }
+                val response = Response(context,protocolPackage,socket.getOutputStream())
                 //其他类型协议
-                dealProtocol(rtProtocol,protocolPackage,data,response)
+                dealProtocol(request,response)
                 tryClose()
             }
         }
@@ -78,9 +104,9 @@ internal class ClientRequest(private val context: Context,private val client: Cl
             tryClose()
         }
 
-        private suspend fun dealProtocol(rtProtocol: MessageListener.MessageRtProtocol,protocolPackage: ProtocolPackage,data: MutableList<ByteArray>,response: Response){
+        private suspend fun dealProtocol(request: Request,response: Response){
             try {
-                clientListener?.onMessage(client, Request(context,protocolPackage,data), response)
+                clientListener?.onMessage(client, request, response)
             }catch (e:Exception){
                 clientListener?.onException(e)
             }
@@ -216,6 +242,13 @@ internal class ClientRequest(private val context: Context,private val client: Cl
     fun tryClose() {
         if (!isAlive){
             return
+        }
+        if (isRtIn){
+            try {
+                clientListener?.onRtClientOut(client,rtResponse!!)
+            }catch (e:Exception){
+                clientListener?.onException(e)
+            }
         }
         try {
             socket.close()

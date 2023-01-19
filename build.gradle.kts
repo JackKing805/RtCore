@@ -6,7 +6,7 @@ plugins {
     `maven-publish`
 }
 
-val vv = "0.1.6"
+val vv = "0.1.7"
 
 group = "com.jerry"
 version = vv

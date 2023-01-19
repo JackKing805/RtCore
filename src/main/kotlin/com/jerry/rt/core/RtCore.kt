@@ -5,6 +5,7 @@ import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.interfaces.ClientListener
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
+import com.jerry.rt.core.http.pojo.RtResponse
 import com.jerry.rt.core.http.protocol.RtContentType
 import com.jerry.rt.core.thread.Looper
 import com.jerry.rt.extensions.createExceptionCoroutineScope
@@ -15,6 +16,7 @@ import com.jerry.rt.utils.PlatformUtils
 import kotlinx.coroutines.*
 import java.io.File
 import java.io.InputStream
+import java.lang.Thread.sleep
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
@@ -156,8 +158,28 @@ fun main(){
             override fun onClientIn(client: Client) {
                 println("onClientIn:")
                 client.listen(object :ClientListener{
-                    override suspend fun onRtHeartbeatIn(client: Client) {
+                    override suspend fun onRtHeartbeat(client: Client) {
                         println("onRtHeartbeatIn:")
+                    }
+
+                    override fun onRtClientIn(client: Client, response: RtResponse) {
+                        println("onRtClientIn:")
+                        thread {
+                            var i = 1
+                            while (true){
+                                sleep(2000)
+                                response.write("hello:$i")
+                                i++
+                            }
+                        }
+                    }
+
+                    override suspend fun onRtMessage(request: Request,response: RtResponse) {
+                        println("onRtMessage:$request")
+                    }
+
+                    override fun onRtClientOut(client: Client,response: RtResponse) {
+                        println("onRtClientOut:")
                     }
 
                     override suspend fun onMessage(client: Client, request: Request, response: Response) {
@@ -169,8 +191,8 @@ fun main(){
 
                     }
 
-                    override fun onException(exception: java.lang.Exception) {
-
+                    override fun onException(exception: Exception) {
+                        exception.printStackTrace()
                     }
                 })
             }
@@ -181,12 +203,11 @@ fun main(){
             }
 
             override fun onRtCoreException(exception: Exception) {
+                exception.printStackTrace()
                 println("onRtCoreException:$exception")
 
             }
 
         })
     }
-
-    RtCore.instance.stopAfter(Duration.ofSeconds(10))
 }

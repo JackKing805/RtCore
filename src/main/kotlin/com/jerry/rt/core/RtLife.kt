@@ -8,8 +8,6 @@ import com.jerry.rt.interfaces.RtCoreListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
@@ -26,7 +24,9 @@ internal class RtLife(private val rtConfig: RtConfig,private val rtCoreListener:
     suspend fun onInit() {
         "RtLife>>onInit".logInfo()
         context = Context(rtConfig)
-        server = Server(context)
+        server = Server(context){
+            rtCoreListener.onRtCoreException(it)
+        }
         clientDispatchers = ClientDispatchers(context,rtCoreListener)
     }
 
