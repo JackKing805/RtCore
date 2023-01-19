@@ -75,25 +75,7 @@ open class IResponse(
 
     @Throws(IOException::class)
     open fun write(body: ByteArray, contentType: String, length: Int = body.size) {
-        if (isSendResponse) {
-            throw RuntimeException("response is send")
-        }
-        isSendResponse = true
 
-        if (!header.contains(RtHeader.CONTENT_TYPE.content)) {
-            setContentType(contentType)
-        }
-        if (!header.contains(RtHeader.CONTENT_LENGTH.content)) {
-            setContentLength(length)
-        }
-        byteResponseWriter.writeFirstLine(RtVersion.RT_1_0.content, statusCode, RtCode.match(statusCode).message)
-        header.entries.forEach {
-            byteResponseWriter.writeHeader(it.key, it.value)
-        }
-        if (length != 0) {
-            byteResponseWriter.writeBody(body)
-        }
-        byteResponseWriter.endWrite()
     }
 
 

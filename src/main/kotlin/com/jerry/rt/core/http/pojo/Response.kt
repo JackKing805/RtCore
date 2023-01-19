@@ -32,4 +32,26 @@ class Response(
     output: OutputStream
 ): IResponse(context,output) {
     fun getPackage() = protocolPackage
+
+    override fun write(body: ByteArray, contentType: String, length: Int) {
+        if (isSendResponse) {
+            throw RuntimeException("response is send")
+        }
+        isSendResponse = true
+
+        if (!header.contains(RtHeader.CONTENT_TYPE.content)) {
+            setContentType(contentType)
+        }
+        if (!header.contains(RtHeader.CONTENT_LENGTH.content)) {
+            setContentLength(length)
+        }
+        byteResponseWriter.writeFirstLine(protocolPackage.protocol, statusCode, RtCode.match(statusCode).message)
+        header.entries.forEach {
+            byteResponseWriter.writeHeader(it.key, it.value)
+        }
+        if (length != 0) {
+            byteResponseWriter.writeBody(body)
+        }
+        byteResponseWriter.endWrite()
+    }
 }

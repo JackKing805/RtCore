@@ -193,6 +193,7 @@ fun main(){
 
                     override fun onException(exception: Exception) {
                         exception.printStackTrace()
+                        println("onRtCoreException:$exception")
                     }
                 })
             }
