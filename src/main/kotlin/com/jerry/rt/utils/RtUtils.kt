@@ -22,7 +22,7 @@ object RtUtils {
     }
 
     fun getPublishHost(request: Request):String{
-        return request.getPackage().getHeaderValue("Host","")
+        return request.getPackage().getHeader().getHeaderValue("Host","")
     }
 
 

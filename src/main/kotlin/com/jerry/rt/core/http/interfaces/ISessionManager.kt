@@ -1,6 +1,7 @@
 package com.jerry.rt.core.http.interfaces
 
 import com.jerry.rt.bean.RtSessionConfig
+import com.jerry.rt.core.http.pojo.ProtocolPackage
 
 
 /**
@@ -14,11 +15,19 @@ interface ISessionManager {
 
     fun deactivate()
 
+    /*
+     * 自定义key的获取方式
+     */
+    fun getSessionKey(key:String,header: ProtocolPackage.Header):String?
+
     fun createSession(sessionId: String?): ISession
 
     fun removeSession(session: ISession)
 
     fun findSession(sessionId: String?): ISession?
 
+    /**
+     * 创建认证key
+     */
     fun generateSessionId(): String
 }

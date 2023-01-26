@@ -3,6 +3,7 @@ package com.jerry.rt.core.http.other
 import com.jerry.rt.bean.RtSessionConfig
 import com.jerry.rt.core.http.interfaces.ISession
 import com.jerry.rt.core.http.interfaces.ISessionManager
+import com.jerry.rt.core.http.pojo.ProtocolPackage
 import com.jerry.rt.core.http.pojo.Session
 import com.jerry.rt.extensions.createStandCoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,6 +37,10 @@ class SessionManager :ISessionManager{
         }
         sessions.clear()
         scope.cancel()
+    }
+
+    override fun getSessionKey(key: String, header: ProtocolPackage.Header): String? {
+        return header.getCookie(key)
     }
 
 
