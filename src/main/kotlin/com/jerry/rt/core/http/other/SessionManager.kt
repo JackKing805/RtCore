@@ -1,6 +1,7 @@
 package com.jerry.rt.core.http.other
 
 import com.jerry.rt.bean.RtSessionConfig
+import com.jerry.rt.core.Context
 import com.jerry.rt.core.http.interfaces.ISession
 import com.jerry.rt.core.http.interfaces.ISessionManager
 import com.jerry.rt.core.http.pojo.ProtocolPackage
@@ -9,6 +10,7 @@ import com.jerry.rt.extensions.createStandCoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import java.net.URI
 import java.util.UUID
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -39,10 +41,9 @@ class SessionManager :ISessionManager{
         scope.cancel()
     }
 
-    override fun getSessionKey(key: String, header: ProtocolPackage.Header): String? {
-        return header.getCookie(key)
+    override fun getSessionKey(context: Context, path: String, uri: URI, header: ProtocolPackage.Header): String? {
+        return header.getCookie(context.getRtConfig().rtSessionConfig.sessionKey)
     }
-
 
     override fun createSession(sessionId: String?): ISession {
         if (sessionId.isNullOrEmpty()) {

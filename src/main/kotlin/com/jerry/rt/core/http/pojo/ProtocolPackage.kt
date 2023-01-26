@@ -40,7 +40,7 @@ class ProtocolPackage(
         return session!!
     }
 
-    private fun getSessionKey() = context.getSessionManager().getSessionKey(context.getRtConfig().rtSessionConfig.sessionKey,header)
+    private fun getSessionKey() = context.getSessionManager().getSessionKey(context,path,requestURI,header)
 
 
     data class Header(
