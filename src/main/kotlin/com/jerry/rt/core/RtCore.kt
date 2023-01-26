@@ -3,6 +3,7 @@ package com.jerry.rt.core
 import com.jerry.rt.bean.RtConfig
 import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.interfaces.ClientListener
+import com.jerry.rt.core.http.pojo.Cookie
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
 import com.jerry.rt.core.http.pojo.RtResponse
@@ -13,6 +14,7 @@ import com.jerry.rt.extensions.createStandCoroutineScope
 import com.jerry.rt.extensions.logInfo
 import com.jerry.rt.interfaces.RtCoreListener
 import com.jerry.rt.utils.PlatformUtils
+import com.jerry.rt.utils.RtUtils
 import kotlinx.coroutines.*
 import java.io.File
 import java.io.InputStream
@@ -35,7 +37,6 @@ class RtCore private constructor() {
     private var active = AtomicBoolean(false)
     private var isStopping = AtomicBoolean(false)
     private var mainJob: Job? = null
-
 
 
 
@@ -175,7 +176,7 @@ fun main(){
                     }
 
                     override suspend fun onRtMessage(request: Request,response: RtResponse) {
-                        println("onRtMessage:$request")
+                        println("onRtMessage:${request.getPackage().getRequestURI()}")
                     }
 
                     override fun onRtClientOut(client: Client,response: RtResponse) {
@@ -183,7 +184,9 @@ fun main(){
                     }
 
                     override suspend fun onMessage(client: Client, request: Request, response: Response) {
-                        println("onMessage:")
+                        println("onRtMessage:${RtUtils.getPublishHost(request)},${RtUtils.getLocalHost(request.getContext())},url:${request.getPackage().path},${request.getPackage().getRequestURI().toString()},${request.getPackage().getSession().getId()}")
+                        response.addCookie(Cookie("AA","BBB"))
+                        response.addCookie(Cookie("DD","CCCC"))
                         response.write("ssssss",RtContentType.TEXT_HTML.content)
                     }
 

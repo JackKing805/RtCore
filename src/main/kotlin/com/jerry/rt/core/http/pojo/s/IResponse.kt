@@ -1,6 +1,7 @@
 package com.jerry.rt.core.http.pojo.s
 
 import com.jerry.rt.core.Context
+import com.jerry.rt.core.http.pojo.Cookie
 import com.jerry.rt.core.http.protocol.RtCode
 import com.jerry.rt.core.http.protocol.RtHeader
 import com.jerry.rt.core.http.protocol.RtMimeType
@@ -28,6 +29,8 @@ open class IResponse(
     protected var isSendResponse = false
     protected var statusCode = 200
 
+    protected var cookies = mutableListOf<Cookie>()
+
 
     fun getContext() = context
 
@@ -39,6 +42,10 @@ open class IResponse(
 
     fun setHeader(key: String, value: String) {
         header[key] = value
+    }
+
+    fun addCookie(cookie: Cookie){
+        cookies.add(cookie)
     }
 
     fun setHeaders(headers: MutableMap<String, String>) {

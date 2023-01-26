@@ -1,5 +1,9 @@
 package com.jerry.rt.core.http.pojo
 
+import com.jerry.rt.core.Context
+import com.jerry.rt.core.http.interfaces.ISession
+import com.jerry.rt.core.http.other.SessionManager
+import com.jerry.rt.core.http.protocol.RtVersion
 import java.net.URI
 
 /**
@@ -9,13 +13,28 @@ import java.net.URI
  * @date: 2023/1/7:18:53
  **/
 class ProtocolPackage(
-    val sessionId:String,
+    private val context: Context,
     val method: String,
-    val url: String,
-    val protocol: String,
+    val path: String,
+    val protocol: RtVersion,
     private val header: MutableMap<String, String>,
 ) {
-    private val requestURI = URI.create(url)
+    private val realUrl = "${RtVersion.getPrefix(protocol)}://"+getHeaderValue("Host","") + if (path.startsWith("/")) path else "/$path"
+    private val requestURI = URI.create(realUrl)
+
+
+    private val cookies = mutableMapOf<String,String>()
+
+    init {
+        getHeaderValue("Cookie","").split(";").forEach {
+            if (it.contains("=")){
+                val index = it.indexOf("=")
+                val name = it.substring(0,index).trim()
+                val value = it.substring(index+1).trim()
+                cookies[name] = value
+            }
+        }
+    }
 
     fun getHeaders() = header
 
@@ -44,8 +63,22 @@ class ProtocolPackage(
 
     fun getUserAgent() = getHeaderValue("User-Agent", "")
 
-    fun getCookie() = getHeaderValue("Cookie", "")
+    fun getCookies() = cookies
 
+    fun getCookie(name:String) = getCookies()[name]
 
     fun getRequestURI() = requestURI
+
+
+    private var session:ISession?=null
+
+    fun getSession():ISession{
+        if (session==null){
+            val s = getCookies()[context.getRtConfig().rtSessionConfig.sessionKey]
+            //创建session和刷新session
+            val createSession = context.getSessionManager().createSession(s)
+            session = createSession
+        }
+        return session!!
+    }
 }

@@ -3,6 +3,8 @@ package com.jerry.rt.core
 import com.jerry.rt.bean.RtConfig
 import com.jerry.rt.core.http.ClientDispatchers
 import com.jerry.rt.core.http.Server
+import com.jerry.rt.core.http.interfaces.ISessionManager
+import com.jerry.rt.core.http.other.SessionManager
 import com.jerry.rt.extensions.logInfo
 import com.jerry.rt.interfaces.RtCoreListener
 import kotlinx.coroutines.Dispatchers
@@ -20,10 +22,13 @@ internal class RtLife(private val rtConfig: RtConfig,private val rtCoreListener:
     private lateinit var context: Context
     private lateinit var server: Server
     private lateinit var clientDispatchers: ClientDispatchers
+    private lateinit var sessionManager: ISessionManager
 
     suspend fun onInit() {
         "RtLife>>onInit".logInfo()
-        context = Context(rtConfig)
+        sessionManager = rtConfig.rtSessionConfig.sessionClazz.newInstance() as ISessionManager
+        context = Context(rtConfig,sessionManager)
+        sessionManager.active(rtConfig.rtSessionConfig)
         server = Server(context){
             rtCoreListener.onRtCoreException(it)
         }
@@ -44,6 +49,7 @@ internal class RtLife(private val rtConfig: RtConfig,private val rtCoreListener:
         "RtLife>>onStopping".logInfo()
         server.stop()
         clientDispatchers.clear()
+        sessionManager.deactivate()
     }
 
     suspend fun onDestroy() {

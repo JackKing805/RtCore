@@ -12,7 +12,7 @@ import com.jerry.rt.core.http.protocol.RtVersion
  * @date: 2023/1/1:13:05
  **/
 
-internal fun RtProtocol.connectIsRtConnect() = protocol.method == RtMethod.RT.content && protocol.version==RtVersion.RT_1_0.content
+internal fun RtProtocol.connectIsRtConnect() = protocol.method.equals(RtMethod.RT.content,true) && protocol.version.equals(RtVersion.RT_1_0.content,true)
 
-internal fun String.rtContentTypeIsHeartbeat() = this == RtContentType.RT_HEARTBEAT.content
+internal fun String.rtContentTypeIsHeartbeat() = this.equals(RtContentType.RT_HEARTBEAT.content,true)
 

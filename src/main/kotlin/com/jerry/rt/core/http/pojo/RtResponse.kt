@@ -1,6 +1,7 @@
 package com.jerry.rt.core.http.pojo
 
 import com.jerry.rt.core.Context
+import com.jerry.rt.core.http.other.SessionManager
 import com.jerry.rt.core.http.pojo.s.IResponse
 import com.jerry.rt.core.http.protocol.*
 import com.jerry.rt.core.http.response.impl.ByteResponseWriter
@@ -28,6 +29,7 @@ import kotlin.jvm.Throws
  **/
 class RtResponse(
    context: Context,
+   private val protocolPackage: ProtocolPackage,
    output: OutputStream
 ): IResponse(context,output) {
     @Throws(IOException::class)
@@ -43,6 +45,15 @@ class RtResponse(
         byteResponseWriter.writeFirstLine(RtVersion.RT_1_0.content, statusCode, RtCode.match(statusCode).message)
         header.entries.forEach {
             byteResponseWriter.writeHeader(it.key, it.value)
+        }
+
+        val session = protocolPackage.getSession()
+        if (session.isNew()){
+            addCookie(Cookie(getContext().getRtConfig().rtSessionConfig.sessionKey,session.getId()))
+        }
+
+        cookies.forEach {
+            byteResponseWriter.writeHeader("Set-Cookie", it.toCookieString(protocolPackage.getRequestURI()))
         }
         if (length != 0) {
             byteResponseWriter.writeBody(body)

@@ -3,6 +3,7 @@ package com.jerry.rt.core.http.request
 import com.jerry.rt.core.Context
 import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.interfaces.ClientListener
+import com.jerry.rt.core.http.other.SessionManager
 import com.jerry.rt.core.http.pojo.ProtocolPackage
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
@@ -10,11 +11,13 @@ import com.jerry.rt.core.http.pojo.RtResponse
 import com.jerry.rt.core.http.protocol.Header
 import com.jerry.rt.core.http.protocol.RtContentType
 import com.jerry.rt.core.http.protocol.RtProtocol
+import com.jerry.rt.core.http.protocol.RtVersion
 import com.jerry.rt.core.thread.Looper
 import com.jerry.rt.extensions.connectIsRtConnect
 import com.jerry.rt.extensions.createStandCoroutineScope
 import com.jerry.rt.extensions.readLength
 import com.jerry.rt.extensions.rtContentTypeIsHeartbeat
+import com.jerry.rt.utils.RtUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -53,12 +56,13 @@ internal class ClientRequest(private val context: Context,private val client: Cl
 
 
         override suspend  fun onMessage(rtProtocol: MessageListener.MessageRtProtocol, data: MutableList<ByteArray>) {
-            val protocolPackage = ProtocolPackage(client.getClientId(),rtProtocol.method,rtProtocol.url,rtProtocol.protocolString,rtProtocol.header)
+            val protocolPackage = ProtocolPackage(context,rtProtocol.method,rtProtocol.url,rtProtocol.protocolString,rtProtocol.header)
+
             val request = Request(context,protocolPackage,data)
             if(rtProtocol.isRtConnect()){
                 checkHeartbeat()
                 if (rtResponse==null){
-                    rtResponse = RtResponse(context,socket.getOutputStream())
+                    rtResponse = RtResponse(context,protocolPackage,socket.getOutputStream())
                 }
 
                 if (rtProtocol.getContentType().rtContentTypeIsHeartbeat()) {
@@ -89,6 +93,8 @@ internal class ClientRequest(private val context: Context,private val client: Cl
                     return
                 }
                 val response = Response(context,protocolPackage,socket.getOutputStream())
+
+
                 //其他类型协议
                 dealProtocol(request,response)
                 tryClose()
@@ -157,7 +163,7 @@ internal class ClientRequest(private val context: Context,private val client: Cl
         this.clientListener = clientListener
     }
 
-    @Throws(SocketException::class)
+    @Throws(SocketException::class,IllegalArgumentException::class)
     private suspend fun onPre(inputStream: DataInputStream) {
         var isProtocolLine = true
         val rtProtocol = RtProtocol()
@@ -184,31 +190,21 @@ internal class ClientRequest(private val context: Context,private val client: Cl
                 }
                 isProtocolLine = false
             } else if (readLine.contains(":")) {
-                val split = readLine.split(":")
-                if (split.size < 2) {
-                    return
-                }
-                val head = Header("","")
-                for (i in split.indices) {
-                    val content = split[i]
-                    if (i == 0) {
-                        //method
-                        head.key = content
-                    } else if (i == 1) {
-                        //link
-                        head.value = content
-                    }
-                }
+                val dotIndex = readLine.indexOf(":")
+                val name = readLine.substring(0,dotIndex)
+                val value = readLine.substring(dotIndex+1)
+                val head = Header(name,value)
                 rtProtocol.header.add(head)
             } else if (readLine.isEmpty()) {
                 break
             }
         }
 
+        val rtVersion = RtVersion.toRtVersion(rtProtocol.protocol.version)
         val protocolMessage = MessageListener.MessageRtProtocol(
             method = rtProtocol.protocol.method,
             url = rtProtocol.protocol.url,
-            protocolString = rtProtocol.protocol.version,
+            protocolString = rtVersion,
             header = rtProtocol.getHeaderMap(),
             rtProtocol
         )
@@ -273,7 +269,7 @@ internal class ClientRequest(private val context: Context,private val client: Cl
         data class MessageRtProtocol(
             var method:String,
             var url:String,
-            var protocolString:String,
+            var protocolString:RtVersion,
             val header: MutableMap<String,String>,
             private val protocol: RtProtocol
         ){

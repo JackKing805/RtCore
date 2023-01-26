@@ -18,7 +18,33 @@ enum class RtContentType(val content:String) {
 }
 
 enum class RtVersion(val content: String){
-    RT_1_0("rt/1.0")
+    RT_1_0("rt/1.0"),
+    HTTP_1_0("http/1.0"),
+    HTTP_1_1("http/1.1"),
+    HTTP_2_0("http/2.0");
+
+    companion object{
+        fun toRtVersion(version:String):RtVersion{
+            return when(version.lowercase()){
+                RT_1_0.content->RT_1_0
+                HTTP_1_0.content->HTTP_1_0
+                HTTP_1_1.content->HTTP_1_1
+                HTTP_2_0.content->HTTP_2_0
+                else->{
+                    throw IllegalArgumentException("not support protocol")
+                }
+            }
+        }
+
+        fun getPrefix(version: RtVersion):String{
+            return when(version){
+                RT_1_0 -> "rt"
+                HTTP_1_0 ,
+                HTTP_1_1 ,
+                HTTP_2_0 -> "http"
+            }
+        }
+    }
 }
 
 enum class RtMethod(val content: String){
