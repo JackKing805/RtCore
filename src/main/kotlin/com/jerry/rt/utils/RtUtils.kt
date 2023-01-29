@@ -4,7 +4,7 @@ import com.jerry.rt.core.Context
 import com.jerry.rt.core.http.pojo.Request
 import java.net.InetAddress
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.util.*
 
 /**
  * @className: RtUtils
@@ -27,7 +27,7 @@ object RtUtils {
 
 
     fun dateToFormat(date: Date,format:String):String{
-        val simpleDateFormat = SimpleDateFormat(format)
+        val simpleDateFormat = SimpleDateFormat(format, Locale.US)
         return simpleDateFormat.format(date)
     }
 }

@@ -36,7 +36,7 @@ open class IResponse(
 
 
     init {
-        setHeader("Date",RtUtils.dateToFormat(Date(),"DAY, DD MMM YYYY HH:MM:SS GMT"))
+        setHeader("Date",RtUtils.dateToFormat(Date(),"EEE, DD MMM YYYY HH:MM:SS GMT"))
         setHeader("Server","RtServer/1.0")
     }
 
