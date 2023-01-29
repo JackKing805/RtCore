@@ -7,9 +7,11 @@ import com.jerry.rt.core.http.protocol.RtHeader
 import com.jerry.rt.core.http.protocol.RtMimeType
 import com.jerry.rt.core.http.protocol.RtVersion
 import com.jerry.rt.core.http.response.impl.ByteResponseWriter
+import com.jerry.rt.utils.RtUtils
 import com.jerry.rt.utils.URLEncodeUtil
 import java.io.*
 import java.nio.charset.Charset
+import java.util.*
 import kotlin.jvm.Throws
 
 /**
@@ -30,6 +32,13 @@ open class IResponse(
     protected var statusCode = 200
 
     protected var cookies = mutableListOf<Cookie>()
+
+
+
+    init {
+        setHeader("Date",RtUtils.dateToFormat(Date(),"DAY, DD MMM YYYY HH:MM:SS GMT"))
+        setHeader("Server","RtServer/1.0")
+    }
 
 
     fun getContext() = context
