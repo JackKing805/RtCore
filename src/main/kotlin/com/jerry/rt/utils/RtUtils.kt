@@ -28,6 +28,7 @@ object RtUtils {
 
     fun dateToFormat(date: Date,format:String):String{
         val simpleDateFormat = SimpleDateFormat(format, Locale.US)
+        simpleDateFormat.timeZone = TimeZone.getTimeZone("GMT")
         return simpleDateFormat.format(date)
     }
 }
