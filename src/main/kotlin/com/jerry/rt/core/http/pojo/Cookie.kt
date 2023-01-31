@@ -66,7 +66,9 @@ data class Cookie(
             cookie.append("Domain=$it;")
         }
         maxAge.let {
-            cookie.append("Max-Age=$it;")
+            if (it>=0){
+                cookie.append("Max-Age=$it;")
+            }
         }
         if (secure){
             cookie.append("Secure;")
