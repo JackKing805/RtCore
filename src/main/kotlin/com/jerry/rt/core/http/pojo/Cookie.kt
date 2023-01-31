@@ -40,7 +40,7 @@ data class Cookie(
      * 则Web服务器上所有的WWW资源均可读取该Cookie。
      * 同样该项设置是可选的，如果缺省时，则Path的属性值为Web服务器传给浏览器的资源的路径名。
      */
-    val path: String = "",
+    val path: String = "/",
     /**
      * `;Secure ...` e.g. use SSL
      */
@@ -54,12 +54,10 @@ data class Cookie(
         val cookie = StringBuilder("")
         cookie.append("$name=$value;")
         expires?.let {
-            cookie.append("Expires=${RtUtils.dateToFormat(it,"DD－MM－YY HH:MM:SS")};")
+            cookie.append("Expires=${RtUtils.dateToFormat(it,"EEE, d MMM yyyy HH:mm:ss Z")} GMT;")
         }
-        val llPath = if(path.isEmpty()){
+        val llPath = path.ifEmpty {
             requestUri.path
-        }else{
-            path
         }
         llPath.let {
             cookie.append("Path=$it;")

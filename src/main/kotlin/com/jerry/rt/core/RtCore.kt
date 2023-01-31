@@ -185,9 +185,7 @@ fun main(){
 
                     override suspend fun onMessage(client: Client, request: Request, response: Response) {
                         println("onRtMessage:${RtUtils.getPublishHost(request)},${RtUtils.getLocalHost(request.getContext())},url:${request.getPackage().path},${request.getPackage().getRequestURI().toString()},${request.getPackage().getSession().getId()}")
-                        response.addCookie(Cookie("AA","BBB"))
-                        response.addCookie(Cookie("DD","CCCC"))
-                        response.write("ssssss",RtContentType.TEXT_HTML.content)
+                        response.write(request.getPackage().getSession().getId(),RtContentType.TEXT_HTML.content)
                     }
 
                     override suspend fun onInputStreamIn(client: Client, inputStream: InputStream) {
