@@ -9,12 +9,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="300a933b-3837-4079-860c-f135f59bc703" name="Changes" comment="publish 0.1.3">
-      <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/classes/kotlin/main/com/jerry/rt/core/http/pojo/Cookie.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/kotlin/main/com/jerry/rt/core/http/pojo/Cookie.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/core/http/pojo/Cookie.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/core/http/pojo/Cookie.kt" afterDir="false" />
-    </list>
+    <list default="true" id="300a933b-3837-4079-860c-f135f59bc703" name="Changes" comment="publish 0.1.3" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

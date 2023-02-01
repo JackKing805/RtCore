@@ -23,6 +23,7 @@ class ByteResponseWriter(outputStream: OutputStream): ResponseWriter<ByteArray>(
         }else{
             outputStream.write((line+"\r\n").toByteArray())
         }
+        outputStream.flush()
     }
 
     override fun writeHeader(key: String, value: Any) {
@@ -40,6 +41,7 @@ class ByteResponseWriter(outputStream: OutputStream): ResponseWriter<ByteArray>(
         }
 
         outputStream.write(content)
+        outputStream.flush()
     }
 
     override fun endWrite() {

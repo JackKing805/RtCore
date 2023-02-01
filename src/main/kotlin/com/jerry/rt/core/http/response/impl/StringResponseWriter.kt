@@ -25,6 +25,7 @@ class StringResponseWriter(outputStream: OutputStream): ResponseWriter<String>(o
         }else{
             printWriter.write(line+"\r\n")
         }
+        printWriter.flush()
     }
 
     override fun writeHeader(key: String, value: Any) {
@@ -41,6 +42,7 @@ class StringResponseWriter(outputStream: OutputStream): ResponseWriter<String>(o
             writeLine("\r\n")
         }
         printWriter.write(content)
+        printWriter.flush()
     }
 
     override fun endWrite() {
