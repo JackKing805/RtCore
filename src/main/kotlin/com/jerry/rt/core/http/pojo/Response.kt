@@ -27,7 +27,6 @@ class Response(
     protected var charset = Charsets.UTF_8
 
     protected val header = mutableMapOf<String, String>()
-    protected var isSendResponse = false
     protected var statusCode = 200
 
     protected var cookies = mutableListOf<Cookie>()
