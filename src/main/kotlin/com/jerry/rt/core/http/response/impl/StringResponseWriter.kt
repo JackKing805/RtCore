@@ -33,12 +33,9 @@ class StringResponseWriter(outputStream: OutputStream): ResponseWriter<String>(o
         writeLine("$key: $value")
     }
 
-    private var isFirstBody = true
-
     override fun writeBody(content: String) {
         super.writeBody(content)
-        if (isFirstBody){
-            isFirstBody = false
+        if (isFirstBody()){
             writeLine("\r\n")
         }
         printWriter.write(content)
@@ -47,10 +44,10 @@ class StringResponseWriter(outputStream: OutputStream): ResponseWriter<String>(o
 
     override fun endWrite() {
         super.endWrite()
-        if (isFirstBody){
-            isFirstBody = false
+        if (isFirstBody()){
             writeLine("\r\n")
         }
         printWriter.flush()
+        reset()
     }
 }

@@ -31,12 +31,10 @@ class ByteResponseWriter(outputStream: OutputStream): ResponseWriter<ByteArray>(
         writeLine("$key: $value")
     }
 
-    private var isFirstBody = true
 
     override fun writeBody(content: ByteArray) {
         super.writeBody(content)
-        if (isFirstBody){
-            isFirstBody = false
+        if (isFirstBody()){
             writeLine("\r\n")
         }
 
@@ -46,10 +44,10 @@ class ByteResponseWriter(outputStream: OutputStream): ResponseWriter<ByteArray>(
 
     override fun endWrite() {
         super.endWrite()
-        if (isFirstBody){
-            isFirstBody = false
+        if (isFirstBody()){
             writeLine("\r\n")
         }
         outputStream.flush()
+        reset()
     }
 }

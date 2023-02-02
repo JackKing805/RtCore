@@ -1,24 +1,15 @@
 package com.jerry.rt.core.http.pojo
 
 import com.jerry.rt.core.Context
-import com.jerry.rt.core.http.other.SessionManager
-import com.jerry.rt.core.http.pojo.s.IResponse
-import com.jerry.rt.core.http.protocol.*
+import com.jerry.rt.core.http.protocol.RtCode
+import com.jerry.rt.core.http.protocol.RtHeader
+import com.jerry.rt.core.http.protocol.RtMimeType
 import com.jerry.rt.core.http.response.impl.ByteResponseWriter
-import com.jerry.rt.extensions.getElse
-import com.jerry.rt.extensions.getMimeType
-import com.jerry.rt.extensions.readLength
-import com.jerry.rt.jva.StreamUtils
+import com.jerry.rt.utils.RtUtils
 import com.jerry.rt.utils.URLEncodeUtil
-import sun.net.util.URLUtil
-import java.io.File
-import java.io.FileInputStream
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
-import java.io.PrintWriter
-import java.net.URLEncoder
+import java.io.*
 import java.nio.charset.Charset
+import java.util.*
 import kotlin.jvm.Throws
 
 /**
@@ -28,18 +19,77 @@ import kotlin.jvm.Throws
  * @date: 2023/1/6:19:47
  **/
 class Response(
-    context: Context,
-    private val protocolPackage: ProtocolPackage,
-    output: OutputStream
-): IResponse(context,output) {
+    private val context: Context,
+    private val output: OutputStream,
+    private val protocolPackage: ProtocolPackage
+){
+    protected val byteResponseWriter = ByteResponseWriter(output)
+    protected var charset = Charsets.UTF_8
+
+    protected val header = mutableMapOf<String, String>()
+    protected var isSendResponse = false
+    protected var statusCode = 200
+
+    protected var cookies = mutableListOf<Cookie>()
+
     fun getPackage() = protocolPackage
 
-    override fun write(body: ByteArray, contentType: String, length: Int) {
-        if (isSendResponse) {
-            throw RuntimeException("response is send")
-        }
-        isSendResponse = true
 
+    init {
+        reset()
+    }
+
+
+    fun getContext() = context
+
+    fun setResponseCharset(charset: Charset) {
+        this.charset = charset
+    }
+
+    fun getResponseCharset() = charset
+
+    fun setHeader(key: String, value: String) {
+        header[key] = value
+    }
+
+    fun addCookie(cookie: Cookie){
+        cookies.add(cookie)
+    }
+
+    fun setHeaders(headers: MutableMap<String, String>) {
+        header.putAll(headers.filter {
+            it.key != "Content-Type" &&
+                    it.key != "Content-Length"
+        })
+    }
+
+    fun setContentType(contentType: String) {
+        val result = if (contentType.startsWith("text")) {
+            if (contentType.contains(";")) {
+                contentType
+            } else {
+                contentType + ";" + charset.name()
+            }
+        } else {
+            contentType
+        }
+        header[RtHeader.CONTENT_TYPE.content] = result
+    }
+
+    fun setResponseStatusCode(code: Int) {
+        statusCode = code
+    }
+
+    fun setContentLength(length: Int) {
+        header[RtHeader.CONTENT_LENGTH.content] = length.toString()
+    }
+
+    fun sendHeader() {
+        write("")
+    }
+
+    @Throws(IOException::class)
+    open fun write(body: ByteArray, contentType: String, length: Int = body.size) {
         if (!header.contains(RtHeader.CONTENT_TYPE.content)) {
             setContentType(contentType)
         }
@@ -65,5 +115,70 @@ class Response(
             byteResponseWriter.writeBody(body)
         }
         byteResponseWriter.endWrite()
+
+
+
+        reset()
     }
+
+    fun reset(){
+        header.clear()
+        setHeader("Date", RtUtils.dateToFormat(Date(),"EEE, DD MMM YYYY HH:MM:SS"))
+        setHeader("Server","RtServer/1.0")
+        setResponseStatusCode(200)
+        cookies.clear()
+    }
+
+
+    @Throws(IOException::class)
+    fun write(body: String, contentType: String, length: Int = body.length) {
+        write(body.toByteArray(), contentType, length)
+    }
+
+    @Throws(IOException::class)
+    fun write(body: String, contentType: String) {
+        write(body.toByteArray(), contentType, body.length)
+    }
+
+    @Throws(IOException::class)
+    fun write(body: String) {
+        val contentType =
+            header[RtHeader.CONTENT_TYPE.content] ?: throw IllegalStateException("Please provider Content-Type")
+        write(body.toByteArray(), contentType, body.length)
+    }
+
+    @Throws(IOException::class)
+    open fun writeFile(file: File, contentType: String? = null) {
+        val fileSize = file.length()
+        if (fileSize > 2147483647L) {
+            throw IllegalArgumentException("File size is too bigger than 2147483647")
+        } else {
+            val rcontentType = contentType ?: RtMimeType.matchContentType(file.absolutePath).mimeType
+            if (!rcontentType.startsWith("text/")) {
+                setHeader(
+                    RtHeader.CONTENT_DISPOSITION.content,
+                    "attachment;filename=${URLEncodeUtil.encode(file.name, charset)}"
+                )
+            }
+
+            val fileInputStream = FileInputStream(file)
+            fileInputStream.use {
+                write(it.readBytes(), rcontentType, fileSize.toInt())
+            }
+        }
+    }
+
+    @Throws(IOException::class)
+    fun writeFile(path: String, contentType: String? = null) {
+        writeFile(File(path), contentType)
+    }
+
+    @Throws(IOException::class)
+    fun writeInputStream(inputStream: InputStream, contentType: String, length: Int) {
+        val byteArray = ByteArray(length)
+        inputStream.read(byteArray)
+        write(byteArray, contentType, length)
+    }
+
+    fun getPrintWriter() = PrintWriter(output)
 }

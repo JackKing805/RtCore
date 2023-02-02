@@ -3,14 +3,11 @@ package com.jerry.rt.core
 import com.jerry.rt.bean.RtConfig
 import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.interfaces.ClientListener
-import com.jerry.rt.core.http.pojo.Cookie
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
-import com.jerry.rt.core.http.pojo.RtResponse
 import com.jerry.rt.core.http.protocol.RtContentType
 import com.jerry.rt.core.thread.Looper
 import com.jerry.rt.extensions.createExceptionCoroutineScope
-import com.jerry.rt.extensions.createStandCoroutineScope
 import com.jerry.rt.extensions.logInfo
 import com.jerry.rt.interfaces.RtCoreListener
 import com.jerry.rt.utils.PlatformUtils
@@ -163,7 +160,7 @@ fun main(){
                         println("onRtHeartbeatIn:")
                     }
 
-                    override fun onRtClientIn(client: Client, response: RtResponse) {
+                    override fun onRtClientIn(client: Client, response: Response) {
                         println("onRtClientIn:")
                         thread {
                             var i = 1
@@ -175,17 +172,18 @@ fun main(){
                         }
                     }
 
-                    override suspend fun onRtMessage(request: Request,response: RtResponse) {
+                    override suspend fun onRtMessage(request: Request,response: Response) {
                         println("onRtMessage:${request.getPackage().getRequestURI()}")
                     }
 
-                    override fun onRtClientOut(client: Client,response: RtResponse) {
+                    override fun onRtClientOut(client: Client,response: Response) {
                         println("onRtClientOut:")
                     }
 
                     override suspend fun onMessage(client: Client, request: Request, response: Response) {
                         println("onRtMessage:${RtUtils.getPublishHost(request)},${RtUtils.getLocalHost(request.getContext())},url:${request.getPackage().path},${request.getPackage().getRequestURI().toString()},${request.getPackage().getSession().getId()}")
                         response.write(request.getPackage().getSession().getId(),RtContentType.TEXT_HTML.content)
+                        response.write("ss",RtContentType.TEXT_HTML.content)
                     }
 
                     override suspend fun onInputStreamIn(client: Client, inputStream: InputStream) {

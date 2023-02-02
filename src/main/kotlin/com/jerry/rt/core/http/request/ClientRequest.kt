@@ -3,11 +3,9 @@ package com.jerry.rt.core.http.request
 import com.jerry.rt.core.Context
 import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.interfaces.ClientListener
-import com.jerry.rt.core.http.other.SessionManager
 import com.jerry.rt.core.http.pojo.ProtocolPackage
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
-import com.jerry.rt.core.http.pojo.RtResponse
 import com.jerry.rt.core.http.protocol.Header
 import com.jerry.rt.core.http.protocol.RtContentType
 import com.jerry.rt.core.http.protocol.RtProtocol
@@ -17,7 +15,6 @@ import com.jerry.rt.extensions.connectIsRtConnect
 import com.jerry.rt.extensions.createStandCoroutineScope
 import com.jerry.rt.extensions.readLength
 import com.jerry.rt.extensions.rtContentTypeIsHeartbeat
-import com.jerry.rt.utils.RtUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -42,7 +39,7 @@ internal class ClientRequest(private val context: Context, private val client: C
     }
     private var clientListener: ClientListener? = null
 
-    private var rtResponse: RtResponse? = null
+    private var rtResponse: Response? = null
     private var isRtIn = false
 
     private var localMessageListener: MessageListener = object : MessageListener {
@@ -65,7 +62,7 @@ internal class ClientRequest(private val context: Context, private val client: C
             if (rtProtocol.isRtConnect()) {
                 checkHeartbeat()
                 if (rtResponse == null) {
-                    rtResponse = RtResponse(context, protocolPackage, socket.getOutputStream())
+                    rtResponse = Response(context, socket.getOutputStream(),protocolPackage)
                 }
 
                 if (rtProtocol.getContentType().rtContentTypeIsHeartbeat()) {
@@ -95,7 +92,7 @@ internal class ClientRequest(private val context: Context, private val client: C
                     tryClose()
                     return
                 }
-                val response = Response(context, protocolPackage, socket.getOutputStream())
+                val response = Response(context, socket.getOutputStream(),protocolPackage)
 
 
                 //其他类型协议

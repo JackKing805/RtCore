@@ -11,6 +11,9 @@ import java.io.OutputStream
  **/
 abstract class ResponseWriter<T>(protected val outputStream: OutputStream):Writer<T> {
     private var isFirstLineWrite =false
+    private var isHeaderWrite = false
+    private var isFirstBody = true
+
 
     override fun writeFirstLine(protocol: String, code: Int, msg: String) {
         isFirstLineWrite = true
@@ -23,19 +26,39 @@ abstract class ResponseWriter<T>(protected val outputStream: OutputStream):Write
 
     override fun writeHeader(key: String, value: Any) {
         checkWriteFirstLine()
+        isHeaderWrite = true
     }
 
     override fun writeBody(content: T) {
         checkWriteFirstLine()
+        checkWriteHeaer()
+
     }
 
     open fun endWrite(){
         checkWriteFirstLine()
+        checkWriteHeaer()
+    }
+
+    fun checkWriteHeaer(){
+         if (!isHeaderWrite){
+            throw IllegalStateException("please write header")
+        }
     }
 
     fun checkWriteFirstLine(){
         if (!isFirstLineWrite){
             throw IllegalStateException("please write first line")
         }
+    }
+
+    fun isFirstBody() = isFirstBody.also{
+        isFirstBody = false
+    }
+
+    fun reset(){
+        isFirstBody = true
+        isHeaderWrite = false
+        isFirstLineWrite = false
     }
 }

@@ -3,7 +3,6 @@ package com.jerry.rt.core.http.interfaces
 import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
-import com.jerry.rt.core.http.pojo.RtResponse
 import java.io.InputStream
 
 /**
@@ -15,9 +14,9 @@ import java.io.InputStream
 interface ClientListener {
     suspend fun onRtHeartbeat(client: Client)
 
-    fun onRtClientIn(client: Client,response: RtResponse)
-    suspend fun onRtMessage(request: Request,rtResponse: RtResponse)
-    fun onRtClientOut(client: Client,rtResponse: RtResponse)
+    fun onRtClientIn(client: Client,response: Response)
+    suspend fun onRtMessage(request: Request,response: Response)
+    fun onRtClientOut(client: Client,response: Response)
 
     suspend fun onMessage(client: Client,request: Request,response: Response)
 
