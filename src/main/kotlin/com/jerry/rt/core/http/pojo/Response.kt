@@ -122,7 +122,7 @@ class Response(
 
     fun reset(){
         header.clear()
-        setHeader("Date", RtUtils.dateToFormat(Date(),"EEE, DD MMM YYYY HH:MM:SS"))
+        setHeader("Date", RtUtils.dateToFormat(Date(),"EEE, dd MMM yyyy HH:mm:ss 'GMT'"))
         setHeader("Server","RtServer/1.0")
         setResponseStatusCode(200)
         cookies.clear()

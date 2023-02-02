@@ -54,7 +54,7 @@ data class Cookie(
         val cookie = StringBuilder("")
         cookie.append("$name=$value;")
         expires?.let {
-            cookie.append("Expires=${RtUtils.dateToFormat(it,"EEE, d MMM yyyy HH:mm:ss Z")} GMT;")
+            cookie.append("Expires=${RtUtils.dateToFormat(it,"EEE, dd MMM yyyy HH:mm:ss 'GMT'")};")
         }
         val llPath = path.ifEmpty {
             requestUri.path

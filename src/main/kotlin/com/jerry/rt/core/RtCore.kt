@@ -3,6 +3,7 @@ package com.jerry.rt.core
 import com.jerry.rt.bean.RtConfig
 import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.interfaces.ClientListener
+import com.jerry.rt.core.http.pojo.Cookie
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
 import com.jerry.rt.core.http.protocol.RtContentType
@@ -17,6 +18,7 @@ import java.io.File
 import java.io.InputStream
 import java.lang.Thread.sleep
 import java.time.Duration
+import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 
@@ -182,8 +184,8 @@ fun main(){
 
                     override suspend fun onMessage(client: Client, request: Request, response: Response) {
                         println("onRtMessage:${RtUtils.getPublishHost(request)},${RtUtils.getLocalHost(request.getContext())},url:${request.getPackage().path},${request.getPackage().getRequestURI().toString()},${request.getPackage().getSession().getId()}")
+                        response.addCookie(Cookie("aa","dd", expires = Date(System.currentTimeMillis() + 1000000)))
                         response.write(request.getPackage().getSession().getId(),RtContentType.TEXT_HTML.content)
-                        response.write("ss",RtContentType.TEXT_HTML.content)
                     }
 
                     override suspend fun onInputStreamIn(client: Client, inputStream: InputStream) {
