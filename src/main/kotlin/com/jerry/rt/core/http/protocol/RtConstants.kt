@@ -25,7 +25,7 @@ enum class RtVersion(val content: String){
 
     companion object{
         fun toRtVersion(version:String):RtVersion{
-            return when(version.lowercase()){
+            return when(version.uppercase()){
                 RT_1_0.content->RT_1_0
                 HTTP_1_0.content->HTTP_1_0
                 HTTP_1_1.content->HTTP_1_1
