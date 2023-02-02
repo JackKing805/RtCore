@@ -18,10 +18,10 @@ enum class RtContentType(val content:String) {
 }
 
 enum class RtVersion(val content: String){
-    RT_1_0("rt/1.0"),
-    HTTP_1_0("http/1.0"),
-    HTTP_1_1("http/1.1"),
-    HTTP_2_0("http/2.0");
+    RT_1_0("RT/1.0"),
+    HTTP_1_0("HTTP/1.0"),
+    HTTP_1_1("HTTP/1.1"),
+    HTTP_2_0("HTTP/2.0");
 
     companion object{
         fun toRtVersion(version:String):RtVersion{
