@@ -100,11 +100,6 @@ class Response(
             byteResponseWriter.writeHeader(it.key, it.value)
         }
 
-        val session = protocolPackage.getSession()
-        if (session.isNew()){
-            addCookie(Cookie(getContext().getRtConfig().rtSessionConfig.sessionKey,session.getId()))
-        }
-
         cookies.forEach {
             byteResponseWriter.writeHeader("Set-Cookie", it.toCookieString(protocolPackage.getRequestURI()))
         }
@@ -122,10 +117,14 @@ class Response(
 
     fun reset(){
         header.clear()
+        cookies.clear()
         setHeader("Date", RtUtils.dateToFormat(Date(),"EEE, dd MMM yyyy HH:mm:ss 'GMT'"))
         setHeader("Server","RtServer/1.0")
         setResponseStatusCode(200)
-        cookies.clear()
+        val session = protocolPackage.getSession()
+        if (session.isNew()){
+            addCookie(Cookie(getContext().getRtConfig().rtSessionConfig.sessionKey,session.getId()))
+        }
     }
 
 
