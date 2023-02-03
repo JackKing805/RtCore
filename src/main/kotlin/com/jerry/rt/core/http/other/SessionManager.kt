@@ -1,7 +1,7 @@
 package com.jerry.rt.core.http.other
 
 import com.jerry.rt.bean.RtSessionConfig
-import com.jerry.rt.core.Context
+import com.jerry.rt.core.RtContext
 import com.jerry.rt.core.http.interfaces.ISession
 import com.jerry.rt.core.http.interfaces.ISessionManager
 import com.jerry.rt.core.http.pojo.ProtocolPackage
@@ -41,8 +41,8 @@ class SessionManager :ISessionManager{
         scope.cancel()
     }
 
-    override fun getSessionKey(context: Context, path: String, uri: URI, header: ProtocolPackage.Header): String? {
-        return header.getCookie(context.getRtConfig().rtSessionConfig.sessionKey)
+    override fun getSessionKey(rtContext: RtContext, path: String, uri: URI, header: ProtocolPackage.Header): String? {
+        return header.getCookie(rtContext.getRtConfig().rtSessionConfig.sessionKey)
     }
 
     override fun createSession(sessionId: String?): ISession {

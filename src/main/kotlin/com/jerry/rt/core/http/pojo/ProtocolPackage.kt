@@ -1,8 +1,8 @@
 package com.jerry.rt.core.http.pojo
 
-import com.jerry.rt.core.Context
+import com.jerry.rt.core.RtContext
 import com.jerry.rt.core.http.interfaces.ISession
-import com.jerry.rt.core.http.other.SessionManager
+import com.jerry.rt.core.http.protocol.RtHeader
 import com.jerry.rt.core.http.protocol.RtVersion
 import java.net.URI
 
@@ -13,13 +13,13 @@ import java.net.URI
  * @date: 2023/1/7:18:53
  **/
 class ProtocolPackage(
-    private val context: Context,
+    private val rtContext: RtContext,
     val method: String,
     val path: String,
     val protocol: RtVersion,
     private val header: Header
 ) {
-    private val realUrl = "${RtVersion.getPrefix(protocol)}://"+header.getHeaderValue("Host","") + if (path.startsWith("/")) path else "/$path"
+    private val realUrl = "${RtVersion.getPrefix(protocol)}://"+header.getHeaderValue(RtHeader.HOST.content,"") + if (path.startsWith("/")) path else "/$path"
     private val requestURI = URI.create(realUrl)
 
     fun getHeader() = header
@@ -34,13 +34,13 @@ class ProtocolPackage(
         if (session==null){
             val s = getSessionKey()
             //创建session和刷新session
-            val createSession = context.getSessionManager().createSession(s)
+            val createSession = rtContext.getSessionManager().createSession(s)
             session = createSession
         }
         return session!!
     }
 
-    private fun getSessionKey() = context.getSessionManager().getSessionKey(context,path,requestURI,header)
+    private fun getSessionKey() = rtContext.getSessionManager().getSessionKey(rtContext,path,requestURI,header)
 
 
     data class Header(
@@ -49,7 +49,7 @@ class ProtocolPackage(
         private val cookies = mutableMapOf<String,String>()
 
         init {
-            getHeaderValue("Cookie","").split(";").forEach {
+            getHeaderValue(RtHeader.COOKIE.content,"").split(";").forEach {
                 if (it.contains("=")){
                     val index = it.indexOf("=")
                     val name = it.substring(0,index).trim()
@@ -69,10 +69,10 @@ class ProtocolPackage(
             return (header[key] ?: default).trim()
         }
 
-        fun getContentType() = getHeaderValue("Content-Type", "text/plain")
+        fun getContentType() = getHeaderValue(RtHeader.CONTENT_TYPE.content, "text/plain")
 
         fun getContentLength() = try {
-            val values = getHeaderValue("Content-Length")
+            val values = getHeaderValue(RtHeader.CONTENT_LENGTH.content)
             if (values.isEmpty()) {
                 0L
             }else {
@@ -82,9 +82,9 @@ class ProtocolPackage(
             0L
         }
 
-        fun getDate() = getHeaderValue("Date", "")
+        fun getDate() = getHeaderValue(RtHeader.DATE.content, "")
 
-        fun getUserAgent() = getHeaderValue("User-Agent", "")
+        fun getUserAgent() = getHeaderValue(RtHeader.USER_AGENT.content, "")
 
         fun getCookies() = cookies
 

@@ -1,10 +1,9 @@
 package com.jerry.rt.core.http
 
-import com.jerry.rt.core.Context
+import com.jerry.rt.core.RtContext
 import com.jerry.rt.extensions.createStandCoroutineScope
 import com.jerry.rt.interfaces.RtCoreListener
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.net.Socket
 import java.util.Collections
@@ -16,7 +15,7 @@ import java.util.UUID
  * @author: Jerry
  * @date: 2022/12/31:16:41
  **/
-internal class ClientDispatchers(private val context: Context,private val rtCoreListener: RtCoreListener) {
+internal class ClientDispatchers(private val rtContext: RtContext, private val rtCoreListener: RtCoreListener) {
     private val scope = createStandCoroutineScope(){
         rtCoreListener.onRtCoreException(it)
     }
@@ -35,7 +34,7 @@ internal class ClientDispatchers(private val context: Context,private val rtCore
     }
 
     fun onClientIn(socket:Socket){
-        val client = Client(context)
+        val client = Client(rtContext)
         client.initClient(generateClientId())
         synchronized(ClientDispatchers::class){
             clients.add(client)

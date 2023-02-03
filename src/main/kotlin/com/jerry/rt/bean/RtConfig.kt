@@ -14,7 +14,8 @@ data class RtConfig(
     val port:Int = 8080,
     val customerParse:Boolean = false,//是否自主解析inputStream
     val heartbeatReceiverIntervalTime:Duration = Duration.ofSeconds(10),//收到心跳包最小间隔时间
-    val rtSessionConfig: RtSessionConfig = RtSessionConfig()
+    val rtSessionConfig: RtSessionConfig = RtSessionConfig(),
+    val serverVersionDetails:String = "RtServer/1.0"
 )
 
 

@@ -1,6 +1,6 @@
 package com.jerry.rt.core.http.pojo
 
-import com.jerry.rt.core.Context
+import com.jerry.rt.core.RtContext
 import com.jerry.rt.extensions.toByteArray
 
 /**
@@ -10,7 +10,7 @@ import com.jerry.rt.extensions.toByteArray
  * @date: 2023/1/6:19:47
  **/
 data class Request(
-    private val context: Context,
+    private val rtContext: RtContext,
     private val protocolPackage: ProtocolPackage,
     private val data: MutableList<ByteArray>
 ) {
@@ -20,5 +20,5 @@ data class Request(
 
     fun getBody() = data.toByteArray()
 
-    fun getContext() = context
+    fun getContext() = rtContext
 }

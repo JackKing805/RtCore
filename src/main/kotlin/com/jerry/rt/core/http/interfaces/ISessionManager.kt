@@ -1,7 +1,7 @@
 package com.jerry.rt.core.http.interfaces
 
 import com.jerry.rt.bean.RtSessionConfig
-import com.jerry.rt.core.Context
+import com.jerry.rt.core.RtContext
 import com.jerry.rt.core.http.pojo.ProtocolPackage
 import java.net.URI
 
@@ -20,7 +20,7 @@ interface ISessionManager {
     /*
      * 自定义key的获取方式
      */
-    fun getSessionKey(context: Context, path:String, uri:URI, header: ProtocolPackage.Header):String?
+    fun getSessionKey(rtContext: RtContext, path:String, uri:URI, header: ProtocolPackage.Header):String?
 
     fun createSession(sessionId: String?): ISession
 

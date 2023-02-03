@@ -1,6 +1,6 @@
 package com.jerry.rt.core.http.pojo
 
-import com.jerry.rt.core.Context
+import com.jerry.rt.core.RtContext
 import com.jerry.rt.core.http.protocol.RtCode
 import com.jerry.rt.core.http.protocol.RtHeader
 import com.jerry.rt.core.http.protocol.RtMimeType
@@ -19,7 +19,7 @@ import kotlin.jvm.Throws
  * @date: 2023/1/6:19:47
  **/
 class Response(
-    private val context: Context,
+    private val rtContext: RtContext,
     private val output: OutputStream,
     private val protocolPackage: ProtocolPackage
 ){
@@ -39,7 +39,7 @@ class Response(
     }
 
 
-    fun getContext() = context
+    fun getContext() = rtContext
 
     fun setResponseCharset(charset: Charset) {
         this.charset = charset
@@ -88,7 +88,7 @@ class Response(
     }
 
     @Throws(IOException::class)
-    open fun write(body: ByteArray, contentType: String, length: Int = body.size) {
+    fun write(body: ByteArray, contentType: String, length: Int = body.size) {
         if (!header.contains(RtHeader.CONTENT_TYPE.content)) {
             setContentType(contentType)
         }
@@ -101,7 +101,7 @@ class Response(
         }
 
         cookies.forEach {
-            byteResponseWriter.writeHeader("Set-Cookie", it.toCookieString(protocolPackage.getRequestURI()))
+            byteResponseWriter.writeHeader(RtHeader.SET_COOKIE.content, it.toCookieString(protocolPackage.getRequestURI()))
         }
 
 
@@ -110,16 +110,14 @@ class Response(
         }
         byteResponseWriter.endWrite()
 
-
-
         reset()
     }
 
     fun reset(){
         header.clear()
         cookies.clear()
-        setHeader("Date", RtUtils.dateToFormat(Date(),"EEE, dd MMM yyyy HH:mm:ss 'GMT'"))
-        setHeader("Server","RtServer/1.0")
+        setHeader(RtHeader.DATE.content, RtUtils.dateToFormat(Date(),"EEE, dd MMM yyyy HH:mm:ss 'GMT'"))
+        setHeader("Server",rtContext.getRtConfig().serverVersionDetails)
         setResponseStatusCode(200)
         val session = protocolPackage.getSession()
         if (session.isNew()){

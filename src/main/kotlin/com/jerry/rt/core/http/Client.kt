@@ -1,9 +1,8 @@
 package com.jerry.rt.core.http
 
-import com.jerry.rt.core.Context
+import com.jerry.rt.core.RtContext
 import com.jerry.rt.core.http.interfaces.ClientListener
 import com.jerry.rt.core.http.request.ClientRequest
-import java.lang.Exception
 import java.net.Socket
 
 /**
@@ -17,9 +16,9 @@ import java.net.Socket
 //header /r/n
 ///r/n
 
-class Client(private val context: Context) {
+class Client(private val rtContext: RtContext) {
     private var clientId = ""
-    private val clientRequest = ClientRequest(context,this)
+    private val clientRequest = ClientRequest(rtContext,this)
 
     internal fun initClient(clientId: String){
         this.clientId = clientId

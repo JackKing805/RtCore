@@ -1,5 +1,6 @@
 package com.jerry.rt.interfaces
 
+import com.jerry.rt.core.RtContext
 import com.jerry.rt.core.http.Client
 
 /**
@@ -17,6 +18,10 @@ interface RtCoreListener {
     }
 
     fun onStatusChange(status: Status){}
+
+    fun onCreateContext(rtContext: RtContext){}
+
+    fun onDestroyContext(rtContext: RtContext){}
 
     fun onClientIn(client: Client){}
 

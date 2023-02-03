@@ -1,10 +1,8 @@
 package com.jerry.rt.core.http
 
-import com.jerry.rt.core.Context
+import com.jerry.rt.core.RtContext
 import com.jerry.rt.extensions.createStandCoroutineScope
 import com.jerry.rt.extensions.logInfo
-import com.jerry.rt.interfaces.RtCoreListener
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
@@ -22,7 +20,7 @@ import java.net.Socket
  * @author: Jerry
  * @date: 2022/12/31:16:21
  **/
-internal class Server(private val context: Context,private val onException: (Exception)->Unit) {
+internal class Server(private val rtContext: RtContext, private val onException: (Exception)->Unit) {
     private val channel = Channel<Socket>(
         Int.MAX_VALUE,
         BufferOverflow.SUSPEND
@@ -37,7 +35,7 @@ internal class Server(private val context: Context,private val onException: (Exc
 
     fun run():Flow<Socket>{
         serverJob = scope.launch(Dispatchers.IO) {
-            val port = context.getRtConfig().port
+            val port = rtContext.getRtConfig().port
             val serverSocket = ServerSocket(port)
             "start server at:$port".logInfo()
             while (active){

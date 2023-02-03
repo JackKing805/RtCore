@@ -1,18 +1,10 @@
 package com.jerry.rt.core.http.pojo
 
-import com.jerry.rt.core.Context
 import com.jerry.rt.core.http.interfaces.ISession
-import com.jerry.rt.core.http.other.SessionManager
-import com.jerry.rt.extensions.createExceptionCoroutineScope
-import com.jerry.rt.extensions.logError
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
-import kotlin.Exception
 
 /**
  * @className: Session

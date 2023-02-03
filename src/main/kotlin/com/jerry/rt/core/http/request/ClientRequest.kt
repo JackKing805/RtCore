@@ -1,6 +1,6 @@
 package com.jerry.rt.core.http.request
 
-import com.jerry.rt.core.Context
+import com.jerry.rt.core.RtContext
 import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.interfaces.ClientListener
 import com.jerry.rt.core.http.pojo.ProtocolPackage
@@ -30,7 +30,7 @@ import kotlin.jvm.Throws
  * @author: Jerry
  * @date: 2023/1/2:13:27
  **/
-internal class ClientRequest(private val context: Context, private val client: Client) {
+internal class ClientRequest(private val rtContext: RtContext, private val client: Client) {
     private var isAlive = false
     private var isInit = false
     private lateinit var socket: Socket
@@ -54,15 +54,15 @@ internal class ClientRequest(private val context: Context, private val client: C
 
         override suspend fun onMessage(rtProtocol: MessageListener.MessageRtProtocol, data: MutableList<ByteArray>) {
             val protocolPackage = ProtocolPackage(
-                context, rtProtocol.method, rtProtocol.url, rtProtocol.protocolString,
+                rtContext, rtProtocol.method, rtProtocol.url, rtProtocol.protocolString,
                 ProtocolPackage.Header(rtProtocol.header)
             )
 
-            val request = Request(context, protocolPackage, data)
+            val request = Request(rtContext, protocolPackage, data)
             if (rtProtocol.isRtConnect()) {
                 checkHeartbeat()
                 if (rtResponse == null) {
-                    rtResponse = Response(context, socket.getOutputStream(),protocolPackage)
+                    rtResponse = Response(rtContext, socket.getOutputStream(),protocolPackage)
                 }
 
                 if (rtProtocol.getContentType().rtContentTypeIsHeartbeat()) {
@@ -92,7 +92,7 @@ internal class ClientRequest(private val context: Context, private val client: C
                     tryClose()
                     return
                 }
-                val response = Response(context, socket.getOutputStream(),protocolPackage)
+                val response = Response(rtContext, socket.getOutputStream(),protocolPackage)
 
 
                 //其他类型协议
@@ -131,7 +131,7 @@ internal class ClientRequest(private val context: Context, private val client: C
             isAlive = true
             try {
                 this@ClientRequest.socket = s
-                if (context.getRtConfig().customerParse) {
+                if (rtContext.getRtConfig().customerParse) {
                     socket.getInputStream().use {
                         localMessageListener.ifCustomInputStream(it)
                     }
@@ -222,7 +222,7 @@ internal class ClientRequest(private val context: Context, private val client: C
         }
         isCheckHeartbeatStart = true
         scope.launch(Dispatchers.IO) {
-            val interval = context.getRtConfig().heartbeatReceiverIntervalTime.toMillis()
+            val interval = rtContext.getRtConfig().heartbeatReceiverIntervalTime.toMillis()
             while (isAlive) {
                 delay(5000)
                 if (receiverHeartbeatTime != -1L) {
