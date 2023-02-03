@@ -100,6 +100,14 @@ class RtCore private constructor() {
                 override fun onRtCoreException(exception: Exception) {
                     statusListener?.onRtCoreException(exception)
                 }
+
+                override fun onCreateContext(rtContext: RtContext) {
+                    statusListener?.onCreateContext(rtContext)
+                }
+
+                override fun onDestroyContext(rtContext: RtContext) {
+                    statusListener?.onDestroyContext(rtContext)
+                }
             }
 
             onException = {
