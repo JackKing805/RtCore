@@ -19,10 +19,21 @@ class ProtocolPackage(
     val protocol: RtVersion,
     private val header: Header
 ) {
-    private val realUrl = "${RtVersion.getPrefix(protocol)}://"+header.getHeaderValue(RtHeader.HOST.content,"") + if (path.startsWith("/")) path else "/$path"
+    private val rootPath = "${RtVersion.getPrefix(protocol)}://"+header.getHeaderValue(RtHeader.HOST.content,"")
+    private val realUrl = rootPath + if (path.startsWith("/")) path else "/$path"
     private val requestURI = URI.create(realUrl)
 
     fun getHeader() = header
+
+
+    //获取项目根路径
+    fun getRootAbsolutePath() = rootPath
+
+    //获取访问绝对地址
+    fun getRequestAbsolutePath() = realUrl
+
+    //获取访问地址
+    fun getRequestPath() = requestURI.path
 
 
     fun getRequestURI() = requestURI

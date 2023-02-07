@@ -9,7 +9,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="300a933b-3837-4079-860c-f135f59bc703" name="Changes" comment="publish 0.1.3" />
+    <list default="true" id="300a933b-3837-4079-860c-f135f59bc703" name="Changes" comment="publish 0.1.3">
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/core/RtCore.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/core/RtCore.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/core/http/pojo/ProtocolPackage.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/core/http/pojo/ProtocolPackage.kt" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

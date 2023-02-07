@@ -193,7 +193,11 @@ fun main(){
                     override suspend fun onMessage(client: Client, request: Request, response: Response) {
                         println("onRtMessage:${RtUtils.getPublishHost(request)},${RtUtils.getLocalHost(request.getContext())},url:${request.getPackage().path},${request.getPackage().getRequestURI().toString()},${request.getPackage().getSession().getId()}")
                         response.addCookie(Cookie("aa","dd", expires = Date(System.currentTimeMillis() + 1000000)))
-                        response.write(request.getPackage().getSession().getId(),RtContentType.TEXT_HTML.content)
+
+                        var protocolPackage = request.getPackage()
+                        val strinss = protocolPackage.getRootAbsolutePath() + ":" + protocolPackage.getRequestAbsolutePath() + ":" + protocolPackage.getRequestPath()
+
+                        response.write(strinss,RtContentType.TEXT_HTML.content)
                     }
 
                     override suspend fun onInputStreamIn(client: Client, inputStream: InputStream) {
