@@ -27,7 +27,7 @@ class ProtocolPackage(
 
 
     //获取项目根路径
-    fun getRootAbsolutePath() = rootPath
+    fun getRootAbsolutePath() = if(rootPath.endsWith("/")) rootPath else "$rootPath/"
 
     //获取访问绝对地址
     fun getRequestAbsolutePath() = realUrl
