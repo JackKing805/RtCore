@@ -210,7 +210,7 @@ class Response(
             var len = 0
             var totalLen = 0
             while (fileInput.read(buffer).also { len = it }!=-1 && totalLen<contentLength){
-                val wl = len.coerceAtMost(contentLength.toInt() - len)
+                val wl = len.coerceAtMost(contentLength.toInt() - totalLen)
                 totalLen+=wl
                 it.writeBody(buffer,0,wl)
             }

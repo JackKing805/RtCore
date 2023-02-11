@@ -6,7 +6,7 @@ plugins {
     `maven-publish`
 }
 
-val vv = "0.3.6"
+val vv = "0.3.7"
 
 group = "com.jerry"
 version = vv
@@ -19,6 +19,7 @@ dependencies {
     testImplementation(kotlin("test"))
 
     //协程
+    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 }
 

@@ -227,3 +227,61 @@ class RtCore private constructor() {
 //    }
 //}
 
+fun main() {
+    RtCore.instance.run(rtConfig = RtConfig(
+        port = 8080
+    ),statusListener = object :RtCoreListener{
+        override fun onClientIn(client: Client) {
+            client.listen(object :ClientListener{
+                override fun onException(exception: Exception) {
+                    exception.printStackTrace()
+                }
+
+                override suspend fun onInputStreamIn(client: Client, inputStream: InputStream) {
+
+                }
+
+                override suspend fun onMessage(client: Client, request: Request, response: Response) {
+                    val path = request.getPackage().path
+                    if (path=="/video/list"){
+                        val list = mutableListOf<String>()
+                        val file = File("F:\\BaiduNetdiskDownload\\.sexvideo")
+                        if (file.exists()){
+                            file.listFiles()?.forEach {
+                                list.add(it.name)
+                            }
+                        }
+
+
+                        response.setContentType(RtContentType.JSON.content)
+                        response.write(list.toString())
+                    }else if(path.startsWith("/video/handle/play")){
+                        val file = File("F:\\BaiduNetdiskDownload\\.sexvideo","10.mp4")
+                        response.writeFile(file)
+                    }else{
+                        response.setContentType(RtContentType.TEXT_HTML.content)
+                        response.setResponseStatusCode(RtCode._400.code)
+                        response.sendHeader()
+                    }
+                }
+
+                override fun onRtClientIn(client: Client, response: Response) {
+
+                }
+
+                override fun onRtClientOut(client: Client, response: Response) {
+
+                }
+
+                override suspend fun onRtHeartbeat(client: Client) {
+
+                }
+
+                override suspend fun onRtMessage(request: Request, response: Response) {
+
+                }
+
+            })
+        }
+    })
+}
