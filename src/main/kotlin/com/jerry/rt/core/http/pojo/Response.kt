@@ -22,13 +22,13 @@ class Response(
     private val output: OutputStream,
     private val protocolPackage: ProtocolPackage
 ){
-    protected val byteResponseWriter = ByteResponseWriter(output)
-    protected var charset = Charsets.UTF_8
+    private val byteResponseWriter = ByteResponseWriter(output)
+    private var charset = Charsets.UTF_8
 
-    protected val header = mutableMapOf<String, String>()
-    protected var statusCode = 200
+    private val header = mutableMapOf<String, String>()
+    private var statusCode = 200
 
-    protected var cookies = mutableListOf<Cookie>()
+    private var cookies = mutableListOf<Cookie>()
 
     fun getPackage() = protocolPackage
 
