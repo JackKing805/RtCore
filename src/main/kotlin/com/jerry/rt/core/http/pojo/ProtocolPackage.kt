@@ -93,6 +93,24 @@ class ProtocolPackage(
             0L
         }
 
+        fun getAcceptRanges():Array<Long>?{
+            val ranges = getHeaderValue("Range")
+            if (ranges.isEmpty()){
+                return null
+            }else{
+                var x = 0L
+                var y = 0L
+                if (ranges.startsWith("bytes=")) {
+                    val range = ranges.split("=")[1].split("-")
+                    x = range[0].toLongOrNull()?:0L
+                    if (range.size > 1) {
+                        y = range[1].toLongOrNull()?:0L
+                    }
+                }
+                return arrayOf(x,y)
+            }
+        }
+
         fun getDate() = getHeaderValue(RtHeader.DATE.content, "")
 
         fun getUserAgent() = getHeaderValue(RtHeader.USER_AGENT.content, "")

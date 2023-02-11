@@ -20,9 +20,103 @@
       <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/META-INF/RtCore.kotlin_module" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/bean/RtConfig.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/bean/RtSessionConfig.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/RtContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/RtCore$Companion$instance$2.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/RtCore$Companion.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/RtCore$runAndroid$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/RtCore$runCore$2$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/RtCore$runCore$2$runningJob$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/RtCore$runCore$2$rxLifeListener$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/RtCore$runCore$2.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/RtCore$runJava$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/RtCore$scope$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/RtCore$stopAfter$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/RtCore.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/RtCoreKt$main$1$1$onClientIn$1$onRtClientIn$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/RtCoreKt$main$1$1$onClientIn$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/RtCoreKt$main$1$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/RtCoreKt$main$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/RtCoreKt.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/RtLife$onInit$2.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/RtLife$onRunning$2$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/RtLife$onRunning$2.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/RtLife.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/exceptions/DestroyContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/Client.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/ClientDispatchers$onClientIn$2.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/ClientDispatchers$scope$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/ClientDispatchers.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/Server$run$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/Server$scope$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/Server.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/interfaces/ClientListener.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/interfaces/ISession.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/interfaces/ISessionManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/other/SessionManager$create$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/other/SessionManager.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/pojo/Cookie.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/pojo/ProtocolPackage$Header.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/pojo/ProtocolPackage.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/pojo/Request.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/pojo/Response.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/pojo/Session$listen$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/pojo/Session.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/protocol/Header.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/protocol/Protocol.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/protocol/RtCode$Companion.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/protocol/RtCode.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/protocol/RtContentType.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/protocol/RtHeader.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/protocol/RtMethod.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/protocol/RtMimeType$Companion.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/protocol/RtMimeType.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/protocol/RtProtocol.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/protocol/RtVersion$Companion$WhenMappings.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/protocol/RtVersion$Companion.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/protocol/RtVersion.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/request/ClientRequest$MessageListener$MessageRtProtocol.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/request/ClientRequest$MessageListener.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/request/ClientRequest$checkHeartbeat$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/request/ClientRequest$init$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/request/ClientRequest$localMessageListener$1$dealProtocol$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/request/ClientRequest$localMessageListener$1$ifCustomInputStream$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/request/ClientRequest$localMessageListener$1$ifRtConnectHeartbeat$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/request/ClientRequest$localMessageListener$1$onMessage$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/request/ClientRequest$localMessageListener$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/request/ClientRequest$scope$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/request/ClientRequest.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/response/ResponseWriter.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/response/impl/ByteResponseWriter.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/response/impl/StringResponseWriter.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/http/response/interfaces/Writer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/thread/Handler.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/thread/Looper$Companion.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/thread/Looper.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/core/thread/Message.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/extensions/CoroutineScopeExtensionsKt$createExceptionCoroutineScope$$inlined$CoroutineExceptionHandler$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/extensions/CoroutineScopeExtensionsKt$createStandCoroutineScope$$inlined$CoroutineExceptionHandler$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/extensions/CoroutineScopeExtensionsKt.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/extensions/DataExtensionsKt.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/extensions/FileExtensionsKt.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/extensions/LogExtensionsKt.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/extensions/RtExtensionsKt.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/extensions/StringExtensionsKt.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/interfaces/RtCoreListener$DefaultImpls.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/interfaces/RtCoreListener$Status.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/interfaces/RtCoreListener.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/jva/StreamUtils$NonClosingInputStream.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/jva/StreamUtils$NonClosingOutputStream.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/jva/StreamUtils.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/utils/HexUtil.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/utils/PlatformUtils$isAndroid$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/utils/PlatformUtils.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/utils/RtUtils.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/utils/URLEncodeUtil.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/utils/URLEncoder$Companion.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/jerry/rt/utils/URLEncoder.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/classes/kotlin/main/META-INF/RtCore.kotlin_module" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/classes/kotlin/main/com/jerry/rt/bean/RtConfig.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/classes/kotlin/main/com/jerry/rt/bean/RtSessionConfig.class" beforeDir="false" />
@@ -117,8 +211,6 @@
       <change beforePath="$PROJECT_DIR$/build/classes/kotlin/main/com/jerry/rt/utils/URLEncodeUtil.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/classes/kotlin/main/com/jerry/rt/utils/URLEncoder$Companion.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/classes/kotlin/main/com/jerry/rt/utils/URLEncoder.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/kotlin/RtCore031jar-classes.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/kotlin/RtCore033jar-classes.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/kotlin/compileKotlin/cacheable/caches-jvm/inputs/source-to-output.tab" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/kotlin/compileKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/kotlin/compileKotlin/cacheable/caches-jvm/inputs/source-to-output.tab.keystream.len" beforeDir="false" />
@@ -203,20 +295,25 @@
       <change beforePath="$PROJECT_DIR$/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/lookups.tab.keystream.len" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/lookups.tab.len" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/lookups.tab.values" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.at" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/lookups.tab.values.s" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/lookups.tab_i" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/kotlin/compileKotlin/cacheable/caches-jvm/lookups/lookups.tab_i.len" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/kotlin/compileKotlin/cacheable/last-build.bin" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/kotlin/compileKotlin/local-state/build-history.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/libs/RtCore-0.3.1.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/libs/RtCore-0.3.3.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/libs/RtCore-0.3.4.jar" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/previous-compilation-data.bin" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/tmp/jar/MANIFEST.MF" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/artifacts/RtCore_jar/RtCore.jar" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifacts/RtCore_jar/RtCore.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/artifacts/RtCore_jar/RtCore.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/jerry/rt/jva/StreamUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/jerry/rt/jva/StreamUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/core/RtCore.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/core/RtCore.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/core/http/pojo/ProtocolPackage.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/core/http/pojo/ProtocolPackage.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/core/http/pojo/Response.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/core/http/pojo/Response.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/core/http/protocol/RtConstants.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/core/http/protocol/RtConstants.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/core/http/response/ResponseWriter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/core/http/response/ResponseWriter.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/core/http/response/impl/ByteResponseWriter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/core/http/response/impl/ByteResponseWriter.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/core/http/response/impl/StringResponseWriter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/core/http/response/impl/StringResponseWriter.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/core/http/response/interfaces/Writer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/core/http/response/interfaces/Writer.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/utils/RtUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/utils/RtUtils.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -412,6 +509,26 @@
     <MESSAGE value="publish 0.1.1" />
     <MESSAGE value="publish 0.1.3" />
     <option name="LAST_COMMIT_MESSAGE" value="publish 0.1.3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="java.util.ConcurrentModificationException" package="java.util" />
+          <option name="timeStamp" value="5" />
+        </breakpoint>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/core/http/request/ClientRequest.kt</url>
+          <line>234</line>
+          <option name="timeStamp" value="10" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/src/main/kotlin/com/jerry/rt/core/http/pojo/Response.kt</url>
+          <line>260</line>
+          <option name="timeStamp" value="19" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

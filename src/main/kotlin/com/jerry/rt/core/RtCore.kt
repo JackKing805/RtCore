@@ -6,6 +6,7 @@ import com.jerry.rt.core.http.interfaces.ClientListener
 import com.jerry.rt.core.http.pojo.Cookie
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
+import com.jerry.rt.core.http.protocol.RtCode
 import com.jerry.rt.core.http.protocol.RtContentType
 import com.jerry.rt.core.thread.Looper
 import com.jerry.rt.extensions.createExceptionCoroutineScope
@@ -156,72 +157,133 @@ class RtCore private constructor() {
 
 
 
-fun main(){
-    thread {
-        RtCore.instance.run(RtConfig(),object :RtCoreListener{
-            override fun onStatusChange(status: RtCoreListener.Status) {
-                println("status:$status")
-            }
+//fun main(){
+//    thread {
+//        RtCore.instance.run(RtConfig(),object :RtCoreListener{
+//            override fun onStatusChange(status: RtCoreListener.Status) {
+//                println("status:$status")
+//            }
+//
+//            override fun onClientIn(client: Client) {
+//                println("onClientIn:")
+//                client.listen(object :ClientListener{
+//                    override suspend fun onRtHeartbeat(client: Client) {
+//                        println("onRtHeartbeatIn:")
+//                    }
+//
+//                    override fun onRtClientIn(client: Client, response: Response) {
+//                        println("onRtClientIn:")
+//                        thread {
+//                            var i = 1
+//                            while (true){
+//                                sleep(2000)
+//                                response.write("hello:$i")
+//                                i++
+//                            }
+//                        }
+//                    }
+//
+//                    override suspend fun onRtMessage(request: Request,response: Response) {
+//                        println("onRtMessage:${request.getPackage().getRequestURI()}")
+//                    }
+//
+//                    override fun onRtClientOut(client: Client,response: Response) {
+//                        println("onRtClientOut:")
+//                    }
+//
+//                    override suspend fun onMessage(client: Client, request: Request, response: Response) {
+//                        println("onRtMessage:${RtUtils.getPublishHost(request)},${RtUtils.getLocalHost(request.getContext())},url:${request.getPackage().path},${request.getPackage().getRequestURI().toString()},${request.getPackage().getSession().getId()}")
+//                        response.addCookie(Cookie("aa","dd", expires = Date(System.currentTimeMillis() + 1000000)))
+//
+//                        var protocolPackage = request.getPackage()
+//                        val strinss = protocolPackage.getRootAbsolutePath() + ":" + protocolPackage.getRequestAbsolutePath() + ":" + protocolPackage.getRequestPath()
+//
+//                        response.write(strinss,RtContentType.TEXT_HTML.content)
+//                    }
+//
+//                    override suspend fun onInputStreamIn(client: Client, inputStream: InputStream) {
+//
+//                    }
+//
+//                    override fun onException(exception: Exception) {
+//                        exception.printStackTrace()
+//                        println("onRtCoreException:$exception")
+//                    }
+//                })
+//            }
+//
+//            override fun onClientOut(client: Client) {
+//                println("onClientOut:")
+//
+//            }
+//
+//            override fun onRtCoreException(exception: Exception) {
+//                exception.printStackTrace()
+//                println("onRtCoreException:$exception")
+//
+//            }
+//
+//        })
+//    }
+//}
 
-            override fun onClientIn(client: Client) {
-                println("onClientIn:")
-                client.listen(object :ClientListener{
-                    override suspend fun onRtHeartbeat(client: Client) {
-                        println("onRtHeartbeatIn:")
-                    }
 
-                    override fun onRtClientIn(client: Client, response: Response) {
-                        println("onRtClientIn:")
-                        thread {
-                            var i = 1
-                            while (true){
-                                sleep(2000)
-                                response.write("hello:$i")
-                                i++
+fun main() {
+    RtCore.instance.run(rtConfig = RtConfig(
+        port = 8080
+    ),statusListener = object :RtCoreListener{
+        override fun onClientIn(client: Client) {
+            client.listen(object :ClientListener{
+                override fun onException(exception: Exception) {
+                    exception.printStackTrace()
+                }
+
+                override suspend fun onInputStreamIn(client: Client, inputStream: InputStream) {
+
+                }
+
+                override suspend fun onMessage(client: Client, request: Request, response: Response) {
+                    val path = request.getPackage().path
+                    if (path=="/video/list"){
+                        val list = mutableListOf<String>()
+                        val file = File("F:\\BaiduNetdiskDownload\\.sexvideo")
+                        if (file.exists()){
+                            file.listFiles()?.forEach {
+                                list.add(it.name)
                             }
                         }
+
+
+                        response.setContentType(RtContentType.JSON.content)
+                        response.write(list.toString())
+                    }else if(path.startsWith("/video/handle/play")){
+                        val videoName = "10.mp4"
+                        val file = File("F:\\BaiduNetdiskDownload\\.sexvideo",videoName)
+                        response.writeFile(file)
+                    }else{
+                        response.setContentType(RtContentType.TEXT_HTML.content)
+                        response.setResponseStatusCode(RtCode._400.code)
+                        response.sendHeader()
                     }
+                }
 
-                    override suspend fun onRtMessage(request: Request,response: Response) {
-                        println("onRtMessage:${request.getPackage().getRequestURI()}")
-                    }
+                override fun onRtClientIn(client: Client, response: Response) {
 
-                    override fun onRtClientOut(client: Client,response: Response) {
-                        println("onRtClientOut:")
-                    }
+                }
 
-                    override suspend fun onMessage(client: Client, request: Request, response: Response) {
-                        println("onRtMessage:${RtUtils.getPublishHost(request)},${RtUtils.getLocalHost(request.getContext())},url:${request.getPackage().path},${request.getPackage().getRequestURI().toString()},${request.getPackage().getSession().getId()}")
-                        response.addCookie(Cookie("aa","dd", expires = Date(System.currentTimeMillis() + 1000000)))
+                override fun onRtClientOut(client: Client, response: Response) {
 
-                        var protocolPackage = request.getPackage()
-                        val strinss = protocolPackage.getRootAbsolutePath() + ":" + protocolPackage.getRequestAbsolutePath() + ":" + protocolPackage.getRequestPath()
+                }
 
-                        response.write(strinss,RtContentType.TEXT_HTML.content)
-                    }
+                override suspend fun onRtHeartbeat(client: Client) {
 
-                    override suspend fun onInputStreamIn(client: Client, inputStream: InputStream) {
+                }
 
-                    }
+                override suspend fun onRtMessage(request: Request, response: Response) {
 
-                    override fun onException(exception: Exception) {
-                        exception.printStackTrace()
-                        println("onRtCoreException:$exception")
-                    }
-                })
-            }
+                }
 
-            override fun onClientOut(client: Client) {
-                println("onClientOut:")
-
-            }
-
-            override fun onRtCoreException(exception: Exception) {
-                exception.printStackTrace()
-                println("onRtCoreException:$exception")
-
-            }
-
-        })
-    }
+            })
+        }
+    })
 }
