@@ -85,12 +85,12 @@ class ProtocolPackage(
         fun getContentLength() = try {
             val values = getHeaderValue(RtHeader.CONTENT_LENGTH.content)
             if (values.isEmpty()) {
-                0L
+                0
             }else {
-                values.toLong()
+                values.toInt()
             }
         } catch (e: Exception) {
-            0L
+            0
         }
 
         fun getAcceptRanges():Array<Long>?{

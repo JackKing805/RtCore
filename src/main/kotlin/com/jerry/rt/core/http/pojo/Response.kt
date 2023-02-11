@@ -134,7 +134,7 @@ class Response(
     //https://blog.csdn.net/lantian_123/article/details/101517817?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-1-101517817-blog-110749214.pc_relevant_3mothn_strategy_and_data_recovery&spm=1001.2101.3001.4242.2&utm_relevant_index=4 分块传输原理
     @Throws(IOException::class)
     open fun writeFile(file: File, contentType: String? = null) {
-        val content_type = contentType?: RtMimeTypeMatcher.matchContentType(file.absolutePath)
+        val content_type =contentType?:header[RtHeader.CONTENT_TYPE.content]?: RtMimeTypeMatcher.matchContentType(file.absolutePath)
         setHeader(RtHeader.CONTENT_TYPE.content,content_type)
 
 
@@ -229,14 +229,19 @@ class Response(
 
     @Throws(IOException::class)
     fun writeInputStream(inputStream: InputStream, contentType: String, length: Int) {
+        val rContentType = header[RtHeader.CONTENT_TYPE.content]?:contentType
+        val l = header[RtHeader.CONTENT_LENGTH.content]
+        val rContentLength =  if (!l.isNullOrEmpty()){
+            l.toInt()
+        }else{
+            length
+        }
         val byteArray = ByteArray(length)
         inputStream.read(byteArray)
-        write(byteArray, contentType, length)
+        write(byteArray, rContentType, rContentLength)
     }
 
     fun getPrintWriter() = PrintWriter(output)
-
-
 
 
     /**
