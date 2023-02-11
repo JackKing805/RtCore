@@ -4,6 +4,7 @@ import com.jerry.rt.core.RtContext
 import com.jerry.rt.core.http.protocol.RtCode
 import com.jerry.rt.core.http.protocol.RtHeader
 import com.jerry.rt.core.http.protocol.RtMimeType
+import com.jerry.rt.core.http.protocol.RtMimeTypeMatcher
 import com.jerry.rt.core.http.response.impl.ByteResponseWriter
 import com.jerry.rt.utils.RtUtils
 import com.jerry.rt.utils.URLEncodeUtil
@@ -149,7 +150,7 @@ class Response(
         if (fileSize > 2147483647L) {
             throw IllegalArgumentException("File size is too bigger than 2147483647")
         } else {
-            val rcontentType = contentType ?: RtMimeType.matchContentType(file.absolutePath).mimeType
+            val rcontentType = contentType ?: RtMimeTypeMatcher.matchContentType(file.absolutePath)
             if (!rcontentType.startsWith("text/")) {
                 setHeader(
                     RtHeader.CONTENT_DISPOSITION.content,
