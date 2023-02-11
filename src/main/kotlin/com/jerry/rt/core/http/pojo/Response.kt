@@ -50,9 +50,17 @@ class Response(
         header[key] = value
     }
 
+    fun getHeader(key: String,default:String?=null):String?{
+        return header[key]?:default
+    }
+
+    fun getHeaders() = header
+
     fun addCookie(cookie: Cookie){
         cookies.add(cookie)
     }
+
+    fun getCookies() = cookies
 
     fun setHeaders(headers: MutableMap<String, String>) {
         header.putAll(headers.filter {
@@ -78,6 +86,8 @@ class Response(
         statusCode = code
     }
 
+    fun getResponseStatusCode() = statusCode
+
     fun setContentLength(length: Int) {
         header[RtHeader.CONTENT_LENGTH.content] = length.toString()
     }
@@ -89,6 +99,8 @@ class Response(
     fun removeHeader(name:String){
         header.remove(name)
     }
+
+    fun getByteWriter() = byteResponseWriter
 
     @Throws(IOException::class)
     fun write(body: ByteArray, contentType: String, length: Int = body.size) {
