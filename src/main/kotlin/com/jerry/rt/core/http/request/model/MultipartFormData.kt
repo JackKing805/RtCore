@@ -26,6 +26,7 @@ This is the file content.
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
  */
+//todo 当前读取中文会乱码
 class MultipartFormData(
     private val context: RtContext,
     private val protocolPackage: ProtocolPackage,
