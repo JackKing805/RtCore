@@ -1,6 +1,7 @@
 package com.jerry.rt.core
 
 import com.jerry.rt.bean.RtConfig
+import com.jerry.rt.bean.RtFileConfig
 import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.interfaces.ClientListener
 import com.jerry.rt.core.http.pojo.Request
@@ -228,7 +229,11 @@ fun main() {
 //            File("C:\\Users\\10720\\Downloads\\key\\testkeystore.jks"),
 //            "123456",
 //            "123456"
-//        )
+//        ),
+    rtFileConfig = RtFileConfig(
+        tempFileDir = "C:\\Users\\10720\\Downloads\\key\\temp",
+        saveFileDir = "C:\\Users\\10720\\Downloads\\key"
+    )
     ),statusListener = object :RtCoreListener{
         override fun onClientIn(client: Client) {
             client.listen(object : ClientListener {
@@ -241,13 +246,13 @@ fun main() {
                     val path = request.getPackage().path
                     val readAllData = request.readAllData()
                     val data = String(readAllData)
-                    val multipartFile = request.getMultipartFile()
+                    val multipartFile = request.getMultipartFormData()
                     if (multipartFile!=null){
-                        val file = File("C:\\Users\\10720\\Downloads\\key",multipartFile.getFileName())
+                        val file = File("C:\\Users\\10720\\Downloads\\key","xx")
                         if (!file.exists()){
                             file.createNewFile()
                         }
-                        multipartFile.save(file)
+
                     }
 
                     println("path:$path,pp:${request.getPackage().protocol},header:${request.getPackage().getHeader().toString()},data:$data")

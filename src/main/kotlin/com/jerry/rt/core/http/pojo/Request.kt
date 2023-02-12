@@ -3,7 +3,7 @@ package com.jerry.rt.core.http.pojo
 import com.jerry.rt.core.RtContext
 import com.jerry.rt.core.http.protocol.RtContentType
 import com.jerry.rt.core.http.request.interfaces.DataReadListener
-import com.jerry.rt.core.http.request.model.MultipartFile
+import com.jerry.rt.core.http.request.model.MultipartFormData
 import com.jerry.rt.core.http.request.model.SocketData
 
 /**
@@ -23,33 +23,31 @@ data class Request(
     
     fun getPackage() = protocolPackage
     
-    
-
     fun getContext() = rtContext
 
     override fun readData(byteArray: ByteArray, len: Int) {
-        if (isFileUpload()){
+        if (isMultipart()){
             return
         }
         socketData.readData(byteArray,len)
     }
 
     override fun readData(byteArray: ByteArray, offset: Int, len: Int) {
-        if (isFileUpload()){
+        if (isMultipart()){
             return
         }
         socketData.readData(byteArray,offset, len)
     }
 
     override fun readAllData(): ByteArray {
-        if (isFileUpload()){
+        if (isMultipart()){
             return ByteArray(0)
         }
         return socketData.readAllData()
     }
 
     override fun readLine():String? {
-        if (isFileUpload()){
+        if (isMultipart()){
             return null
         }
         return socketData.readLine()
@@ -59,15 +57,15 @@ data class Request(
         socketData.skipData()
     }
 
-    fun getMultipartFile():MultipartFile?{
-        if (isFileUpload()){
-            return MultipartFile(protocolPackage,socketData.getSocketBody())
+    fun getMultipartFormData():MultipartFormData?{
+        if (isMultipart()){
+            return MultipartFormData(rtContext,protocolPackage,socketData.getSocketBody())
         }
         return null
     }
 
-    private fun isFileUpload():Boolean{
-        val contentType = protocolPackage.getHeader().getContentType()
-        return contentType.startsWith(RtContentType.MULTIPART.content)
+    private fun isMultipart():Boolean{
+        val contentType = protocolPackage.getHeader().getContentType().lowercase()
+        return contentType.startsWith(RtContentType.MULTIPART.content) || contentType==RtContentType.FORM_URLENCODED.content
     }
 }

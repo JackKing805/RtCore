@@ -18,7 +18,8 @@ data class RtConfig(
     val rtSessionConfig: RtSessionConfig = RtSessionConfig(),
     val serverVersionDetails:String = "RtServer/1.0",
     val socketListener: Class<out SocketListenerImpl> = SocketListenerImpl::class.java,//socket进入时负责数据处理的类
-    val rtSSLConfig: RtSSLConfig?=null
+    val rtSSLConfig: RtSSLConfig?=null,
+    val rtFileConfig:RtFileConfig
 )
 
 
@@ -33,4 +34,10 @@ data class RtSSLConfig(
     val keyStoreFile:File,
     val keyStorePassword:String,
     val keyPassword:String
+)
+
+data class RtFileConfig(
+    val tempFileDir:String,//上传文件的临时存储文职
+    val saveFileDir:String,//用户文件保存位置
+    val uploadMaxSize:Long = 1000L*1000*1000*20L//20gb
 )

@@ -6,7 +6,9 @@ import com.jerry.rt.core.http.request.interfaces.DataReadListener
 import com.jerry.rt.extensions.readLength
 import com.jerry.rt.extensions.skipNotConsumptionByte
 import com.jerry.rt.extensions.toByteArray
+import java.io.ByteArrayInputStream
 import java.io.DataInputStream
+import java.io.InputStream
 
 /**
  * @className: SocketBody
