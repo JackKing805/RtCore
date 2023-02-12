@@ -3,11 +3,10 @@ package com.jerry.rt.core.http.request.model
 import com.jerry.rt.core.http.request.exceptions.LimitLengthException
 import com.jerry.rt.core.http.request.exceptions.NoLengthReadException
 import com.jerry.rt.core.http.request.interfaces.DataReadListener
+import com.jerry.rt.extensions.asBufferReader
 import com.jerry.rt.extensions.readLength
 import com.jerry.rt.extensions.skipNotConsumptionByte
 import com.jerry.rt.extensions.toByteArray
-import java.io.ByteArrayInputStream
-import java.io.DataInputStream
 import java.io.InputStream
 
 /**
@@ -15,8 +14,9 @@ import java.io.InputStream
  * @author: Jerry
  * @date: 2023/2/12:14:52
  **/
-class SocketBody(private val maxSize:Long,private val inputStream: DataInputStream):DataReadListener {
+class SocketBody(private val maxSize:Long,private val inputStream: InputStream):DataReadListener {
     private var readSize = 0L
+    private val bufferReader = inputStream.asBufferReader()
 
     @Throws(exceptionClasses = [NoLengthReadException::class, LimitLengthException::class])
     override fun readData(byteArray: ByteArray,len: Int){
@@ -51,7 +51,7 @@ class SocketBody(private val maxSize:Long,private val inputStream: DataInputStre
             throw NoLengthReadException()
         }
 
-        val readLine = inputStream.readLine()
+        val readLine = bufferReader.readLine()
         readSize+=readLine?.length?:0
         return readLine
     }

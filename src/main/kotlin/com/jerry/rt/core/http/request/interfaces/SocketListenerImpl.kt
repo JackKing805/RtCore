@@ -5,10 +5,10 @@ import com.jerry.rt.core.http.protocol.RtProtocol
 import com.jerry.rt.core.http.protocol.RtVersion
 import com.jerry.rt.core.http.request.model.MessageRtProtocol
 import com.jerry.rt.core.http.request.model.SocketData
-import com.jerry.rt.extensions.asDataInputStream
+import com.jerry.rt.extensions.asBufferReader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.DataInputStream
+import java.io.BufferedReader
 import java.net.Socket
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -26,6 +26,7 @@ open class SocketListenerImpl:SocketListener {
 
     protected fun isAlive() = isAlive.get()
 
+
     @Throws(Exception::class)
     override suspend fun onSocketIn(
         socket: Socket,
@@ -33,10 +34,12 @@ open class SocketListenerImpl:SocketListener {
     ) {
         val inputStream = withContext(Dispatchers.IO) {
             socket.getInputStream()
-        }.asDataInputStream()
+        }
+
+        val bufferedReader = inputStream.asBufferReader()
         while (isAlive()){
             try {
-                val onPre = onPre(inputStream)
+                val onPre = onPre(bufferedReader)
                 if (onPre!=null){
                     onSocketData.invoke(SocketData(onPre,inputStream))
                 }
@@ -52,11 +55,13 @@ open class SocketListenerImpl:SocketListener {
     }
 
     @Throws(Exception::class)
-    private suspend fun onPre(inputStream: DataInputStream):MessageRtProtocol? {
+    private suspend fun onPre(inputStream: BufferedReader):MessageRtProtocol? {
         var isProtocolLine = true
         val rtProtocol = RtProtocol()
         while (isAlive()) {
-            val readLine = inputStream.readLine()
+            val readLine = withContext(Dispatchers.IO) {
+                inputStream.readLine()
+            }
             if (isProtocolLine) {
                 readLine ?: return null
                 val split = readLine.split(" ")
