@@ -3,6 +3,7 @@ package com.jerry.rt.core.http.pojo
 import com.jerry.rt.core.RtContext
 import com.jerry.rt.core.http.interfaces.ISession
 import com.jerry.rt.core.http.protocol.RtHeader
+import com.jerry.rt.core.http.protocol.RtMethod
 import com.jerry.rt.core.http.protocol.RtVersion
 import java.net.URI
 
@@ -22,6 +23,10 @@ class ProtocolPackage(
     private val rootPath = "${RtVersion.getPrefix(protocol)}://"+header.getHeaderValue(RtHeader.HOST.content,"")
     private val realUrl = rootPath + if (path.startsWith("/")) path else "/$path"
     private val requestURI = URI.create(realUrl)
+
+
+    fun isRtConnect() = method.equals(RtMethod.RT.content,true) && protocol == RtVersion.RT_1_0
+
 
     fun getHeader() = header
 
@@ -93,18 +98,27 @@ class ProtocolPackage(
             0
         }
 
-        fun getAcceptRanges():Array<Long>?{
+        fun getAcceptRanges():Array<Int>?{
             val ranges = getHeaderValue("Range")
             if (ranges.isEmpty()){
                 return null
             }else{
-                var x = 0L
-                var y = 0L
+                var x = 0
+                var y = 0
                 if (ranges.startsWith("bytes=")) {
-                    val range = ranges.split("=")[1].split("-")
-                    x = range[0].toLongOrNull()?:0L
-                    if (range.size > 1) {
-                        y = range[1].toLongOrNull()?:0L
+                    val range = ranges.split("=")[1]//bytes=x-y
+                    val split = range.split("-")
+                    if(split.size==1){
+                        if (range.startsWith("-")){
+                            y = -(split[0].toIntOrNull()?:0)
+                        }else{
+                            x = split[0].toIntOrNull()?:0
+                        }
+                    }else{
+                        x = split[0].toIntOrNull()?:0
+                        if (split.size > 1) {
+                            y = split[1].toIntOrNull()?:0
+                        }
                     }
                 }
                 return arrayOf(x,y)

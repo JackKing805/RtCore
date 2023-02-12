@@ -71,6 +71,8 @@ internal fun InputStream.skipNotConsumptionByte(length: Long){
     skip(length)
 }
 
+internal fun InputStream.asDataInputStream() = DataInputStream(this)
+
 fun MutableList<ByteArray>.getIndex(index:Int):Byte{
     var position = -1
     for (i in 0 until size){

@@ -1,27 +1,22 @@
 package com.jerry.rt.core
 
 import com.jerry.rt.bean.RtConfig
+import com.jerry.rt.bean.RtSSLConfig
 import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.interfaces.ClientListener
-import com.jerry.rt.core.http.pojo.Cookie
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
-import com.jerry.rt.core.http.protocol.RtCode
 import com.jerry.rt.core.http.protocol.RtContentType
 import com.jerry.rt.core.thread.Looper
 import com.jerry.rt.extensions.createExceptionCoroutineScope
 import com.jerry.rt.extensions.logInfo
 import com.jerry.rt.interfaces.RtCoreListener
 import com.jerry.rt.utils.PlatformUtils
-import com.jerry.rt.utils.RtUtils
 import kotlinx.coroutines.*
 import java.io.File
 import java.io.InputStream
-import java.lang.Thread.sleep
 import java.time.Duration
-import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.concurrent.thread
 
 class RtCore private constructor() {
     companion object {
@@ -226,3 +221,52 @@ class RtCore private constructor() {
 //        })
 //    }
 //}
+
+
+fun main() {
+    RtCore.instance.run(rtConfig = RtConfig(
+        port = 8080,
+        rtSSLConfig = RtSSLConfig(
+            File("C:\\Users\\10720\\Downloads\\key\\testkeystore.jks"),
+            "123456",
+            "123456"
+        )
+    ),statusListener = object :RtCoreListener{
+        override fun onClientIn(client: Client) {
+            client.listen(object :ClientListener{
+                override fun onException(exception: Exception) {
+                    exception.printStackTrace()
+                }
+
+                override suspend fun onInputStreamIn(client: Client, inputStream: InputStream) {
+
+                }
+
+                override suspend fun onMessage(client: Client, request: Request, response: Response) {
+                    val path = request.getPackage().path
+                    val readAllData = request.readAllData()
+                    val data = String(readAllData)
+                    response.setContentType(RtContentType.TEXT_HTML.content)
+                    response.write("path:$path,data:$data,pp:${request.getPackage().protocol}")
+                }
+
+                override fun onRtClientIn(client: Client, response: Response) {
+
+                }
+
+                override fun onRtClientOut(client: Client, response: Response) {
+
+                }
+
+                override suspend fun onRtHeartbeat(client: Client) {
+
+                }
+
+                override suspend fun onRtMessage(request: Request, response: Response) {
+
+                }
+
+            })
+        }
+    })
+}

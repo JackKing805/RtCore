@@ -6,23 +6,15 @@ import com.jerry.rt.core.http.interfaces.ClientListener
 import com.jerry.rt.core.http.pojo.ProtocolPackage
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
-import com.jerry.rt.core.http.protocol.Header
 import com.jerry.rt.core.http.protocol.RtContentType
-import com.jerry.rt.core.http.protocol.RtProtocol
-import com.jerry.rt.core.http.protocol.RtVersion
+import com.jerry.rt.core.http.request.model.SocketData
 import com.jerry.rt.core.thread.Looper
-import com.jerry.rt.extensions.connectIsRtConnect
 import com.jerry.rt.extensions.createStandCoroutineScope
-import com.jerry.rt.extensions.readLength
 import com.jerry.rt.extensions.rtContentTypeIsHeartbeat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.io.DataInputStream
-import java.io.InputStream
 import java.net.Socket
-import java.net.SocketException
-import kotlin.jvm.Throws
 
 /**
  * @className: ClientRequest
@@ -43,7 +35,7 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
     private var isRtIn = false
 
     private var localMessageListener: MessageListener = object : MessageListener {
-        override suspend fun ifRtConnectHeartbeat(rtProtocol: MessageListener.MessageRtProtocol) {
+        override suspend fun ifRtConnectHeartbeat(protocolPackage: ProtocolPackage) {
             try {
                 clientListener?.onRtHeartbeat(client)
             } catch (e: Exception) {
@@ -52,25 +44,20 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
         }
 
 
-        override suspend fun onMessage(rtProtocol: MessageListener.MessageRtProtocol, data: MutableList<ByteArray>) {
-            val protocolPackage = ProtocolPackage(
-                rtContext, rtProtocol.method, rtProtocol.url, rtProtocol.protocolString,
-                ProtocolPackage.Header(rtProtocol.header)
-            )
-
-            val request = Request(rtContext, protocolPackage, data)
-            if (rtProtocol.isRtConnect()) {
+        override suspend fun onMessage(socketData: SocketData) {
+            val request = Request(rtContext, socketData)
+            if (request.getPackage().isRtConnect()) {
                 checkHeartbeat()
                 if (rtResponse == null) {
-                    rtResponse = Response(rtContext, socket.getOutputStream(),protocolPackage)
+                    rtResponse = Response(rtContext, socket.getOutputStream(),request.getPackage())
                 }
 
-                if (rtProtocol.getContentType().rtContentTypeIsHeartbeat()) {
+                if (request.getPackage().getHeader().getContentType().rtContentTypeIsHeartbeat()) {
                     //心跳包
                     receiverHeartbeatTime = System.currentTimeMillis()
                     rtResponse!!.setContentType(RtContentType.RT_HEARTBEAT.content)
                     rtResponse!!.sendHeader()
-                    ifRtConnectHeartbeat(rtProtocol)
+                    ifRtConnectHeartbeat(request.getPackage())
                     return
                 }
                 //普通rt 信道
@@ -92,22 +79,13 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
                     tryClose()
                     return
                 }
-                val response = Response(rtContext, socket.getOutputStream(),protocolPackage)
+                val response = Response(rtContext, socket.getOutputStream(),request.getPackage())
 
 
                 //其他类型协议
                 dealProtocol(request, response)
                 tryClose()
             }
-        }
-
-        override suspend fun ifCustomInputStream(inputStream: InputStream) {
-            try {
-                clientListener?.onInputStreamIn(client, inputStream)
-            } catch (e: Exception) {
-                clientListener?.onException(e)
-            }
-            tryClose()
         }
 
         private suspend fun dealProtocol(request: Request, response: Response) {
@@ -127,31 +105,33 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
             if (isInit) {
                 return@launch
             }
+            this@ClientRequest.socket = s
             isInit = true
             isAlive = true
+            val socketListener = rtContext.getRtConfig().socketListener.newInstance()
             try {
-                this@ClientRequest.socket = s
-                if (rtContext.getRtConfig().customerParse) {
-                    socket.getInputStream().use {
-                        localMessageListener.ifCustomInputStream(it)
-                    }
-                } else {
-                    val dataInputStream = DataInputStream(socket.getInputStream())
-                    while (isAlive) {
-                        try {
-                            onPre(dataInputStream)
-                        } catch (e: Exception) {
-                            clientListener?.onException(e)
-                            break
-                        }
-                    }
+                socketListener.onSocketIn(s){
+                    localMessageListener.onMessage(it)
+                    it.skipData()
                 }
-            } catch (e: Exception) {
+            }catch (e:Exception){
                 clientListener?.onException(e)
-            } finally {
+            }finally {
                 tryClose()
-                looper.stop()
             }
+
+            while (isAlive){
+                delay(600)
+            }
+
+            try {
+                socketListener.onSocketOut(s)
+            }catch (e:Exception){
+                clientListener?.onException(e)
+            }
+            socketListener.stop()
+            tryClose()
+            looper.stop()
         }
         looper.loop()
     }
@@ -163,54 +143,6 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
         this.clientListener = clientListener
     }
 
-    @Throws(SocketException::class, IllegalArgumentException::class)
-    private suspend fun onPre(inputStream: DataInputStream) {
-        var isProtocolLine = true
-        val rtProtocol = RtProtocol()
-        while (isAlive) {
-            val readLine = inputStream.readLine()
-            if (isProtocolLine) {
-                readLine ?: return
-                val split = readLine.split(" ")
-                if (split.size < 3) {
-                    return
-                }
-                for (i in split.indices) {
-                    val content = split[i]
-                    if (i == 0) {
-                        //method
-                        rtProtocol.protocol.method = content
-                    } else if (i == 1) {
-                        //link
-                        rtProtocol.protocol.url = content
-                    } else if (i == 2) {
-                        //version
-                        rtProtocol.protocol.version = content
-                    }
-                }
-                isProtocolLine = false
-            } else if (readLine.contains(":")) {
-                val dotIndex = readLine.indexOf(":")
-                val name = readLine.substring(0, dotIndex)
-                val value = readLine.substring(dotIndex + 1)
-                val head = Header(name, value)
-                rtProtocol.header.add(head)
-            } else if (readLine.isEmpty()) {
-                break
-            }
-        }
-
-        val rtVersion = RtVersion.toRtVersion(rtProtocol.protocol.version)
-        val protocolMessage = MessageListener.MessageRtProtocol(
-            method = rtProtocol.protocol.method,
-            url = rtProtocol.protocol.url,
-            protocolString = rtVersion,
-            header = rtProtocol.getHeaderMap(),
-            rtProtocol
-        )
-        val byteArray = inputStream.readLength(protocolMessage.getContentLength())
-        localMessageListener.onMessage(protocolMessage, byteArray)
-    }
 
     private var isCheckHeartbeatStart = false
     private var receiverHeartbeatTime = -1L
@@ -261,43 +193,9 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
     internal fun isAlive(): Boolean = isAlive
 
     private interface MessageListener {
-        suspend fun ifRtConnectHeartbeat(rtProtocol: MessageRtProtocol)
+        suspend fun ifRtConnectHeartbeat(protocolPackage: ProtocolPackage)
 
-        suspend fun onMessage(rtProtocol: MessageRtProtocol, data: MutableList<ByteArray>)
-
-        suspend fun ifCustomInputStream(inputStream: InputStream)
-
-        data class MessageRtProtocol(
-            var method: String,
-            var url: String,
-            var protocolString: RtVersion,
-            val header: MutableMap<String, String>,
-            private val protocol: RtProtocol
-        ) {
-            private fun getValue(key: String, default: String = ""): String {
-                return ((header[key] as? String) ?: default).trim()
-            }
-
-            //获取内容类型:
-            fun getContentType() = getValue("Content-Type", "none")
-
-            //获取内容长度
-            fun getContentLength() = try {
-                val value = getValue("Content-Length")
-                if (value.isEmpty()) {
-                    0L
-                } else {
-                    value.toLong()
-                }
-            } catch (e: Exception) {
-                0L
-            }
-
-            fun isRtConnect() = protocol.connectIsRtConnect()
-
-            override fun toString(): String {
-                return "MessageRtProtocol(method='$method', url='$url', protocolString='$protocolString', header=$header)"
-            }
-        }
+        suspend fun onMessage(socketData: SocketData)
     }
+
 }

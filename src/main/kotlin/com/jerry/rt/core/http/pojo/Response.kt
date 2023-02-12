@@ -179,22 +179,25 @@ class Response(
         realWriteFile(file,acceptRanges,content_type)
     }
 
-    private fun realWriteFile(file: File,acceptRanges:Array<Long>?,contentType: String){
-        var rangeStart = 0L
-        var rangeEnd = 0L
+    private fun realWriteFile(file: File,acceptRanges:Array<Int>?,contentType: String){
+        var rangeStart = 0
+        var rangeEnd = 0
 
 
         val fileLength = file.length().toInt()
         if (acceptRanges == null) {
-            rangeEnd = fileLength - 1L
+            rangeEnd = fileLength - 1
         } else {
             rangeStart = acceptRanges.first()
             rangeEnd = acceptRanges.last()
         }
 
 
-        if (rangeEnd == 0L) {
-            rangeEnd = fileLength - 1L
+        if (rangeEnd == 0) {
+            rangeEnd = fileLength - 1
+        }else if (rangeEnd<0){
+            rangeStart = fileLength + rangeEnd-1
+            rangeEnd = fileLength - 1
         }
 
         if (rangeStart>=fileLength || rangeEnd>=fileLength){
@@ -203,9 +206,9 @@ class Response(
             return
         }
 
-        val contentLength = rangeEnd - rangeStart + 1L
+        val contentLength = rangeEnd - rangeStart + 1
         val fileInput = FileInputStream(file)
-        fileInput.skip(rangeStart)
+        fileInput.skip(rangeStart.toLong())
         send({
             setResponseStatusCode(RtCode._206.code)
             if (!contentType.startsWith("text/")) {
@@ -222,7 +225,7 @@ class Response(
             var len = 0
             var totalLen = 0
             while (fileInput.read(buffer).also { len = it }!=-1 && totalLen<contentLength){
-                val wl = len.coerceAtMost(contentLength.toInt() - totalLen)
+                val wl = len.coerceAtMost(contentLength - totalLen)
                 totalLen+=wl
                 it.writeBody(buffer,0,wl)
             }

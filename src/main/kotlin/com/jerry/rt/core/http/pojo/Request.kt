@@ -1,7 +1,8 @@
 package com.jerry.rt.core.http.pojo
 
 import com.jerry.rt.core.RtContext
-import com.jerry.rt.extensions.toByteArray
+import com.jerry.rt.core.http.request.interfaces.DataReadListener
+import com.jerry.rt.core.http.request.model.SocketData
 
 /**
  * @className: Request
@@ -11,14 +12,32 @@ import com.jerry.rt.extensions.toByteArray
  **/
 data class Request(
     private val rtContext: RtContext,
-    private val protocolPackage: ProtocolPackage,
-    private val data: MutableList<ByteArray>
-) {
+    private val socketData: SocketData
+):DataReadListener {
+    private val protocolPackage = ProtocolPackage(
+        rtContext, socketData.messageRtProtocol.method, socketData.messageRtProtocol.url, socketData.messageRtProtocol.protocolString,
+        ProtocolPackage.Header(socketData.messageRtProtocol.header)
+    )
+    
     fun getPackage() = protocolPackage
-
-    fun getOriginBody() = data
-
-    fun getBody() = data.toByteArray()
+    
+    
 
     fun getContext() = rtContext
+
+    override fun readData(byteArray: ByteArray, len: Int) {
+        socketData.readData(byteArray,len)
+    }
+
+    override fun readData(byteArray: ByteArray, offset: Int, len: Int) {
+        socketData.readData(byteArray,offset, len)
+    }
+
+    override fun readAllData(): ByteArray {
+        return socketData.readAllData()
+    }
+
+    override fun skipData() {
+        socketData.skipData()
+    }
 }

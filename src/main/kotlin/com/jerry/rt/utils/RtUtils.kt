@@ -12,6 +12,7 @@ import java.util.*
  * @date: 2023/1/26:15:14
  **/
 object RtUtils {
+    //获取局域网ip加端口
     fun getLocalHost(rtContext: RtContext):String{
         return try {
             InetAddress.getLocalHost().hostAddress + ":" + rtContext.getRtConfig().port
@@ -32,6 +33,17 @@ object RtUtils {
         return simpleDateFormat.format(date)
     }
 
+    //获取局域网ip
+    fun getLocalIpAddress(): String {
+        val host = InetAddress.getLocalHost()
+        val ip = host.hostAddress
 
+        // 检查是否是局域网 IP 地址
+        if (!ip.startsWith("192.168.")) {
+            throw Exception("Not a LAN IP address")
+        }
+
+        return ip
+    }
 
 }

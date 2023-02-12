@@ -2,6 +2,8 @@ package com.jerry.rt.bean
 
 import com.jerry.rt.core.http.interfaces.ISessionManager
 import com.jerry.rt.core.http.other.SessionManager
+import com.jerry.rt.core.http.request.interfaces.SocketListenerImpl
+import java.io.File
 import java.time.Duration
 
 /**
@@ -12,10 +14,11 @@ import java.time.Duration
  **/
 data class RtConfig(
     val port:Int = 8080,
-    val customerParse:Boolean = false,//是否自主解析inputStream
     val heartbeatReceiverIntervalTime:Duration = Duration.ofSeconds(10),//收到心跳包最小间隔时间
     val rtSessionConfig: RtSessionConfig = RtSessionConfig(),
-    val serverVersionDetails:String = "RtServer/1.0"
+    val serverVersionDetails:String = "RtServer/1.0",
+    val socketListener: Class<out SocketListenerImpl> = SocketListenerImpl::class.java,//socket进入时负责数据处理的类
+    val rtSSLConfig: RtSSLConfig?=null
 )
 
 
@@ -23,4 +26,11 @@ data class RtSessionConfig(
     val sessionValidTime:Duration = Duration.ofMinutes(15),//session有效时间
     val sessionClazz:Class<out ISessionManager> = SessionManager::class.java,
     val sessionKey:String = "JESSIONID"
+)
+
+data class RtSSLConfig(
+    //只能配置地址为本地文件
+    val keyStoreFile:File,
+    val keyStorePassword:String,
+    val keyPassword:String
 )

@@ -3,6 +3,7 @@ package com.jerry.rt.core.thread
 import java.lang.Thread.sleep
 import java.util.LinkedHashMap
 import java.util.LinkedList
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 
 /**
@@ -13,7 +14,7 @@ import kotlin.concurrent.thread
  **/
 class Looper {
     private var initThread:Thread?=null
-    private var active = true
+    private var active = AtomicBoolean(true)
 
     fun prepare(){
         if (initThread!=null){
@@ -31,14 +32,14 @@ class Looper {
             throw IllegalStateException("please loop at same thread")
         }
 
-        while (active){
+        while (active.get()){
             sleep(500)
         }
     }
 
 
     fun stop(){
-        active = false
+        active.set(false)
     }
 
     fun getThread() = initThread?:throw NullPointerException("please prepare first")
