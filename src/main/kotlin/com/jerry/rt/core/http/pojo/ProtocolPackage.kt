@@ -85,6 +85,10 @@ class ProtocolPackage(
             return (header[key] ?: default).trim()
         }
 
+        fun getHeaderValueOrNull(key: String): String? {
+            return header[key]?.trim()
+        }
+
         fun getContentType() = getHeaderValue(RtHeader.CONTENT_TYPE.content, "text/plain")
 
         fun getContentLength() = try {

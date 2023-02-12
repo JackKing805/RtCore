@@ -1,7 +1,6 @@
 package com.jerry.rt.core
 
 import com.jerry.rt.bean.RtConfig
-import com.jerry.rt.bean.RtSSLConfig
 import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.interfaces.ClientListener
 import com.jerry.rt.core.http.pojo.Request
@@ -14,7 +13,6 @@ import com.jerry.rt.interfaces.RtCoreListener
 import com.jerry.rt.utils.PlatformUtils
 import kotlinx.coroutines.*
 import java.io.File
-import java.io.InputStream
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -226,28 +224,35 @@ class RtCore private constructor() {
 fun main() {
     RtCore.instance.run(rtConfig = RtConfig(
         port = 8080,
-        rtSSLConfig = RtSSLConfig(
-            File("C:\\Users\\10720\\Downloads\\key\\testkeystore.jks"),
-            "123456",
-            "123456"
-        )
+//        rtSSLConfig = RtSSLConfig(
+//            File("C:\\Users\\10720\\Downloads\\key\\testkeystore.jks"),
+//            "123456",
+//            "123456"
+//        )
     ),statusListener = object :RtCoreListener{
         override fun onClientIn(client: Client) {
-            client.listen(object :ClientListener{
+            client.listen(object : ClientListener {
                 override fun onException(exception: Exception) {
                     exception.printStackTrace()
                 }
 
-                override suspend fun onInputStreamIn(client: Client, inputStream: InputStream) {
-
-                }
 
                 override suspend fun onMessage(client: Client, request: Request, response: Response) {
                     val path = request.getPackage().path
                     val readAllData = request.readAllData()
                     val data = String(readAllData)
+                    val multipartFile = request.getMultipartFile()
+                    if (multipartFile!=null){
+                        val file = File("C:\\Users\\10720\\Downloads\\key",multipartFile.getFileName())
+                        if (!file.exists()){
+                            file.createNewFile()
+                        }
+                        multipartFile.save(file)
+                    }
+
+                    println("path:$path,pp:${request.getPackage().protocol},header:${request.getPackage().getHeader().toString()},data:$data")
                     response.setContentType(RtContentType.TEXT_HTML.content)
-                    response.write("path:$path,data:$data,pp:${request.getPackage().protocol}")
+                    response.write("path:$path,data:$data,pp:${request.getPackage().protocol},header:${request.getPackage().getHeader().toString()}}")
                 }
 
                 override fun onRtClientIn(client: Client, response: Response) {
@@ -268,5 +273,58 @@ fun main() {
 
             })
         }
+
+        override fun onRtCoreException(exception: Exception) {
+            exception.printStackTrace()
+        }
     })
 }
+
+
+//fun main() {
+//    val server = ServerSocket(8080)
+//    println("服务器启动，等待客户端连接...")
+//    while (true) {
+//        val client = server.accept()
+//        println("客户端已连接：${client.inetAddress.hostAddress}")
+//        val reader = BufferedReader(InputStreamReader(client.getInputStream()))
+//        val writer = DataOutputStream(client.getOutputStream())
+//        // 解析请求
+//        val request = StringBuilder()
+//        while (true) {
+//            val line = reader.readLine() ?: break
+//            request.append(line).append("\n")
+//        }
+//        println("请求报文：\n$request")
+//        // 处理请求
+//        if (request.startsWith("POST / HTTP/1.1")) {
+//            // 解析上传的文件
+//            val boundary =
+//                "--" + request.toString().substringAfter("Content-Type: multipart/form-data; boundary=").trim()
+//            val parts = request.split(boundary).filter { it.isNotEmpty() && !it.startsWith("--") }
+//            for (part in parts) {
+//                val headers = part.substringBefore("\r\n\r\n")
+//                val name =
+//                    headers.substringAfter("Content-Disposition: form-data; name=").substringBefore(";").trim('"')
+//                val fileName = headers.substringAfter("filename=").substringBefore("\r").trim('"')
+//                val contentType = headers.substringAfter("Content-Type:").trim()
+//                val content = part.substringAfter("\r\n\r\n").trim('\r', '\n')
+//                println("参数 $name=$content")
+//                println("文件 $fileName, 格式 $contentType, 大小 ${content.length} 字节")
+//                // 根据需要进行存储操作
+//            }
+//            // 响应请求
+//            writer.writeBytes("HTTP/1.1 200 OK\r\n")
+//            writer.writeBytes("Content-Type: text/plain\r\n")
+//            writer.writeBytes("\r\n")
+//            writer.writeBytes("文件上传成功\r\n")
+//        } else {
+//            // 响应请求
+//            writer.writeBytes("HTTP/1.1 400 Bad request\r\n")
+//            writer.writeBytes("Content-Type: text/plain\r\n")
+//            writer.writeBytes("\r\n")
+//            writer.writeBytes("文件上传失败\r\n")
+//        }
+//
+//    }
+//}

@@ -44,7 +44,6 @@ open class SocketListenerImpl:SocketListener {
                 break
             }
         }
-        inputStream.close()
     }
 
 
