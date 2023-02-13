@@ -244,15 +244,14 @@ fun main() {
 
                 override suspend fun onMessage(client: Client, request: Request, response: Response) {
                     val path = request.getPackage().path
-                    val readAllData = request.readAllData()
-                    val data = String(readAllData)
+                    val data = request.getBody()
                     val multipartFile = request.getMultipartFormData()
                     if (multipartFile!=null){
                         val file = File("C:\\Users\\10720\\Downloads\\key","xx")
                         if (!file.exists()){
                             file.createNewFile()
                         }
-
+                        multipartFile
                     }
 
                     println("path:$path,pp:${request.getPackage().protocol},header:${request.getPackage().getHeader().toString()},data:$data")

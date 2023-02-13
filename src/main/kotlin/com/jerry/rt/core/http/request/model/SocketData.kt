@@ -10,7 +10,7 @@ import java.io.InputStream
  **/
 class SocketData(
     val messageRtProtocol: MessageRtProtocol,
-    private val inputStream: InputStream
+    inputStream: InputStream
 ) :DataReadListener{
     private val socketBody = SocketBody(messageRtProtocol.getContentLength(),inputStream)
 
@@ -26,10 +26,6 @@ class SocketData(
 
     override fun readAllData(): ByteArray {
         return socketBody.readAllData()
-    }
-
-    override fun readLine():String? {
-        return socketBody.readLine()
     }
 
     override fun skipData() {

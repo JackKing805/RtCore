@@ -82,7 +82,7 @@ class ProtocolPackage(
         }
 
         fun getHeaderValue(key: String, default: String = ""): String {
-            return (header[key] ?: default).trim()
+            return header.entries.find { it.key.trim().lowercase() == key.lowercase() }?.value?.trim()?:default
         }
 
         fun getHeaderValueOrNull(key: String): String? {
