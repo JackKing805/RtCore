@@ -186,6 +186,10 @@ class MultipartFormData(
                         )
                     }
 
+                    if (tLine==endBoundary){
+                        break
+                    }
+
                     contentDisposition = ""
                     mContentType = ""
                     name = ""
