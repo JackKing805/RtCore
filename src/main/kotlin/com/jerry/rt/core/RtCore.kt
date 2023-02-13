@@ -251,7 +251,6 @@ fun main() {
                         if (!file.exists()){
                             file.createNewFile()
                         }
-                        multipartFile
                     }
 
                     println("path:$path,pp:${request.getPackage().protocol},header:${request.getPackage().getHeader().toString()},data:$data")

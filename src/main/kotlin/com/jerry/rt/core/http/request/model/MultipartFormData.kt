@@ -72,6 +72,8 @@ class MultipartFormData(
         val rtFileConfig = context.getRtConfig().rtFileConfig
         val input = MultipartRequestInputStream(socketBody.getInputStream())
         input.readBoundary()
+
+        //todo 读取完所有文件之后会卡在这里
         while (true) {
             val header: MultipartFileHeader = input.readDataHeader(charset) ?: break
             if (header.isFile()) {
