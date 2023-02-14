@@ -2,6 +2,7 @@ package com.jerry.rt.core.http.request.model
 
 import com.jerry.rt.core.http.request.interfaces.DataReadListener
 import java.io.InputStream
+import java.io.OutputStream
 
 /**
  * @className: SocketData
@@ -10,9 +11,10 @@ import java.io.InputStream
  **/
 class SocketData(
     val messageRtProtocol: MessageRtProtocol,
-    inputStream: InputStream
+    inputStream: InputStream,
+    outputStream: OutputStream
 ) :DataReadListener{
-    private val socketBody = SocketBody(messageRtProtocol.getContentLength(),inputStream)
+    private val socketBody = SocketBody(messageRtProtocol.getContentLength(),inputStream,outputStream)
 
     fun getSocketBody() = socketBody
 

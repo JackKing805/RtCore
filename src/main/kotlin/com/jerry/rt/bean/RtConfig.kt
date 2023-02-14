@@ -19,7 +19,8 @@ data class RtConfig(
     val serverVersionDetails:String = "RtServer/1.0",
     val socketListener: Class<out SocketListenerImpl> = SocketListenerImpl::class.java,//socket进入时负责数据处理的类
     val rtSSLConfig: RtSSLConfig?=null,
-    val rtFileConfig:RtFileConfig
+    val rtFileConfig:RtFileConfig,
+    val rtTimeOutConfig: RtTimeOutConfig = RtTimeOutConfig()
 )
 
 
@@ -41,4 +42,8 @@ data class RtFileConfig(
     val saveFileDir:String,//用户文件保存位置
     val uploadMaxSize:Long = -1,//最大文件大小，默认无限制
     val memoryThreshold:Int = 8192//文件保存到内存的边界
+)
+
+data class RtTimeOutConfig(
+    val soTimeout:Int = 15000
 )

@@ -7,13 +7,14 @@ import com.jerry.rt.extensions.readLength
 import com.jerry.rt.extensions.skipNotConsumptionByte
 import com.jerry.rt.extensions.toByteArray
 import java.io.InputStream
+import java.io.OutputStream
 
 /**
  * @className: SocketBody
  * @author: Jerry
  * @date: 2023/2/12:14:52
  **/
-class SocketBody(private val maxSize:Long,private val inputStream: InputStream):DataReadListener {
+class SocketBody(private val maxSize:Long,private val inputStream: InputStream,private val outputStream: OutputStream):DataReadListener {
     private var readSize = 0L
 
     @Throws(exceptionClasses = [NoLengthReadException::class, LimitLengthException::class])
@@ -51,4 +52,6 @@ class SocketBody(private val maxSize:Long,private val inputStream: InputStream):
     }
 
     fun getInputStream() = inputStream
+
+    fun getOutputStream() = outputStream
 }

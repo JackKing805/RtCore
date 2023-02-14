@@ -29,10 +29,12 @@ open class SocketListenerImpl:SocketListener {
         onSocketData: suspend (SocketData) -> Unit
     ) {
         val inputStream = socket.getInputStream()
+        val outputStream = socket.getOutputStream()
+        val inputStreamHandler = InputStreamHandler(inputStream,outputStream)
         while (isAlive()){
             try {
-                val onPre = onPre(inputStream)
-                val socketData = SocketData(onPre,inputStream)
+                val onPre = onPre(inputStreamHandler)
+                val socketData = SocketData(onPre,inputStreamHandler.inputStream(),inputStreamHandler.outputStream())
                 onSocketData.invoke(socketData)
             }catch (e:Exception){
                 break
@@ -49,10 +51,9 @@ open class SocketListenerImpl:SocketListener {
 
 
     @Throws(Exception::class)
-    private fun onPre(inputStream: InputStream): MessageRtProtocol {
-        val inputStreamHandler = InputStreamHandler(inputStream)
-        val headers = inputStreamHandler.headers()
-        val requestLine = inputStreamHandler.requestLine()
+    private fun onPre(inputStream: InputStreamHandler): MessageRtProtocol {
+        val headers = inputStream.headers()
+        val requestLine = inputStream.requestLine()
 
 
         val split = requestLine.split(" ")

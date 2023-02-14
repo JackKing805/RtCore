@@ -3,6 +3,7 @@ package com.jerry.rt.core.http.request.model
 import com.jerry.rt.core.RtContext
 import com.jerry.rt.core.http.pojo.ProtocolPackage
 import com.jerry.rt.jva.utils.MultipartRequestInputStream
+import java.io.IOException
 import java.nio.charset.Charset
 
 /**
@@ -73,9 +74,13 @@ class MultipartFormData(
         val input = MultipartRequestInputStream(socketBody.getInputStream())
         input.readBoundary()
 
-        //todo 读取完所有文件之后会卡在这里
         while (true) {
-            val header: MultipartFileHeader = input.readDataHeader(charset) ?: break
+            val header: MultipartFileHeader = try{
+                input.readDataHeader(charset)
+            }catch (e:IOException){
+                e.printStackTrace()
+                null
+            }?: break
             if (header.isFile()) {
                 // 文件类型的表单项
                 val fileName = header.getFileName()!!

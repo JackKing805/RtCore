@@ -1,8 +1,10 @@
 package com.jerry.rt.jva.http;
 
 
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * @className: InputStreamHandler
@@ -13,13 +15,18 @@ import java.io.InputStream;
 public class InputStreamHandler {
     private String startLine;
     private InputStream is;
+
+    OutputStream os;
     char[] buf = new char[2048];
     int pos;
     StringBuffer lineBuf;
     Headers hdrs = null;
 
-    public InputStreamHandler(InputStream inputStream) throws IOException {
+
+
+    public InputStreamHandler(InputStream inputStream,OutputStream outputStream) throws IOException {
         this.is = inputStream;
+        this.os = outputStream;
         do {
             this.startLine = this.readLine();
             if (this.startLine == null) {
@@ -146,7 +153,9 @@ public class InputStreamHandler {
     public InputStream inputStream() {
         return this.is;
     }
-
+    public OutputStream outputStream() {
+        return this.os;
+    }
 
     public String readLine() throws IOException {
         boolean gotCR = false;

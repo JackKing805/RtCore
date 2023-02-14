@@ -49,7 +49,7 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
             if (request.getPackage().isRtConnect()) {
                 checkHeartbeat()
                 if (rtResponse == null) {
-                    rtResponse = Response(rtContext, socket.getOutputStream(),request.getPackage())
+                    rtResponse = Response(rtContext, socketData.getSocketBody().getOutputStream(),request.getPackage())
                 }
 
                 if (request.getPackage().getHeader().getContentType().rtContentTypeIsHeartbeat()) {
@@ -79,7 +79,7 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
                     tryClose()
                     return
                 }
-                val response = Response(rtContext, socket.getOutputStream(),request.getPackage())
+                val response = Response(rtContext, socketData.getSocketBody().getOutputStream(),request.getPackage())
 
 
                 //其他类型协议
@@ -106,6 +106,7 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
                 return@launch
             }
             this@ClientRequest.socket = s
+            this@ClientRequest.socket.soTimeout = rtContext.getRtConfig().rtTimeOutConfig.soTimeout
             isInit = true
             isAlive = true
             val socketListener = rtContext.getRtConfig().socketListener.newInstance()
