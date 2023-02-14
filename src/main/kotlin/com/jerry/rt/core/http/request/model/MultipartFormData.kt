@@ -2,10 +2,8 @@ package com.jerry.rt.core.http.request.model
 
 import com.jerry.rt.core.RtContext
 import com.jerry.rt.core.http.pojo.ProtocolPackage
-import com.jerry.rt.core.http.protocol.RtContentType
-import com.jerry.rt.extensions.logError
-import java.io.File
-import java.io.FileOutputStream
+import com.jerry.rt.jva.utils.MultipartRequestInputStream
+import java.nio.charset.Charset
 
 /**
  * @className: MultipartFile
@@ -28,12 +26,11 @@ This is the file content.
  */
 //todo 当前读取中文会乱码
 class MultipartFormData(
-    private val context: RtContext,
+    context: RtContext,
     private val protocolPackage: ProtocolPackage,
-    private val socketBody: SocketBody
+    socketBody: SocketBody,
+    charset: Charset
 ) {
-    private lateinit var multipartData: MultipartData
-
     /**
      *
     HTTP文件上传格式有两种：
@@ -68,98 +65,29 @@ class MultipartFormData(
 
     注意：这两种请求格式的请求体里的数据格式不同，接收方需要对应的解析方式来读取请求的内容。
      */
+    private val parameters = mutableMapOf<String,String>()
+    private val files = mutableMapOf<String,MultipartFile>()
+
     init {
-        val contentType = protocolPackage.getHeader().getContentType().lowercase()
-        if (contentType.startsWith(RtContentType.MULTIPART.content)) {
-            parseFormData(contentType)
-        } else if (contentType == RtContentType.FORM_URLENCODED.content) {
-            parseXwwformUrlencoded(contentType)
-        } else {
-            throw IllegalArgumentException("ill contentType")
-        }
-    }
-
-
-    private fun parseXwwformUrlencoded(contentType: String) {
-        val data = String(socketBody.readAllData())
-        multipartData = MultipartData.XWWForm(data)
-    }
-
-    private fun parseFormData(contentType: String) {
         val rtFileConfig = context.getRtConfig().rtFileConfig
+        val input = MultipartRequestInputStream(socketBody.getInputStream())
+        input.readBoundary()
 
-        var boundary = ""
-        var endBoundary = ""
-        val contentLength = protocolPackage.getHeader().getContentLength().toLong()
-        if (contentType.contains("boundary")) {
-            val boundaryLine = contentType.substringAfter(RtContentType.MULTIPART.content + "; boundary=").trim()
-            boundary = "--$boundaryLine\r\n"
-            endBoundary = "--$boundaryLine--\r\n"
-        }
-
-
-        val formBodys = mutableListOf<FormBody>()
-
-        "contentLength:$contentLength".logError()
-        var line: String? = null
-        var readLength = 0L
-
-
-        var contentDisposition: String = ""
-        var mContentType: String = ""
-        var name: String = ""
-        var fileName: String = ""
-
-        var isNew = true
-        var isFile = false
-
-        var readContent = StringBuilder("")
-        var fileOutPutStream: FileOutputStream? = null
-        var file:File?=null
-        while (readLength < contentLength && socketBody.readLine()
-                .also { line = if (it == null) null else it + "\r\n" } != null
-        ) {
-            val tLine = line!!
-            //解析头部
-            if (isNew) {
-                if (tLine == boundary) {
-                    contentDisposition = ""
-                    mContentType = ""
-                    name = ""
-                    fileName = ""
-                    readContent = StringBuilder("")
-                    isNew = true
-                    isFile = false
-                    file=null
-                    fileOutPutStream = null
-                } else if (tLine.lowercase().startsWith("content-disposition:")) {
-                    val split = tLine.trim().split(";")
-                    split.forEach {
-                        if (it.lowercase().contains("content-disposition:")) {
-                            contentDisposition = it.substringAfter(":").trim()
-                        } else if (it.lowercase().trim().startsWith("name=")) {
-                            name = it.substringAfter("=").trim('"')
-                        } else if (it.lowercase().trim().startsWith("filename=")) {
-                            fileName = it.substringAfter("=").trim('"')
-                        }
-                    }
-                } else if (tLine.lowercase().startsWith("content-type:")) {
-                    mContentType = tLine.substringAfter(":").trim()
-                } else if (tLine == "\r\n") {
-                    if (mContentType.isNotEmpty() || fileName.isNotEmpty()) {
-                        isFile = true
-
-                        file = File(rtFileConfig.tempFileDir, fileName)
-                        file.delete()
-                        if (!file.exists()) {
-                            file.createNewFile()
-                        }
-                        fileOutPutStream = FileOutputStream(file)
-                    }
-                    isNew = false
-                    continue
+        //todo 读取完所有文件之后会卡在这里
+        while (true) {
+            val header: MultipartFileHeader = input.readDataHeader(charset) ?: break
+            if (header.isFile()) {
+                // 文件类型的表单项
+                val fileName = header.getFileName()!!
+                if (fileName.isNotEmpty() && header.getContentType()!!.contains("application/x-macbinary")) {
+                    input.skipBytes(128)
+                }
+                val newFile = MultipartFile(rtFileConfig,header)
+                if (newFile.processStream(input)) {
+                    files[header.getFormFieldName()!!] = newFile
                 }
             } else {
+<<<<<<< HEAD
                 if (tLine == endBoundary || tLine==boundary) {
                     //添加数据
                     if (isFile) {
@@ -209,64 +137,26 @@ class MultipartFormData(
                         readContent.append(rTline,0,wl)
                     }
                 }
+=======
+                // 标准表单项
+                parameters[header.getFormFieldName()!!] = input.readString(charset)
+>>>>>>> test_multi_inputstream
             }
-            readLength += tLine.length
+            input.skipBytes(1)
+            input.mark(1)
 
-            "readLength:${readLength},tLine:$tLine".logError()
-        }
-        "contentLength:${contentLength},readLength:$readLength".logError()
-        try {
-            fileOutPutStream?.close()
-        }catch (e:Exception){
-            e.printStackTrace()
-        }
-        fileOutPutStream = null
-
-        formBodys.forEach {
-            "formBody:$it".logError()
+            // read byte, but may be end of stream
+            val nextByte: Int = input.read()
+            if (nextByte == -1 || nextByte == '-'.code) {
+                input.reset()
+                break
+            }
+            input.reset()
         }
     }
 
+    fun getParameters() = parameters
 
-    fun getMultipartData() = multipartData
-}
-
-
-sealed class MultipartData {
-    data class XWWForm(val query: String) : MultipartData() {
-        private val map = mutableMapOf<String, String>()
-
-        init {
-            query.split("&").forEach {
-                if (it.contains("=")) {
-                    map[it.substringBefore("=").trim()] = it.substringAfter("=").trim()
-                }
-            }
-        }
-
-        fun getQueryMap() = map
-
-        fun getValue(key: String) = map[key]
-    }
-
-    data class DataForms(val fileItems: List<FormBody>) : MultipartData()
-
-    data class DataForm(val fileItem: FormBody) : MultipartData()
-}
-
-sealed class FormBody {
-    data class FileItem(
-        private val contentDisposition: String,
-        private val contentType: String,
-        private val name: String,
-        private val fileName: String,
-        private val file: File
-    ) : FormBody()
-
-    data class StringItem(
-        private val contentDisposition: String,
-        private val name: String,
-        private val content: String
-    ) : FormBody()
+    fun getFiles() = files
 }
 

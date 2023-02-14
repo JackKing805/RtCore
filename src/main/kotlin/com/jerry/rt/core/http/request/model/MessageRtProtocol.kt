@@ -14,7 +14,7 @@ data class MessageRtProtocol(
     val header: MutableMap<String, String>
 ) {
     private fun getValue(key: String, default: String = ""): String {
-        return ((header[key] as? String) ?: default).trim()
+        return header.entries.find { it.key.trim().lowercase() == key.lowercase() }?.value?.trim()?:default
     }
 
     //获取内容类型:

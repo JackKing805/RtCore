@@ -1,7 +1,9 @@
 package com.jerry.rt.extensions
 
+import java.io.BufferedReader
 import java.io.DataInputStream
 import java.io.InputStream
+import java.io.InputStreamReader
 
 /**
  * @className: DataExtensions
@@ -72,6 +74,7 @@ internal fun InputStream.skipNotConsumptionByte(length: Long){
 }
 
 internal fun InputStream.asDataInputStream() = DataInputStream(this)
+internal fun InputStream.asBufferReader() = BufferedReader(InputStreamReader(this,"GBK"))
 
 fun MutableList<ByteArray>.getIndex(index:Int):Byte{
     var position = -1

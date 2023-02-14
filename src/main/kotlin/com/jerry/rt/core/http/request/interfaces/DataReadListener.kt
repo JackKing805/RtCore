@@ -16,8 +16,5 @@ interface DataReadListener {
     fun readAllData():ByteArray
 
     @Throws(exceptionClasses = [Exception::class])
-    fun readLine():String?
-
-    @Throws(exceptionClasses = [Exception::class])
     fun skipData()
 }

@@ -1,10 +1,9 @@
 package com.jerry.rt.core.http.pojo
 
 import com.jerry.rt.core.RtContext
-import com.jerry.rt.core.http.protocol.RtContentType
-import com.jerry.rt.core.http.request.interfaces.DataReadListener
 import com.jerry.rt.core.http.request.model.MultipartFormData
 import com.jerry.rt.core.http.request.model.SocketData
+import java.nio.charset.Charset
 
 /**
  * @className: Request
@@ -15,57 +14,52 @@ import com.jerry.rt.core.http.request.model.SocketData
 data class Request(
     private val rtContext: RtContext,
     private val socketData: SocketData
-):DataReadListener {
+) {
     private val protocolPackage = ProtocolPackage(
         rtContext, socketData.messageRtProtocol.method, socketData.messageRtProtocol.url, socketData.messageRtProtocol.protocolString,
         ProtocolPackage.Header(socketData.messageRtProtocol.header)
     )
-    
+
+    private var bodyCache:ByteArray? = null
+
     fun getPackage() = protocolPackage
-    
+
     fun getContext() = rtContext
 
-    override fun readData(byteArray: ByteArray, len: Int) {
-        if (isMultipart()){
-            return
+    fun getCharset():Charset = protocolPackage.getCharset()
+
+    fun getByteBody():ByteArray?{
+        return if (isMultipart()){
+            null
+        }else{
+            if (bodyCache==null){
+                bodyCache = ByteArray(protocolPackage.getHeader().getContentLength())
+                socketData.readData(bodyCache!!,0,bodyCache!!.size)
+            }
+            bodyCache!!
         }
-        socketData.readData(byteArray,len)
     }
 
-    override fun readData(byteArray: ByteArray, offset: Int, len: Int) {
-        if (isMultipart()){
-            return
+    fun getBody() = getBody(getCharset())
+
+    fun getBody(charset: Charset):String?{
+        val body = getByteBody()
+        if (body!=null){
+            return String(body,charset)
         }
-        socketData.readData(byteArray,offset, len)
+        return null
     }
 
-    override fun readAllData(): ByteArray {
-        if (isMultipart()){
-            return ByteArray(0)
-        }
-        return socketData.readAllData()
-    }
-
-    override fun readLine():String? {
-        if (isMultipart()){
-            return null
-        }
-        return socketData.readLine()
-    }
-
-    override fun skipData() {
-        socketData.skipData()
-    }
 
     fun getMultipartFormData():MultipartFormData?{
         if (isMultipart()){
-            return MultipartFormData(rtContext,protocolPackage,socketData.getSocketBody())
+            return MultipartFormData(rtContext,protocolPackage,socketData.getSocketBody(),getCharset())
         }
         return null
     }
 
     private fun isMultipart():Boolean{
         val contentType = protocolPackage.getHeader().getContentType().lowercase()
-        return contentType.startsWith(RtContentType.MULTIPART.content) || contentType==RtContentType.FORM_URLENCODED.content
+        return contentType.startsWith("multipart/")
     }
 }
