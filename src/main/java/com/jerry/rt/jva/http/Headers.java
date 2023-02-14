@@ -148,7 +148,7 @@ public class Headers implements Map<String, List<String>> {
         return this.map.values();
     }
 
-    public Set<Map.Entry<String, List<String>>> entrySet() {
+    public Set<Entry<String, List<String>>> entrySet() {
         return this.map.entrySet();
     }
 

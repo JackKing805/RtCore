@@ -87,60 +87,8 @@ class MultipartFormData(
                     files[header.getFormFieldName()!!] = newFile
                 }
             } else {
-<<<<<<< HEAD
-                if (tLine == endBoundary || tLine==boundary) {
-                    //添加数据
-                    if (isFile) {
-                        try {
-                            fileOutPutStream?.close()
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-
-                        formBodys.add(FormBody.FileItem(
-                            contentDisposition,
-                            contentType,
-                            name,
-                            fileName,
-                            file!!
-                        ))
-                    } else {
-                        formBodys.add(
-                            FormBody.StringItem(
-                                contentDisposition,
-                                name,
-                                readContent.toString()
-                            )
-                        )
-                    }
-
-                    if (tLine==endBoundary){
-                        break
-                    }
-
-                    contentDisposition = ""
-                    mContentType = ""
-                    name = ""
-                    fileName = ""
-                    readContent = StringBuilder("")
-                    isNew = true
-                    isFile = false
-                    file=null
-                    fileOutPutStream = null
-                }else{
-                    val rTline = tLine.substring(0,tLine.length-2)
-                    val wl = Math.min(rTline.length,contentLength.toInt()-readLength.toInt())
-                    if (isFile) {
-                        fileOutPutStream?.write(rTline.toByteArray(),0,wl)
-                        fileOutPutStream?.flush()
-                    } else {
-                        readContent.append(rTline,0,wl)
-                    }
-                }
-=======
                 // 标准表单项
                 parameters[header.getFormFieldName()!!] = input.readString(charset)
->>>>>>> test_multi_inputstream
             }
             input.skipBytes(1)
             input.mark(1)

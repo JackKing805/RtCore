@@ -46,11 +46,13 @@ open class SocketListenerImpl:SocketListener {
     }
 
 
+
+
     @Throws(Exception::class)
     private fun onPre(inputStream: InputStream): MessageRtProtocol {
         val inputStreamHandler = InputStreamHandler(inputStream)
-        val requestLine = inputStreamHandler.requestLine()
         val headers = inputStreamHandler.headers()
+        val requestLine = inputStreamHandler.requestLine()
 
 
         val split = requestLine.split(" ")
