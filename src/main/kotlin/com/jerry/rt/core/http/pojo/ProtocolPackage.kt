@@ -6,6 +6,9 @@ import com.jerry.rt.core.http.protocol.RtHeader
 import com.jerry.rt.core.http.protocol.RtMethod
 import com.jerry.rt.core.http.protocol.RtVersion
 import java.net.URI
+import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
+import java.util.regex.Pattern
 
 /**
  * @className: ComInPackage
@@ -23,7 +26,30 @@ class ProtocolPackage(
     private val rootPath = "${RtVersion.getPrefix(protocol)}://"+header.getHeaderValue(RtHeader.HOST.content,"")
     private val realUrl = rootPath + if (path.startsWith("/")) path else "/$path"
     private val requestURI = URI.create(realUrl)
+    private val CHARSET_PATTERN = Pattern.compile("charset\\s*=\\s*([a-z0-9-]*)", Pattern.CASE_INSENSITIVE)
 
+    private var charset: Charset?=null
+
+    init {
+        initCharset()
+    }
+
+    private fun initCharset(){
+        val contentType = getHeader().getContentType()
+
+        if (contentType.isNotEmpty()){
+            val matcher = CHARSET_PATTERN.matcher(contentType)
+            if (matcher.find()){
+                charset = Charset.forName(matcher.group(1))
+            }
+        }
+
+        if (charset ==null){
+            charset = StandardCharsets.UTF_8
+        }
+    }
+
+    fun getCharset():Charset = charset!!
 
     fun isRtConnect() = method.equals(RtMethod.RT.content,true) && protocol == RtVersion.RT_1_0
 

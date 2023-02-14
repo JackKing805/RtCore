@@ -3,13 +3,11 @@ package com.jerry.rt.core.http.pojo
 import com.jerry.rt.core.RtContext
 import com.jerry.rt.core.http.protocol.*
 import com.jerry.rt.core.http.response.impl.ByteResponseWriter
-import com.jerry.rt.extensions.logError
 import com.jerry.rt.utils.RtUtils
 import com.jerry.rt.utils.URLEncodeUtil
 import java.io.*
 import java.nio.charset.Charset
 import java.util.*
-import kotlin.jvm.Throws
 
 /**
  * @className: Response
@@ -23,7 +21,7 @@ class Response(
     private val protocolPackage: ProtocolPackage
 ){
     private val byteResponseWriter = ByteResponseWriter(output)
-    private var charset = Charsets.UTF_8
+    private var charset = protocolPackage.getCharset()
 
     private val header = mutableMapOf<String, String>()
     private var statusCode = 200

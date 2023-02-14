@@ -39,5 +39,6 @@ data class RtSSLConfig(
 data class RtFileConfig(
     val tempFileDir:String,//上传文件的临时存储文职
     val saveFileDir:String,//用户文件保存位置
-    val uploadMaxSize:Long = 1000L*1000*1000*20L//20gb
+    val uploadMaxSize:Long = -1,//最大文件大小，默认无限制
+    val memoryThreshold:Int = 8192//文件保存到内存的边界
 )

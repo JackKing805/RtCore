@@ -1,10 +1,59 @@
 package com.jerry.rt.jva.utils;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 
 public class FileUtil {
+    public static File getParent(File file, int level) throws IOException {
+        if (level < 1 || null == file) {
+            return file;
+        }
+
+        File parentFile;
+        try {
+            parentFile = file.getCanonicalFile().getParentFile();
+        } catch (IOException e) {
+            throw new IOException(e);
+        }
+        if (1 == level) {
+            return parentFile;
+        }
+        return getParent(parentFile, level - 1);
+    }
+
+    public static File mkParentDirs(File file) throws IOException {
+        if (null == file) {
+            return null;
+        }
+        return mkdir(getParent(file, 1));
+    }
+
+    public static File touch(File file) throws IOException {
+        if (null == file) {
+            return null;
+        }
+        if (false == file.exists()) {
+            mkParentDirs(file);
+            try {
+                //noinspection ResultOfMethodCallIgnored
+                file.createNewFile();
+            } catch (Exception e) {
+                throw new IOException(e);
+            }
+        }
+        return file;
+    }
+
+    public static BufferedOutputStream getOutputStream(File file) throws IOException {
+        final OutputStream out;
+        try {
+            out = new FileOutputStream(touch(file));
+        } catch (IOException e) {
+            throw new IOException(e);
+        }
+        return IoUtil.toBuffered(out);
+    }
+
     public static int lastIndexOfSeparator(String filePath) {
         if (StrUtil.isNotEmpty(filePath)) {
             int i = filePath.length();

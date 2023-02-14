@@ -4,8 +4,6 @@ import com.jerry.rt.core.RtContext
 import com.jerry.rt.core.http.request.model.MultipartFormData
 import com.jerry.rt.core.http.request.model.SocketData
 import java.nio.charset.Charset
-import java.nio.charset.StandardCharsets
-import java.util.regex.Pattern
 
 /**
  * @className: Request
@@ -21,35 +19,14 @@ data class Request(
         rtContext, socketData.messageRtProtocol.method, socketData.messageRtProtocol.url, socketData.messageRtProtocol.protocolString,
         ProtocolPackage.Header(socketData.messageRtProtocol.header)
     )
-    private val CHARSET_PATTERN = Pattern.compile("charset\\s*=\\s*([a-z0-9-]*)", Pattern.CASE_INSENSITIVE)
 
-    private var charset:Charset?=null
     private var bodyCache:ByteArray? = null
-
-    init {
-       initCharset()
-    }
-
-    private fun initCharset(){
-        val contentType = protocolPackage.getHeader().getContentType()
-
-        if (contentType.isNotEmpty()){
-            val matcher = CHARSET_PATTERN.matcher(contentType)
-            if (matcher.find()){
-                charset = Charset.forName(matcher.group(1))
-            }
-        }
-
-        if (charset==null){
-            charset = StandardCharsets.UTF_8
-        }
-    }
 
     fun getPackage() = protocolPackage
 
     fun getContext() = rtContext
 
-    fun getCharset():Charset = charset!!
+    fun getCharset():Charset = protocolPackage.getCharset()
 
     fun getByteBody():ByteArray?{
         return if (isMultipart()){

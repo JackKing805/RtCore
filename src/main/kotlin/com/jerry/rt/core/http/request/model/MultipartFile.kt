@@ -2,6 +2,7 @@ package com.jerry.rt.core.http.request.model
 
 import com.jerry.rt.bean.RtFileConfig
 import com.jerry.rt.jva.utils.FileUtil
+import com.jerry.rt.jva.utils.IoUtil
 import com.jerry.rt.jva.utils.MultipartRequestInputStream
 import java.io.*
 
@@ -61,7 +62,7 @@ class MultipartFile(
         size = 0
 
         // 处理内存文件
-        val memoryThreshold: Int = rtFileConfig.uploadMaxSize.toInt()
+        val memoryThreshold: Int = rtFileConfig.memoryThreshold
         if (memoryThreshold > 0) {
             val baos = ByteArrayOutputStream(memoryThreshold)
             val written = input.copy(baos, memoryThreshold.toLong())
@@ -79,10 +80,10 @@ class MultipartFile(
 
         // 处理硬盘文件
         tempFile = FileUtil.createTempFile(TMP_FILE_PREFIX, TMP_FILE_SUFFIX, tmpUploadPath, false)
-        val out = BufferedOutputStream(FileOutputStream(tempFile))
+        val out = FileUtil.getOutputStream(this.tempFile);
         if (data != null) {
             size = data!!.size.toLong()
-            out.write(data)
+            out.write(data!!)
             data = null // not needed anymore
         }
         val maxFileSize: Long = rtFileConfig.uploadMaxSize
@@ -100,7 +101,7 @@ class MultipartFile(
                 return false
             }
         } finally {
-            out.close()
+            IoUtil.close(out);
         }
         return true
     }

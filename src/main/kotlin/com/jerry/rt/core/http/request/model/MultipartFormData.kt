@@ -85,7 +85,6 @@ class MultipartFormData(
                 val newFile = MultipartFile(rtFileConfig,header)
                 if (newFile.processStream(input)) {
                     files[header.getFormFieldName()!!] = newFile
-//                    putFile(header.formFieldName, newFile);
                 }
             } else {
                 // 标准表单项
