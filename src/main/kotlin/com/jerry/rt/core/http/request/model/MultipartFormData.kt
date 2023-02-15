@@ -110,5 +110,9 @@ class MultipartFormData(
     fun getParameters() = parameters
 
     fun getFiles() = files
+
+    fun getParameter(name: String) = parameters
+
+    fun getFile(name:String) = files[name]
 }
 
