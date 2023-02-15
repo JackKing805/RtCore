@@ -22,6 +22,7 @@ internal class RtLife(private val rtConfig: RtConfig,private val rtCoreListener:
     private lateinit var server: Server
     private lateinit var clientDispatchers: ClientDispatchers
     private lateinit var sessionManager: ISessionManager
+    private lateinit var rtTempFileWatcher: RtTempFileWatcher
 
     suspend fun onInit() {
         "RtLife>>onInit".logInfo()
@@ -32,12 +33,14 @@ internal class RtLife(private val rtConfig: RtConfig,private val rtCoreListener:
             rtCoreListener.onRtCoreException(it)
         }
         clientDispatchers = ClientDispatchers(rtContext,rtCoreListener)
+        rtTempFileWatcher = RtTempFileWatcher(rtContext)
 
         rtCoreListener.onCreateContext(rtContext)
     }
 
     suspend fun onRunning() {
         "RtLife>>onRunning".logInfo()
+        rtTempFileWatcher.start()
         withContext(Dispatchers.IO){
             val run = server.run()
             run.onEach {
@@ -51,6 +54,7 @@ internal class RtLife(private val rtConfig: RtConfig,private val rtCoreListener:
         server.stop()
         clientDispatchers.clear()
         sessionManager.deactivate()
+        rtTempFileWatcher.stop()
     }
 
     suspend fun onDestroy() {

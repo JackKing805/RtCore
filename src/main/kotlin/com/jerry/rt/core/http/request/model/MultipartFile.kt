@@ -145,6 +145,7 @@ class MultipartFile(
             FileOutputStream(file).use {
                 it.write(data!!)
             }
+            data = null
             return file
         }
 
@@ -154,6 +155,11 @@ class MultipartFile(
         StreamUtils.copy(inputStream,outputStream)
         inputStream.close()
         outputStream.close()
+        try {
+            tempFile!!.delete()
+        }catch (e:Exception){
+            e.printStackTrace()
+        }
         return file
     }
 }

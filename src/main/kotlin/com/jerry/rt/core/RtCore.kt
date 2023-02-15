@@ -249,7 +249,7 @@ fun main() {
                     val multipartFile = request.getMultipartFormData()
                     if (multipartFile!=null){
                         multipartFile.getFiles().forEach { t, u ->
-                            u.save()
+//                            u.save()
                         }
 
                         multipartFile.getParameters().forEach { t, u ->
