@@ -25,7 +25,7 @@ class SocketBody(private val maxSize:Long,private val inputStream: InputStream,p
     @Throws(exceptionClasses = [NoLengthReadException::class, LimitLengthException::class])
     override fun readData(byteArray: ByteArray,offset:Int,len:Int){
         val total = offset + len
-        if (readSize== maxSize){
+        if (readSize == maxSize){
             throw NoLengthReadException()
         }
 
@@ -38,7 +38,7 @@ class SocketBody(private val maxSize:Long,private val inputStream: InputStream,p
     @Throws(exceptionClasses = [LimitLengthException::class])
     override fun readAllData():ByteArray{
         if (readSize!=0L){
-            throw LimitLengthException()
+            return ByteArray(0)
         }
         val byteArray = inputStream.readLength(maxSize).toByteArray()
         readSize = maxSize

@@ -68,8 +68,8 @@ class MultipartFileHeader(dataHeader:String) {
      *
      * @return 表单字段名
      */
-    fun getFormFieldName(): String? {
-        return formFieldName
+    fun getFormFieldName(): String {
+        return formFieldName?:""
     }
 
     /**
@@ -77,8 +77,8 @@ class MultipartFileHeader(dataHeader:String) {
      *
      * @return 表单文件名
      */
-    fun getFormFileName(): String? {
-        return formFileName
+    fun getFormFileName(): String {
+        return formFileName?:""
     }
 
     /**
@@ -86,8 +86,8 @@ class MultipartFileHeader(dataHeader:String) {
      *
      * @return 文件名
      */
-    fun getFileName(): String? {
-        return fileName
+    fun getFileName(): String {
+        return fileName?:""
     }
 
     /**
@@ -98,8 +98,8 @@ class MultipartFileHeader(dataHeader:String) {
      * @see .getMimeType
      * @see .getMimeSubtype
      */
-    fun getContentType(): String? {
-        return contentType
+    fun getContentType(): String {
+        return contentType?:""
     }
 
     /**
@@ -107,8 +107,8 @@ class MultipartFileHeader(dataHeader:String) {
      *
      * @return types MIME
      */
-    fun getMimeType(): String? {
-        return mimeType
+    fun getMimeType(): String {
+        return mimeType?:""
     }
 
     /**
@@ -129,9 +129,7 @@ class MultipartFileHeader(dataHeader:String) {
         return contentDisposition
     }
 
-    // ---------------------------------------------------------------- Private Method
 
-    // ---------------------------------------------------------------- Private Method
     /**
      * 获得头信息字符串字符串中指定的值
      *

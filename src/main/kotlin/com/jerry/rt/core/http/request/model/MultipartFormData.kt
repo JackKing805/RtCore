@@ -78,7 +78,6 @@ class MultipartFormData(
             val header: MultipartFileHeader = try{
                 input.readDataHeader(charset)
             }catch (e:IOException){
-                e.printStackTrace()
                 null
             }?: break
             if (header.isFile()) {
