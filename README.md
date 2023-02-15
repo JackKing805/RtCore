@@ -1,12 +1,16 @@
 # RtCore
 
-
-jitpack.io
-
-
-RtCore.instance.run(RtConfig,RtCoreListener)
+```java
+    RtCore.instance.run(RtConfig,RtCoreListener)
+```
 
 
 
-导入：
-	  implementation 'com.github.jerryxfl:RtCore:Tag'
+### 导入： 
+```gradle
+maven{
+    url "https://jitpack.io"
+}
+
+implementation 'com.github.jerryxfl:RtCore:Tag'
+```
