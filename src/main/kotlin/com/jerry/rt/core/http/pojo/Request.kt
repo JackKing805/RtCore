@@ -1,6 +1,8 @@
 package com.jerry.rt.core.http.pojo
 
 import com.jerry.rt.core.RtContext
+import com.jerry.rt.core.http.request.exceptions.LimitLengthException
+import com.jerry.rt.core.http.request.exceptions.NoLengthReadException
 import com.jerry.rt.core.http.request.model.MultipartFormData
 import com.jerry.rt.core.http.request.model.SocketData
 import java.nio.charset.Charset
@@ -17,7 +19,7 @@ data class Request(
 ) {
     private val protocolPackage = ProtocolPackage(
         rtContext, socketData.messageRtProtocol.method, socketData.messageRtProtocol.url, socketData.messageRtProtocol.protocolString,
-        ProtocolPackage.Header(socketData.messageRtProtocol.header)
+        ProtocolPackage.Header(socketData.messageRtProtocol.header.toMutableMap())
     )
 
     private var bodyCache:ByteArray? = null
@@ -34,7 +36,11 @@ data class Request(
         }else{
             if (bodyCache==null){
                 bodyCache = ByteArray(protocolPackage.getHeader().getContentLength())
-                socketData.readData(bodyCache!!,0,bodyCache!!.size)
+                try {
+                    socketData.readData(bodyCache!!,0,bodyCache!!.size)
+                }catch (_: NoLengthReadException){
+                }catch (_: LimitLengthException){
+                }
             }
             bodyCache!!
         }

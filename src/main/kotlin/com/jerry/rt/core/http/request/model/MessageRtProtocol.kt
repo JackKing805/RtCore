@@ -11,7 +11,7 @@ data class MessageRtProtocol(
     var method: String,
     var url: String,
     var protocolString: RtVersion,
-    val header: MutableMap<String, String>
+    val header: Map<String, String>
 ) {
     private fun getValue(key: String, default: String = ""): String {
         return header.entries.find { it.key.trim().lowercase() == key.lowercase() }?.value?.trim()?:default

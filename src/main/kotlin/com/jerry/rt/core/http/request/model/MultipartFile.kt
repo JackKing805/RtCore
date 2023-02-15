@@ -4,7 +4,10 @@ import com.jerry.rt.bean.RtFileConfig
 import com.jerry.rt.jva.utils.FileUtil
 import com.jerry.rt.jva.utils.IoUtil
 import com.jerry.rt.jva.utils.MultipartRequestInputStream
+import com.jerry.rt.jva.utils.StreamUtils
+import kotlinx.coroutines.NonDisposableHandle.parent
 import java.io.*
+import java.nio.file.NoSuchFileException
 
 /**
  * @className: MultipartFile
@@ -104,5 +107,53 @@ class MultipartFile(
             IoUtil.close(out);
         }
         return true
+    }
+
+    private fun createFile(path: String?):File{
+        if (path!=null){
+            val file = File(path)
+            if (file.exists()){
+                file.delete()
+            }
+            file.createNewFile()
+            return file
+        }
+
+
+        val parent = File(rtFileConfig.saveFileDir)
+        if (!parent.exists()){
+            parent.mkdir()
+        }
+
+        val file = File(parent,getHeader().getFileName())
+        if (file.exists()){
+            file.delete()
+        }
+        file.createNewFile()
+        return file
+    }
+
+    fun saveByName(name:String){
+        val path = if (rtFileConfig.saveFileDir.endsWith("/")) rtFileConfig.saveFileDir else rtFileConfig.saveFileDir+"/" + name
+        save(path)
+    }
+
+    @Throws(IOException::class)
+    fun save(path:String?=null):File{
+        if (data!=null){
+            val file = createFile(path)
+            FileOutputStream(file).use {
+                it.write(data!!)
+            }
+            return file
+        }
+
+        val file = createFile(path)
+        val inputStream = FileInputStream(tempFile!!)
+        val outputStream = FileOutputStream(file)
+        StreamUtils.copy(inputStream,outputStream)
+        inputStream.close()
+        outputStream.close()
+        return file
     }
 }

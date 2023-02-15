@@ -1,5 +1,6 @@
 package com.jerry.rt.jva.utils;
 
+import com.jerry.rt.core.http.request.impl.NoWaitBufferedInputStream;
 import com.jerry.rt.core.http.request.model.MultipartFileHeader;
 
 import java.io.*;
@@ -7,7 +8,7 @@ import java.net.SocketTimeoutException;
 import java.nio.charset.Charset;
 
 
-public class MultipartRequestInputStream extends BufferedInputStream {
+public class MultipartRequestInputStream extends NoWaitBufferedInputStream {
 
     public MultipartRequestInputStream(InputStream in) {
         super(in);

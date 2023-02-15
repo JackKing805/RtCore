@@ -233,7 +233,8 @@ fun main() {
     rtFileConfig = RtFileConfig(
         tempFileDir = "C:\\Users\\10720\\Downloads\\key\\temp",
         saveFileDir = "C:\\Users\\10720\\Downloads\\key"
-    )
+    ),
+
     ),statusListener = object :RtCoreListener{
         override fun onClientIn(client: Client) {
             client.listen(object : ClientListener {
@@ -243,19 +244,22 @@ fun main() {
 
 
                 override suspend fun onMessage(client: Client, request: Request, response: Response) {
-                    val path = request.getPackage().path
+                    val path = request.getPackage().getRelativePath()
                     val data = request.getBody()
                     val multipartFile = request.getMultipartFormData()
                     if (multipartFile!=null){
-                        val file = File("C:\\Users\\10720\\Downloads\\key","xx")
-                        if (!file.exists()){
-                            file.createNewFile()
+                        multipartFile.getFiles().forEach { t, u ->
+                            u.save()
+                        }
+
+                        multipartFile.getParameters().forEach { t, u ->
+                            println("t:$t,u:${u}")
                         }
                     }
 
-                    println("path:$path,pp:${request.getPackage().protocol},header:${request.getPackage().getHeader().toString()},data:$data")
+                    println("path:$path,pp:${request.getPackage().getProtocol()},header:${request.getPackage().getHeader().toString()},data:$data")
                     response.setContentType(RtContentType.TEXT_HTML.content)
-                    response.write("path:$path,data:$data,pp:${request.getPackage().protocol},header:${request.getPackage().getHeader().toString()}}")
+                    response.write("path:$path,data:$data,pp:${request.getPackage().getProtocol()},header:${request.getPackage().getHeader().toString()}}")
                 }
 
                 override fun onRtClientIn(client: Client, response: Response) {

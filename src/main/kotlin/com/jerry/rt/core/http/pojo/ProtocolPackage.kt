@@ -18,13 +18,13 @@ import java.util.regex.Pattern
  **/
 class ProtocolPackage(
     private val rtContext: RtContext,
-    val method: String,
-    val path: String,
-    val protocol: RtVersion,
+    private val method: String,
+    private val path: String,
+    private val protocol: RtVersion,
     private val header: Header
 ) {
-    private val rootPath = "${RtVersion.getPrefix(protocol)}://"+header.getHeaderValue(RtHeader.HOST.content,"")
-    private val realUrl = rootPath + if (path.startsWith("/")) path else "/$path"
+    private val rootPath = "${RtVersion.getPrefix(protocol)}://"+header.getHeaderValue(RtHeader.HOST.content,"") + "/"
+    private val realUrl = rootPath + if (path.startsWith("/")) path.substring(1) else path
     private val requestURI = URI.create(realUrl)
     private val CHARSET_PATTERN = Pattern.compile("charset\\s*=\\s*([a-z0-9-]*)", Pattern.CASE_INSENSITIVE)
 
@@ -49,6 +49,10 @@ class ProtocolPackage(
         }
     }
 
+    fun getRequestMethod() = method
+
+    fun getProtocol() = protocol
+
     fun getCharset():Charset = charset!!
 
     fun isRtConnect() = method.equals(RtMethod.RT.content,true) && protocol == RtVersion.RT_1_0
@@ -58,13 +62,13 @@ class ProtocolPackage(
 
 
     //获取项目根路径
-    fun getRootAbsolutePath() = if(rootPath.endsWith("/")) rootPath else "$rootPath/"
+    fun getRootAbsolutePath() = rootPath
 
     //获取访问绝对地址
     fun getRequestAbsolutePath() = realUrl
 
     //获取访问地址
-    fun getRequestPath() = requestURI.path
+    fun getRelativePath() = requestURI.path
 
 
     fun getRequestURI() = requestURI
@@ -103,9 +107,6 @@ class ProtocolPackage(
 
         fun getHeaders() = header
 
-        fun addHeader(key: String,value:String){
-            header[key] = value
-        }
 
         fun getHeaderValue(key: String, default: String = ""): String {
             return header.entries.find { it.key.trim().lowercase() == key.lowercase() }?.value?.trim()?:default

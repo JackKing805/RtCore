@@ -2,7 +2,7 @@ package com.jerry.rt.bean
 
 import com.jerry.rt.core.http.interfaces.ISessionManager
 import com.jerry.rt.core.http.other.SessionManager
-import com.jerry.rt.core.http.request.interfaces.SocketListenerImpl
+import com.jerry.rt.core.http.request.impl.SocketListenerImpl
 import java.io.File
 import java.time.Duration
 
@@ -45,5 +45,5 @@ data class RtFileConfig(
 )
 
 data class RtTimeOutConfig(
-    val soTimeout:Int = 15000
+    val soTimeout:Int = 10
 )

@@ -152,7 +152,7 @@ class Response(
         if (acceptRanges==null){
             val fileLength = file.length().toInt()
             if (fileLength > 1024L) {
-                if(getPackage().protocol==RtVersion.HTTP_1_1){
+                if(getPackage().getProtocol()==RtVersion.HTTP_1_1){
                     //分块传输，只有http1.1支持
                     val inputStream = FileInputStream(file)
                     send({
@@ -263,7 +263,7 @@ class Response(
     private fun send(start:()->Unit,body:(ByteResponseWriter)->Unit,complete:()->Unit){
         try {
             start()
-            byteResponseWriter.writeFirstLine(protocolPackage.protocol.content, statusCode, RtCode.match(statusCode).message)
+            byteResponseWriter.writeFirstLine(protocolPackage.getProtocol().content, statusCode, RtCode.match(statusCode).message)
             header.entries.forEach {
                 byteResponseWriter.writeHeader(it.key, it.value)
             }
