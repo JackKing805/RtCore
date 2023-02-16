@@ -161,7 +161,7 @@ class MultipartFile(
 
 
         if (tempFile==null){
-            throw IOException("${getHeader().getFileName()} is already save")
+            throw IOException("no data to save")
         }
 
 
@@ -171,11 +171,7 @@ class MultipartFile(
         StreamUtils.copy(inputStream,outputStream)
         inputStream.close()
         outputStream.close()
-        try {
-            tempFile!!.delete()
-        }catch (e:Exception){
-            e.printStackTrace()
-        }
+        delete()
         return file
     }
 }
