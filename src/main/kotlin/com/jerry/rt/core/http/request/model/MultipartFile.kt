@@ -8,6 +8,7 @@ import com.jerry.rt.jva.utils.StreamUtils
 import kotlinx.coroutines.NonDisposableHandle.parent
 import java.io.*
 import java.nio.file.NoSuchFileException
+import java.util.UUID
 
 /**
  * @className: MultipartFile
@@ -125,7 +126,12 @@ class MultipartFile(
             parent.mkdir()
         }
 
-        val file = File(parent,getHeader().getFileName())
+        var name = getHeader().getFileName()
+        if (name.isEmpty()){
+            name = UUID.randomUUID().toString() + ".unknown"
+        }
+
+        val file = File(parent,name)
         if (file.exists()){
             file.delete()
         }
@@ -134,6 +140,10 @@ class MultipartFile(
     }
 
     fun saveByName(name:String){
+        if (name.isEmpty()){
+            throw IOException("save name can't be empty")
+        }
+
         val path = if (rtFileConfig.saveFileDir.endsWith("/")) rtFileConfig.saveFileDir else rtFileConfig.saveFileDir+"/" + name
         save(path)
     }
@@ -148,6 +158,12 @@ class MultipartFile(
             data = null
             return file
         }
+
+
+        if (tempFile==null){
+            throw IOException("${getHeader().getFileName()} is already save")
+        }
+
 
         val file = createFile(path)
         val inputStream = FileInputStream(tempFile!!)
