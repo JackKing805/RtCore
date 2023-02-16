@@ -155,7 +155,7 @@ class MultipartFile(
             FileOutputStream(file).use {
                 it.write(data!!)
             }
-            data = null
+            delete()
             return file
         }
 
