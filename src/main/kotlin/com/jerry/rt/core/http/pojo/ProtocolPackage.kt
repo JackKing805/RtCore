@@ -73,6 +73,8 @@ class ProtocolPackage(
 
     fun getRequestURI() = requestURI
 
+    fun getRequestURIQuery() = requestURI.query
+
 
     private var session:ISession?=null
 
@@ -163,5 +165,19 @@ class ProtocolPackage(
         fun getCookies() = cookies
 
         fun getCookie(name:String) = getCookies()[name]
+
+        fun getReferer() = getHeaderValue("Referer","")
+
+        fun getAccept() = getHeaderValue("Accept", "")
+
+        fun getAcceptEncoding() = getHeaderValue("Accept-Encoding","")
+
+        fun getAcceptLanguage() = getHeaderValue("Accept-Language","")
+
+        fun getCacheControl() = getHeaderValue("Cache-Control","")
+
+        fun getConnection() = getHeaderValue("Connection","")
+
+        fun getHost() = getHeaderValue("Host","")
     }
 }

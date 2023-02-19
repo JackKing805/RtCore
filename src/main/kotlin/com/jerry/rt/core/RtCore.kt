@@ -245,21 +245,11 @@ fun main() {
 
                 override suspend fun onMessage(client: Client, request: Request, response: Response) {
                     val path = request.getPackage().getRelativePath()
-                    val data = request.getBody()
-                    val multipartFile = request.getMultipartFormData()
-                    if (multipartFile!=null){
-                        multipartFile.getFiles().forEach { t, u ->
-//                            u.save()
-                        }
 
-                        multipartFile.getParameters().forEach { t, u ->
-                            println("t:$t,u:${u}")
-                        }
-                    }
 
-                    println("path:$path,pp:${request.getPackage().getProtocol()},header:${request.getPackage().getHeader().toString()},data:$data")
+                    println("path:$path,isResources:${request.isResourceRequest()},name:${request.getResourcesPath()}")
                     response.setContentType(RtContentType.TEXT_HTML.content)
-                    response.write("path:$path,data:$data,pp:${request.getPackage().getProtocol()},header:${request.getPackage().getHeader().toString()}}")
+                    response.write("path:$path,isResources:${request.isResourceRequest()},name:${request.getResourcesPath()}")
                 }
 
                 override fun onRtClientIn(client: Client, response: Response) {

@@ -1,6 +1,8 @@
 package com.jerry.rt.core.http.pojo
 
 import com.jerry.rt.core.RtContext
+import com.jerry.rt.core.http.pojo.utils.PojoUtil
+import com.jerry.rt.core.http.protocol.RtMethod
 import com.jerry.rt.core.http.request.exceptions.LimitLengthException
 import com.jerry.rt.core.http.request.exceptions.NoLengthReadException
 import com.jerry.rt.core.http.request.model.MultipartFormData
@@ -68,4 +70,29 @@ data class Request(
         val contentType = protocolPackage.getHeader().getContentType().lowercase()
         return contentType.startsWith("multipart/")
     }
+
+
+    /**
+     * resources请求判断
+     */
+
+    fun isResourceRequest():Boolean{
+        val requestMethod = getPackage().getRequestMethod().lowercase()
+        if (requestMethod=="get"){
+            if (PojoUtil.isResources(rtContext,resourcesName)){
+                return true
+            }
+        }
+        return false
+    }
+
+
+    private val resourcesName:String= PojoUtil.getResourcesName(getPackage())
+    fun getResourcesPath():String?{
+        if (!isResourceRequest()){
+            return null
+        }
+        return resourcesName
+    }
+
 }

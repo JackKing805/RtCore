@@ -20,7 +20,8 @@ data class RtConfig(
     val socketListener: Class<out SocketListenerImpl> = SocketListenerImpl::class.java,//socket进入时负责数据处理的类
     val rtSSLConfig: RtSSLConfig?=null,
     val rtFileConfig:RtFileConfig,
-    val rtTimeOutConfig: RtTimeOutConfig = RtTimeOutConfig()
+    val rtTimeOutConfig: RtTimeOutConfig = RtTimeOutConfig(),
+    val rtResourcesConfig: RtResourcesConfig?=null
 )
 
 
@@ -47,4 +48,8 @@ data class RtFileConfig(
 
 data class RtTimeOutConfig(
     val soTimeout:Int = 10
+)
+
+data class RtResourcesConfig(
+    val suffix:List<String>
 )
