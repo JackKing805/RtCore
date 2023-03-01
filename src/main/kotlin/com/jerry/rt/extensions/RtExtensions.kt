@@ -16,3 +16,4 @@ internal fun RtProtocol.connectIsRtConnect() = protocol.method.equals(RtMethod.R
 
 internal fun String.rtContentTypeIsHeartbeat() = this.equals(RtContentType.RT_HEARTBEAT.content,true)
 
+internal fun SocketData.isRtConnect() = messageRtProtocol.method.equals(RtMethod.RT.content,true) && messageRtProtocol.protocolString == RtVersion.RT_1_0
