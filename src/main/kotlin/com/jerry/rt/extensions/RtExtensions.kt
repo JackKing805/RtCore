@@ -4,6 +4,7 @@ import com.jerry.rt.core.http.protocol.RtContentType
 import com.jerry.rt.core.http.protocol.RtMethod
 import com.jerry.rt.core.http.protocol.RtProtocol
 import com.jerry.rt.core.http.protocol.RtVersion
+import com.jerry.rt.core.http.request.model.SocketData
 
 /**
  * @className: RtExtensions

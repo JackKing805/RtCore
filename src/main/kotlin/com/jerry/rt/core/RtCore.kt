@@ -2,6 +2,7 @@ package com.jerry.rt.core
 
 import com.jerry.rt.bean.RtConfig
 import com.jerry.rt.bean.RtFileConfig
+import com.jerry.rt.bean.RtTimeOutConfig
 import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.interfaces.ClientListener
 import com.jerry.rt.core.http.pojo.Request
@@ -222,60 +223,60 @@ class RtCore private constructor() {
 //}
 
 
-fun main() {
-    RtCore.instance.run(rtConfig = RtConfig(
-        port = 8080,
-//        rtSSLConfig = RtSSLConfig(
-//            File("C:\\Users\\10720\\Downloads\\key\\testkeystore.jks"),
-//            "123456",
-//            "123456"
-//        ),
-    rtFileConfig = RtFileConfig(
-        tempFileDir = "C:\\Users\\10720\\Downloads\\key\\temp",
-        saveFileDir = "C:\\Users\\10720\\Downloads\\key"
-    ),
-
-    ),statusListener = object :RtCoreListener{
-        override fun onClientIn(client: Client) {
-            client.listen(object : ClientListener {
-                override fun onException(exception: Exception) {
-                    exception.printStackTrace()
-                }
-
-
-                override suspend fun onMessage(client: Client, request: Request, response: Response) {
-                    val path = request.getPackage().getRelativePath()
-
-
-                    println("path:$path,isResources:${request.isResourceRequest()},name:${request.getResourcesPath()}")
-                    response.setContentType(RtContentType.TEXT_HTML.content)
-                    response.write("path:$path,isResources:${request.isResourceRequest()},name:${request.getResourcesPath()}")
-                }
-
-                override fun onRtClientIn(client: Client, response: Response) {
-
-                }
-
-                override fun onRtClientOut(client: Client, response: Response) {
-
-                }
-
-                override suspend fun onRtHeartbeat(client: Client) {
-
-                }
-
-                override suspend fun onRtMessage(request: Request, response: Response) {
-
-                }
-
-            })
-        }
-
-        override fun onRtCoreException(exception: Exception) {
-            exception.printStackTrace()
-        }
-    })
-}
+//fun main() {
+//    RtCore.instance.run(rtConfig = RtConfig(
+//        port = 8080,
+////        rtSSLConfig = RtSSLConfig(
+////            File("C:\\Users\\10720\\Downloads\\key\\testkeystore.jks"),
+////            "123456",
+////            "123456"
+////        ),
+//    rtFileConfig = RtFileConfig(
+//        tempFileDir = "C:\\Users\\10720\\Downloads\\key\\temp",
+//        saveFileDir = "C:\\Users\\10720\\Downloads\\key"
+//    ),
+//
+//    ),statusListener = object :RtCoreListener{
+//        override fun onClientIn(client: Client) {
+//            client.listen(object : ClientListener {
+//                override fun onException(exception: Exception) {
+//                    exception.printStackTrace()
+//                }
+//
+//
+//                override suspend fun onMessage(client: Client, request: Request, response: Response) {
+//                    val path = request.getPackage().getRelativePath()
+//
+//
+//                    println("path:$path,isResources:${request.isResourceRequest()},name:${request.getResourcesPath()}")
+//                    response.setContentType(RtContentType.TEXT_HTML.content)
+//                    response.write("path:$path,isResources:${request.isResourceRequest()},name:${request.getResourcesPath()}")
+//                }
+//
+//                override fun onRtClientIn(client: Client, response: Response) {
+//
+//                }
+//
+//                override fun onRtClientOut(client: Client, response: Response) {
+//
+//                }
+//
+//                override suspend fun onRtHeartbeat(client: Client) {
+//
+//                }
+//
+//                override suspend fun onRtMessage(request: Request, response: Response) {
+//
+//                }
+//
+//            })
+//        }
+//
+//        override fun onRtCoreException(exception: Exception) {
+//            exception.printStackTrace()
+//        }
+//    })
+//}
 
 
 //fun main() {
@@ -325,3 +326,49 @@ fun main() {
 //
 //    }
 //}
+
+
+
+fun main() {
+    RtCore.instance.run(rtConfig = RtConfig(
+        port = 8080,
+        rtFileConfig = RtFileConfig(
+            tempFileDir = "C:\\Users\\10720\\Downloads\\key\\temp",
+            saveFileDir = "C:\\Users\\10720\\Downloads\\key"
+        )
+    ),statusListener = object :RtCoreListener{
+        override fun onClientIn(client: Client) {
+            client.listen(object : ClientListener {
+                override fun onException(exception: Exception) {
+                    exception.printStackTrace()
+                }
+
+
+                override suspend fun onMessage(client: Client, request: Request, response: Response) {
+
+                }
+
+                override fun onRtClientIn(client: Client, response: Response) {
+                    "onRtClientIn:${client.getClientId()}".logInfo()
+                }
+
+                override fun onRtClientOut(client: Client, response: Response) {
+                    "onRtClientOut:${client.getClientId()}".logInfo()
+                }
+
+                override suspend fun onRtHeartbeat(client: Client) {
+                    "onRtHeartbeat".logInfo()
+                }
+
+                override suspend fun onRtMessage(request: Request, response: Response) {
+                    "onRtMessage:${client.getClientId()},msg:${request.getBody()}".logInfo()
+                }
+
+            })
+        }
+
+        override fun onRtCoreException(exception: Exception) {
+            exception.printStackTrace()
+        }
+    })
+}
