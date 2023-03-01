@@ -27,13 +27,15 @@ open class SocketListenerImpl: SocketListener {
         socket: Socket,
         onSocketData: suspend (SocketData) -> Unit
     ) {
+        val basicInfo = BasicInfoHandler(socket)
         while (isAlive()){
             try {
-                val basicInfo = BasicInfoHandler(socket)
                 val messageRtProtocol = basicInfo.getMessageRtProtocol()
                 val socketData = SocketData(messageRtProtocol,basicInfo.inputStream(),basicInfo.outputStream())
                 onSocketData.invoke(socketData)
+                socketData.skipData()
             }catch (e:Exception){
+                e.printStackTrace()
                 break
             }
         }
