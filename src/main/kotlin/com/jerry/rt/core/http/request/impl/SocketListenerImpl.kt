@@ -5,6 +5,7 @@ import com.jerry.rt.core.http.request.interfaces.SocketListener
 import com.jerry.rt.core.http.request.model.SocketData
 import java.net.Socket
 import java.net.SocketException
+import java.net.SocketTimeoutException
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -36,6 +37,8 @@ open class SocketListenerImpl: SocketListener {
                 onSocketData.invoke(socketData)
                 socketData.skipData()
             }catch (e:SocketException){
+                break
+            }catch (e:SocketTimeoutException){
                 break
             }catch (e:Exception){
                 e.printStackTrace()
