@@ -55,8 +55,6 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
                 if (request.getPackage().getHeader().getContentType().rtContentTypeIsHeartbeat()) {
                     //心跳包
                     receiverHeartbeatTime = System.currentTimeMillis()
-                    rtResponse!!.setContentType(RtContentType.RT_HEARTBEAT.content)
-                    rtResponse!!.sendHeader()
                     ifRtConnectHeartbeat(request.getPackage())
                     return
                 }
@@ -113,7 +111,6 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
             try {
                 socketListener.onSocketIn(s){
                     localMessageListener.onMessage(it)
-                    it.skipData()
                 }
             }catch (e:Exception){
                 clientListener?.onException(e)
