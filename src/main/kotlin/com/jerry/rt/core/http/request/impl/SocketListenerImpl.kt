@@ -40,6 +40,8 @@ open class SocketListenerImpl: SocketListener {
                 break
             }catch (e:SocketTimeoutException){
                 break
+            }catch (e:NullPointerException){
+                break
             }catch (e:Exception){
                 e.printStackTrace()
                 break
