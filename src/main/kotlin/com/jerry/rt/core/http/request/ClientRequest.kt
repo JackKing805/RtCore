@@ -52,13 +52,6 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
                 if (rtResponse == null) {
                     rtResponse = Response(rtContext, socketData.getSocketBody().getOutputStream(),request.getPackage())
                 }
-
-                if (request.getPackage().getHeader().getContentType().rtContentTypeIsHeartbeat()) {
-                    //心跳包
-                    receiverHeartbeatTime = System.currentTimeMillis()
-                    ifRtConnectHeartbeat(request.getPackage())
-                    return
-                }
                 //普通rt 信道
                 if (!isRtIn) {
                     isRtIn = true
@@ -67,6 +60,12 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
                     } catch (e: Exception) {
                         clientListener?.onException(e)
                     }
+                }
+                if (request.getPackage().getHeader().getContentType().rtContentTypeIsHeartbeat()) {
+                    //心跳包
+                    receiverHeartbeatTime = System.currentTimeMillis()
+                    ifRtConnectHeartbeat(request.getPackage())
+                    return
                 }
                 try {
                     clientListener?.onRtMessage(request, rtResponse!!)
