@@ -260,6 +260,7 @@ class Response(
     /**
      * 发送，重要方法
      */
+    @Synchronized
     private fun send(start:()->Unit,body:(ByteResponseWriter)->Unit,complete:()->Unit){
         try {
             start()
