@@ -4,6 +4,7 @@ import com.jerry.rt.core.http.request.input.BasicInfoHandler
 import com.jerry.rt.core.http.request.interfaces.SocketListener
 import com.jerry.rt.core.http.request.model.SocketData
 import java.net.Socket
+import java.net.SocketException
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -34,6 +35,8 @@ open class SocketListenerImpl: SocketListener {
                 val socketData = SocketData(messageRtProtocol,basicInfo.inputStream(),basicInfo.outputStream())
                 onSocketData.invoke(socketData)
                 socketData.skipData()
+            }catch (e:SocketException){
+                break
             }catch (e:Exception){
                 e.printStackTrace()
                 break
