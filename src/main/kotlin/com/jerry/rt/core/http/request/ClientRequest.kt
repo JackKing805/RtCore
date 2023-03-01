@@ -104,8 +104,9 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
             if (isInit) {
                 return@launch
             }
+            val timeOutConfig = rtContext.getRtConfig().rtTimeOutConfig
             this@ClientRequest.socket = s
-            this@ClientRequest.socket.soTimeout = rtContext.getRtConfig().rtTimeOutConfig.soTimeout
+            this@ClientRequest.socket.soTimeout = timeOutConfig.soTimeout
             isInit = true
             isAlive = true
             val socketListener = rtContext.getRtConfig().socketListener.newInstance()
@@ -113,6 +114,8 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
                 socketListener.onSocketIn(s){
                     if (it.isRtConnect()){
                         this@ClientRequest.socket.soTimeout = 0
+                    }else{
+                        this@ClientRequest.socket.soTimeout = timeOutConfig.soTimeout
                     }
                     localMessageListener.onMessage(it)
                 }
