@@ -10,7 +10,6 @@ import java.net.Socket
 
 /**
  * @className: BasicInfoHandler
- * @description: TODO 类描述
  * @author: Jerry
  * @date: 2023/2/15:19:39
  **/
@@ -27,11 +26,15 @@ class BasicInfoHandler(socket: Socket) {
     init {
         `is` = socket.getInputStream()
         os = socket.getOutputStream()
-        process()
     }
 
 
     private fun process() {
+        buf = CharArray(2048)
+        pos = 0
+        startLine = null
+        lineBuf = null
+        hdrs= null
         parseBasicLine()
         parseHeader()
     }
@@ -186,6 +189,9 @@ class BasicInfoHandler(socket: Socket) {
     fun headers() = hdrs!!
 
     fun getMessageRtProtocol(): MessageRtProtocol {
+        process()
+
+
         val headers = headers()
         val requestLine = requestLine()
 
