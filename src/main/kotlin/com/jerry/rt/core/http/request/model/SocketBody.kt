@@ -53,7 +53,6 @@ class SocketBody(private val maxSize:Long,private val inputStream: InputStream,p
     override fun skipData(){
         val skip = maxSize - readSize
         val skipNotConsumptionByte = inputStream.skipNotConsumptionByte(skip)
-        "skipNotConsumptionByte:$skipNotConsumptionByte".logError()
     }
 
     fun getInputStream() = inputStream
