@@ -10,6 +10,7 @@ import com.jerry.rt.core.http.protocol.RtContentType
 import com.jerry.rt.core.http.request.model.SocketData
 import com.jerry.rt.core.thread.Looper
 import com.jerry.rt.extensions.createStandCoroutineScope
+import com.jerry.rt.extensions.isRtConnect
 import com.jerry.rt.extensions.rtContentTypeIsHeartbeat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -110,6 +111,9 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
             val socketListener = rtContext.getRtConfig().socketListener.newInstance()
             try {
                 socketListener.onSocketIn(s){
+                    if (it.isRtConnect()){
+                        this@ClientRequest.socket.soTimeout = 0
+                    }
                     localMessageListener.onMessage(it)
                 }
             }catch (e:Exception){
