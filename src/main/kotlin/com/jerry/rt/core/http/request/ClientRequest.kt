@@ -48,6 +48,7 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
         override suspend fun onMessage(socketData: SocketData) {
             val request = Request(rtContext, socketData)
             if (request.getPackage().isRtConnect()) {
+                receiverHeartbeatTime = System.currentTimeMillis()
                 checkHeartbeat()
                 if (rtResponse == null) {
                     rtResponse = Response(rtContext, socketData.getSocketBody().getOutputStream(),request.getPackage())
@@ -63,7 +64,6 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
                 }
                 if (request.getPackage().getHeader().getContentType().rtContentTypeIsHeartbeat()) {
                     //心跳包
-                    receiverHeartbeatTime = System.currentTimeMillis()
                     ifRtConnectHeartbeat(request.getPackage())
                     return
                 }
