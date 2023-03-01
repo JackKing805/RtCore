@@ -3,6 +3,7 @@ package com.jerry.rt.core.http.request.model
 import com.jerry.rt.core.http.request.exceptions.LimitLengthException
 import com.jerry.rt.core.http.request.exceptions.NoLengthReadException
 import com.jerry.rt.core.http.request.interfaces.DataReadListener
+import com.jerry.rt.extensions.logError
 import com.jerry.rt.extensions.readLength
 import com.jerry.rt.extensions.skipNotConsumptionByte
 import com.jerry.rt.extensions.toByteArray
@@ -32,7 +33,10 @@ class SocketBody(private val maxSize:Long,private val inputStream: InputStream,p
         if (readSize+total>maxSize){
             throw LimitLengthException()
         }
-        inputStream.read(byteArray,offset,len)
+        val read = inputStream.read(byteArray,offset,len)
+        if (read!=-1){
+            readSize+=read
+        }
     }
 
     @Throws(exceptionClasses = [LimitLengthException::class])
@@ -48,7 +52,8 @@ class SocketBody(private val maxSize:Long,private val inputStream: InputStream,p
     @Throws(exceptionClasses = [Exception::class])
     override fun skipData(){
         val skip = maxSize - readSize
-        inputStream.skipNotConsumptionByte(skip)
+        val skipNotConsumptionByte = inputStream.skipNotConsumptionByte(skip)
+        "skipNotConsumptionByte:$skipNotConsumptionByte".logError()
     }
 
     fun getInputStream() = inputStream
