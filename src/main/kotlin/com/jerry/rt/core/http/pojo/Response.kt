@@ -254,6 +254,20 @@ class Response(
         write(byteArray, rContentType, rContentLength)
     }
 
+    @Throws(IOException::class)
+    fun write(body: ByteArray) {
+        if (header[RtHeader.CONTENT_TYPE.content] ==null){
+            throw NullPointerException("please provider contentType")
+        }
+        send(start = {
+            setContentLength(body.size)
+        },{
+            byteResponseWriter.writeBody(body)
+        }) {
+
+        }
+    }
+
     fun getPrintWriter() = PrintWriter(output)
 
 

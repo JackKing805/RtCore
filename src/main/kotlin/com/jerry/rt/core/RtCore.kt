@@ -350,6 +350,8 @@ fun main() {
 
                 override fun onRtClientIn(client: Client, response: Response) {
                     "onRtClientIn:${client.getClientId()}".logInfo()
+                    response.setContentType(RtContentType.TEXT_PLAIN.content)
+                    response.write("hallo ${client.getClientId()}")
                 }
 
                 override fun onRtClientOut(client: Client, response: Response) {
