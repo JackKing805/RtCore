@@ -129,6 +129,7 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
                 "socketListener finish".logInfo()
             }catch (e:Exception){
                 clientListener?.onException(e)
+            }finally {
                 "socketListener finish to close".logInfo()
                 tryClose()
             }
