@@ -48,7 +48,6 @@ open class SocketListenerImpl: SocketListener {
                 break
             }
         }
-        "SocketListenerImpl stop isAlive:${isAlive()}".logError()
     }
 
 

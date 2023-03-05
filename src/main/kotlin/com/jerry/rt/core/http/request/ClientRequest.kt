@@ -58,7 +58,6 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
                 }
                 //普通rt 信道
                 if (!isRtIn) {
-                    "first rt connect".logInfo()
                     isRtIn = true
                     checkHeartbeat()
                     try {
@@ -69,7 +68,6 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
                 }
                 if (request.getPackage().getHeader().getContentType().rtContentTypeIsHeartbeat()) {
                     //心跳包
-                    "rtHeartbeat connect".logInfo()
                     ifRtConnectHeartbeat(request.getPackage())
                     return
                 }
@@ -118,19 +116,15 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
             try {
                 socketListener.onSocketIn(s){
                     if (it.isRtConnect()){
-                        "this request is rt request".logInfo()
                         this@ClientRequest.socket.soTimeout = 0
                     }else{
-                        "this request is common request".logInfo()
                         this@ClientRequest.socket.soTimeout = timeOutConfig.soTimeout
                     }
                     localMessageListener.onMessage(it)
                 }
-                "socketListener finish".logInfo()
             }catch (e:Exception){
                 clientListener?.onException(e)
             }finally {
-                "socketListener finish to close".logInfo()
                 tryClose()
             }
 
@@ -175,9 +169,7 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
                 if (get != -1L) {
                     val curr = System.currentTimeMillis()
                     val dis = curr - get
-                    "dis:$dis,receiverHeartbeatTime:$receiverHeartbeatTime,curr:$curr".logInfo()
                     if (dis > interval) {
-                        "rtHeartBeat is overtime auto disconnect,dis:$dis,receiverHeartbeatTime:$receiverHeartbeatTime,curr:$curr".logError()
                         break
                     }
                 }else{
@@ -190,12 +182,10 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
     }
 
     fun tryClose() {
-        "someone tryClose".logInfo()
         if (!isAlive.get()) {
             return
         }
         if (isRtIn) {
-            "rt tryClose".logInfo()
             try {
                 clientListener?.onRtClientOut(client, rtResponse!!)
             } catch (e: Exception) {
