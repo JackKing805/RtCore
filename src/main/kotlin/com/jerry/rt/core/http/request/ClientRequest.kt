@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicLong
  * @date: 2023/1/2:13:27
  **/
 internal class ClientRequest(private val rtContext: RtContext, private val client: Client) {
-    private var isAlive = false
+    private var isAlive = AtomicBoolean(false)
     private var isInit = false
     private lateinit var socket: Socket
     private val scope = createStandCoroutineScope {
@@ -113,7 +113,7 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
             this@ClientRequest.socket = s
             this@ClientRequest.socket.soTimeout = timeOutConfig.soTimeout
             isInit = true
-            isAlive = true
+            isAlive.set(true)
             val socketListener = rtContext.getRtConfig().socketListener.newInstance()
             try {
                 socketListener.onSocketIn(s){
@@ -126,13 +126,14 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
                     }
                     localMessageListener.onMessage(it)
                 }
+                "socketListener finish".logInfo()
             }catch (e:Exception){
                 clientListener?.onException(e)
-            }finally {
+                "socketListener finish to close".logInfo()
                 tryClose()
             }
 
-            while (isAlive){
+            while (isAlive.get()){
                 delay(600)
             }
 
@@ -149,7 +150,7 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
     }
 
     fun listen(clientListener: ClientListener) {
-        if (!isAlive && isInit) {
+        if (!isAlive.get() && isInit) {
             return
         }
         this.clientListener = clientListener
@@ -167,7 +168,7 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
         isCheckHeartbeatStart = true
         scope.launch(Dispatchers.IO) {
             val interval = rtContext.getRtConfig().heartbeatReceiverIntervalTime.toMillis()
-            while (isAlive) {
+            while (isAlive.get()) {
                 delay(5000)
                 val get = receiverHeartbeatTime
                 if (get != -1L) {
@@ -189,7 +190,7 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
 
     fun tryClose() {
         "someone tryClose".logInfo()
-        if (!isAlive) {
+        if (!isAlive.get()) {
             return
         }
         if (isRtIn) {
@@ -205,13 +206,13 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {
-            isAlive = false
+            isAlive.set(false)
             clientListener = null
         }
     }
 
 
-    internal fun isAlive(): Boolean = isAlive
+    internal fun isAlive(): Boolean = isAlive.get()
 
     private interface MessageListener {
         suspend fun ifRtConnectHeartbeat(protocolPackage: ProtocolPackage)

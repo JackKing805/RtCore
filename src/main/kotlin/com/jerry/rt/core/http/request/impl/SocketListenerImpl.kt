@@ -3,6 +3,7 @@ package com.jerry.rt.core.http.request.impl
 import com.jerry.rt.core.http.request.input.BasicInfoHandler
 import com.jerry.rt.core.http.request.interfaces.SocketListener
 import com.jerry.rt.core.http.request.model.SocketData
+import com.jerry.rt.extensions.logError
 import java.net.Socket
 import java.net.SocketException
 import java.net.SocketTimeoutException
@@ -47,6 +48,7 @@ open class SocketListenerImpl: SocketListener {
                 break
             }
         }
+        "SocketListenerImpl stop isAlive:${isAlive()}".logError()
     }
 
 
