@@ -50,14 +50,14 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
         override suspend fun onMessage(socketData: SocketData) {
             val request = Request(rtContext, socketData)
             if (request.getPackage().isRtConnect()) {
-                receiverHeartbeatTime.set(System.currentTimeMillis())
-                checkHeartbeat()
+                receiverHeartbeatTime = System.currentTimeMillis()
                 if (rtResponse == null) {
                     rtResponse = Response(rtContext, socketData.getSocketBody().getOutputStream(),request.getPackage())
                 }
                 //普通rt 信道
                 if (!isRtIn) {
                     isRtIn = true
+                    checkHeartbeat()
                     try {
                         clientListener?.onRtClientIn(client, rtResponse!!)
                     } catch (e: Exception) {
@@ -150,20 +150,20 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
     }
 
 
-    private var isCheckHeartbeatStart = AtomicBoolean(false)
-    private var receiverHeartbeatTime = AtomicLong(-1L)
+    private var isCheckHeartbeatStart = false
+    private var receiverHeartbeatTime = -1L
 
     //定时发送心跳
     private fun checkHeartbeat() {
-        if (isCheckHeartbeatStart.get()) {
+        if (isCheckHeartbeatStart) {
             return
         }
-        isCheckHeartbeatStart.set(true)
+        isCheckHeartbeatStart = true
         scope.launch(Dispatchers.IO) {
             val interval = rtContext.getRtConfig().heartbeatReceiverIntervalTime.toMillis()
             while (isAlive) {
                 delay(5000)
-                val get = receiverHeartbeatTime.get()
+                val get = receiverHeartbeatTime
                 if (get != -1L) {
                     val dis = System.currentTimeMillis() - get
                     if (dis > interval) {
@@ -173,7 +173,7 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
                     break
                 }
             }
-            isCheckHeartbeatStart.set(false)
+            isCheckHeartbeatStart = false
             tryClose()
         }
     }
