@@ -166,6 +166,8 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
                     if (dis > interval) {
                         break
                     }
+                }else{
+                    break
                 }
             }
             tryClose()

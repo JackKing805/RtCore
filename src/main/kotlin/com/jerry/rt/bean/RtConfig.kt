@@ -14,7 +14,7 @@ import java.time.Duration
  **/
 data class RtConfig(
     val port:Int = 8080,
-    val heartbeatReceiverIntervalTime:Duration = Duration.ofSeconds(10),//收到心跳包最小间隔时间
+    val heartbeatReceiverIntervalTime:Duration = Duration.ofSeconds(60),//收到心跳包最大间隔时间
     val rtSessionConfig: RtSessionConfig = RtSessionConfig(),
     val serverVersionDetails:String = "RtServer/1.0",
     val socketListener: Class<out SocketListenerImpl> = SocketListenerImpl::class.java,//socket进入时负责数据处理的类
