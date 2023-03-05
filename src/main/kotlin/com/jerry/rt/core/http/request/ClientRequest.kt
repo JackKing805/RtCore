@@ -16,6 +16,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.net.Socket
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
 
 /**
  * @className: ClientRequest
@@ -48,7 +50,7 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
         override suspend fun onMessage(socketData: SocketData) {
             val request = Request(rtContext, socketData)
             if (request.getPackage().isRtConnect()) {
-                receiverHeartbeatTime = System.currentTimeMillis()
+                receiverHeartbeatTime.set(System.currentTimeMillis())
                 checkHeartbeat()
                 if (rtResponse == null) {
                     rtResponse = Response(rtContext, socketData.getSocketBody().getOutputStream(),request.getPackage())
@@ -148,21 +150,22 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
     }
 
 
-    private var isCheckHeartbeatStart = false
-    private var receiverHeartbeatTime = -1L
+    private var isCheckHeartbeatStart = AtomicBoolean(false)
+    private var receiverHeartbeatTime = AtomicLong(-1L)
 
     //定时发送心跳
     private fun checkHeartbeat() {
-        if (isCheckHeartbeatStart) {
+        if (isCheckHeartbeatStart.get()) {
             return
         }
-        isCheckHeartbeatStart = true
+        isCheckHeartbeatStart.set(true)
         scope.launch(Dispatchers.IO) {
             val interval = rtContext.getRtConfig().heartbeatReceiverIntervalTime.toMillis()
             while (isAlive) {
                 delay(5000)
-                if (receiverHeartbeatTime != -1L) {
-                    val dis = System.currentTimeMillis() - receiverHeartbeatTime
+                val get = receiverHeartbeatTime.get()
+                if (get != -1L) {
+                    val dis = System.currentTimeMillis() - get
                     if (dis > interval) {
                         break
                     }
@@ -170,6 +173,7 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
                     break
                 }
             }
+            isCheckHeartbeatStart.set(false)
             tryClose()
         }
     }
