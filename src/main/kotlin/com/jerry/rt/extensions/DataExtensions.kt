@@ -66,11 +66,11 @@ internal fun InputStream.readLength(length:Long):MutableList<ByteArray>{
     return list
 }
 
-internal fun InputStream.skipNotConsumptionByte(length: Long){
+internal fun InputStream.skipNotConsumptionByte(length: Long):Long{
     if (length==0L){
-        return
+        return 0
     }
-    skip(length)
+    return skip(length)
 }
 
 internal fun InputStream.asDataInputStream() = DataInputStream(this)

@@ -45,7 +45,20 @@ class BasicInfoHandler(socket: Socket) {
             if (startLine == null) {
                 return
             }
-        } while (startLine != null && startLine == "")
+        } while (startLine != null && startLine == "" && (startLine!!.startsWith("r",true) || startLine!!.startsWith("h",true)))
+
+//        val lowercase = startLine!!.lowercase()
+//        if (
+//            !lowercase.startsWith("rt") &&
+//            !lowercase.startsWith("http")
+//        ){
+//            for (i in lowercase.indices) {
+//                if (lowercase[i] =='r' || lowercase[i] =='h'){
+//                    startLine = startLine!!.substring(i)
+//                    break
+//                }
+//            }
+//        }
     }
 
     private fun parseHeader() {

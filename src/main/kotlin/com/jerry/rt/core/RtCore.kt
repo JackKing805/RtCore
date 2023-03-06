@@ -350,20 +350,20 @@ fun main() {
 
                 override fun onRtClientIn(client: Client, response: Response) {
                     "onRtClientIn:${client.getClientId()}".logInfo()
-                    response.setContentType(RtContentType.TEXT_PLAIN.content)
-                    response.write("hallo ${client.getClientId()}")
                 }
 
                 override fun onRtClientOut(client: Client, response: Response) {
                     "onRtClientOut:${client.getClientId()}".logInfo()
+
                 }
 
                 override suspend fun onRtHeartbeat(client: Client) {
-                    "onRtHeartbeat".logInfo()
                 }
 
                 override suspend fun onRtMessage(request: Request, response: Response) {
                     "onRtMessage:${client.getClientId()},msg:${request.getBody()}".logInfo()
+                    response.setContentType(RtContentType.TEXT_PLAIN.content)
+                    response.write(request.getPackage().getSession().getId())
                 }
 
             })
