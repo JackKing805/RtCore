@@ -6,7 +6,7 @@ plugins {
     `maven-publish`
 }
 
-val vv = "0.5.4"
+val vv = "0.5.5"
 
 group = "com.jerry"
 version = vv
@@ -20,7 +20,7 @@ dependencies {
 
     //协程
     compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")//todo remove
+//    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")//todo remove
 }
 
 tasks.test {
