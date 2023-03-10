@@ -36,7 +36,6 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
     }
     private var clientListener: ClientListener? = null
 
-    private var rtResponse: Response? = null
     private var isRtIn = false
 
     private var localMessageListener: MessageListener = object : MessageListener {
@@ -53,15 +52,13 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
             val request = Request(rtContext, socketData)
             if (request.getPackage().isRtConnect()) {
                 receiverHeartbeatTime = System.currentTimeMillis()
-                if (rtResponse == null) {
-                    rtResponse = Response(rtContext, socketData.getSocketBody().getOutputStream(),request.getPackage())
-                }
+                val rtResponse = Response(rtContext, socketData.getSocketBody().getOutputStream(),request.getPackage())
                 //普通rt 信道
                 if (!isRtIn) {
                     isRtIn = true
                     checkHeartbeat()
                     try {
-                        clientListener?.onRtClientIn(client, rtResponse!!)
+                        clientListener?.onRtClientIn(client,request, rtResponse)
                     } catch (e: Exception) {
                         clientListener?.onException(e)
                     }
@@ -72,7 +69,7 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
                     return
                 }
                 try {
-                    clientListener?.onRtMessage(request, rtResponse!!)
+                    clientListener?.onRtMessage(request, rtResponse)
                 } catch (e: Exception) {
                     clientListener?.onException(e)
                 }
@@ -187,7 +184,7 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
         }
         if (isRtIn) {
             try {
-                clientListener?.onRtClientOut(client, rtResponse!!)
+                clientListener?.onRtClientOut(client)
             } catch (e: Exception) {
                 clientListener?.onException(e)
             }

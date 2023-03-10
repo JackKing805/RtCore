@@ -13,9 +13,9 @@ import com.jerry.rt.core.http.pojo.Response
 interface ClientListener {
     suspend fun onRtHeartbeat(client: Client)
 
-    fun onRtClientIn(client: Client,response: Response)
+    fun onRtClientIn(client: Client,request: Request,response: Response)
     suspend fun onRtMessage(request: Request,response: Response)
-    fun onRtClientOut(client: Client,response: Response)
+    fun onRtClientOut(client: Client)
 
     suspend fun onMessage(client: Client,request: Request,response: Response)
 

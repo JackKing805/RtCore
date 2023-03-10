@@ -348,11 +348,11 @@ fun main() {
 
                 }
 
-                override fun onRtClientIn(client: Client, response: Response) {
+                override fun onRtClientIn(client: Client,request: Request, response: Response) {
                     "onRtClientIn:${client.getClientId()}".logInfo()
                 }
 
-                override fun onRtClientOut(client: Client, response: Response) {
+                override fun onRtClientOut(client: Client) {
                     "onRtClientOut:${client.getClientId()}".logInfo()
 
                 }
