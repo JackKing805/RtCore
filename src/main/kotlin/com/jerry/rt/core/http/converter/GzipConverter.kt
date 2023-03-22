@@ -10,6 +10,7 @@ class GzipConverter: IDataConverter {
 
     override fun converter(data: ByteArray): IDataConverter.ConverterDataResult {
         gzipOutputStream.write(data)
+        gzipOutputStream.close()
         return IDataConverter.ConverterDataResult("gzip",byteArrayOutputStream.toByteArray())
     }
 

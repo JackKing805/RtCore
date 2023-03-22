@@ -28,6 +28,7 @@ data class RtConfig(
 )
 
 data class RtDataConverter(
+    val enabled:Boolean=true,
     val dataConverter: List<Class<out IDataConverter>> = listOf()
 ){
     private val defaultConverters = listOf<Class<out IDataConverter>>(
