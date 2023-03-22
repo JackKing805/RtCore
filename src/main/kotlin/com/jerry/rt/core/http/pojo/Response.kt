@@ -3,6 +3,7 @@ package com.jerry.rt.core.http.pojo
 import com.jerry.rt.core.RtContext
 import com.jerry.rt.core.http.protocol.*
 import com.jerry.rt.core.http.response.impl.ByteResponseWriter
+import com.jerry.rt.core.http.converter.DataConverter
 import com.jerry.rt.utils.RtUtils
 import com.jerry.rt.utils.URLEncodeUtil
 import java.io.*
@@ -100,18 +101,6 @@ class Response(
 
     fun getByteWriter() = byteResponseWriter
 
-    @Throws(IOException::class)
-    fun write(body: ByteArray, contentType: String, length: Int = body.size) {
-        send(start = {
-            setContentType(contentType)
-            setContentLength(length)
-        },{
-            byteResponseWriter.writeBody(body)
-        }) {
-
-        }
-    }
-
     fun reset(){
         header.clear()
         cookies.clear()
@@ -125,19 +114,37 @@ class Response(
     }
 
     @Throws(IOException::class)
-    fun write(body: String, contentType: String, length: Int = body.length) {
-        write(body.toByteArray(), contentType, length)
+    fun write(body: ByteArray, contentType: String) {
+        val realData = DataConverter.converterToAcceptEncoding(rtContext,protocolPackage.getHeader().getAcceptEncodings(),body)
+
+        send(start = {
+            setContentType(contentType)
+            setContentLength(realData.data.size)
+            setHeader("Content-Encoding",realData.encoding)
+        },{
+            byteResponseWriter.writeBody(realData.data)
+        }) {
+
+        }
+    }
+
+    @Throws(IOException::class)
+    fun write(body: ByteArray) {
+        if (header[RtHeader.CONTENT_TYPE.content] ==null){
+            throw NullPointerException("please provider contentType")
+        }
+        write(body,header[RtHeader.CONTENT_TYPE.content]!!)
     }
 
     @Throws(IOException::class)
     fun write(body: String, contentType: String) {
-        write(body.toByteArray(), contentType, body.length)
+        write(body.toByteArray(), contentType)
     }
 
     @Throws(IOException::class)
     fun write(body: String) {
         val contentType = header[RtHeader.CONTENT_TYPE.content]?:throw NullPointerException("please set Content-Type")
-        write(body.toByteArray(), contentType, body.length)
+        write(body.toByteArray(), contentType)
     }
 
     //https://blog.csdn.net/qq_26046771/article/details/103321223 大文件传输原理
@@ -158,6 +165,7 @@ class Response(
                     send({
                         removeHeader(RtHeader.CONTENT_LENGTH.content)
                         setHeader("Transfer-Encoding","chunked")
+                        setHeader("Content-Encoding","identity")//identity 表示未编码的数据
                     },{
                         val buffer = ByteArray(1024)
                         var len = 0
@@ -218,6 +226,7 @@ class Response(
             setHeader(RtHeader.CONTENT_LENGTH.content,contentLength.toString())
             setHeader("Accept-Ranges","bytes")
             setHeader("Content-Range","bytes $rangeStart-$rangeEnd/$fileLength")
+            setHeader("Content-Encoding","identity")//identity 表示未编码的数据
         },{
             val buffer = ByteArray(1024)
             var len = 0
@@ -249,27 +258,12 @@ class Response(
         }else{
             length
         }
-        val byteArray = ByteArray(length)
+        val byteArray = ByteArray(rContentLength)
         inputStream.read(byteArray)
-        write(byteArray, rContentType, rContentLength)
-    }
-
-    @Throws(IOException::class)
-    fun write(body: ByteArray) {
-        if (header[RtHeader.CONTENT_TYPE.content] ==null){
-            throw NullPointerException("please provider contentType")
-        }
-        send(start = {
-            setContentLength(body.size)
-        },{
-            byteResponseWriter.writeBody(body)
-        }) {
-
-        }
+        write(byteArray, rContentType)
     }
 
     fun getPrintWriter() = PrintWriter(output)
-
 
     /**
      * 发送，重要方法

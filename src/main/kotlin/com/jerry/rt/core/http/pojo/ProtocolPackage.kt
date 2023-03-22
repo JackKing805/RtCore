@@ -172,6 +172,8 @@ class ProtocolPackage(
 
         fun getAcceptEncoding() = getHeaderValue("Accept-Encoding","")
 
+        fun getAcceptEncodings() = getHeaderValue("Accept-Encoding","").split(",")
+
         fun getAcceptLanguage() = getHeaderValue("Accept-Language","")
 
         fun getCacheControl() = getHeaderValue("Cache-Control","")

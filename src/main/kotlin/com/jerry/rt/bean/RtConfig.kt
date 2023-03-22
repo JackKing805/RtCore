@@ -1,5 +1,7 @@
 package com.jerry.rt.bean
 
+import com.jerry.rt.core.http.converter.GzipConverter
+import com.jerry.rt.core.http.interfaces.IDataConverter
 import com.jerry.rt.core.http.interfaces.ISessionManager
 import com.jerry.rt.core.http.other.SessionManager
 import com.jerry.rt.core.http.request.impl.SocketListenerImpl
@@ -21,8 +23,19 @@ data class RtConfig(
     val rtSSLConfig: RtSSLConfig?=null,
     val rtFileConfig:RtFileConfig,
     val rtTimeOutConfig: RtTimeOutConfig = RtTimeOutConfig(),
-    val rtResourcesConfig: RtResourcesConfig?=null
+    val rtResourcesConfig: RtResourcesConfig?=null,
+    val rtDataConverter: RtDataConverter = RtDataConverter()
 )
+
+data class RtDataConverter(
+    val dataConverter: List<Class<out IDataConverter>> = listOf()
+){
+    private val defaultConverters = listOf<Class<out IDataConverter>>(
+        GzipConverter::class.java
+    )
+
+    fun listAll():List<Class<out IDataConverter>> = defaultConverters + dataConverter
+}
 
 
 data class RtSessionConfig(

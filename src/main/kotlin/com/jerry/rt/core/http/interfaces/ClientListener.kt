@@ -1,6 +1,7 @@
 package com.jerry.rt.core.http.interfaces
 
 import com.jerry.rt.core.http.Client
+import com.jerry.rt.core.http.converter.DataConverter
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
 
