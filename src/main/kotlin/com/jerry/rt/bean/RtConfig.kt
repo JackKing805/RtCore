@@ -61,7 +61,7 @@ data class RtFileConfig(
 )
 
 data class RtTimeOutConfig(
-    val soTimeout:Int = 1000*5//毫秒，建议不要低于1秒，不然rt协议会直接中止
+    val soTimeout:Int = 1000*30//毫秒，建议不要低于1秒，不然rt协议会直接中止
 )
 
 data class RtResourcesConfig(

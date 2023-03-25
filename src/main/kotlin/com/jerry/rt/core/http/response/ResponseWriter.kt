@@ -17,11 +17,14 @@ abstract class ResponseWriter<T>(protected val outputStream: OutputStream):Write
     private var isFirstBody = true
 
 
+
+
     @Throws(Exception::class)
     override fun writeFirstLine(protocol: String, code: Int, msg: String) {
         isFirstLineWrite = true
 
     }
+
 
     @Throws(Exception::class)
     override fun writeLine(line: String) {
@@ -42,6 +45,7 @@ abstract class ResponseWriter<T>(protected val outputStream: OutputStream):Write
 
     @Throws(Exception::class)
     override fun writeBody(content: T, offset: Int, size: Int) {
+        writeDividingLine()
         checkWriteFirstLine()
         checkWriteHeaer()
     }
@@ -49,6 +53,7 @@ abstract class ResponseWriter<T>(protected val outputStream: OutputStream):Write
 
     @Throws(Exception::class)
     open fun endWrite(){
+        writeDividingLine()
         checkWriteFirstLine()
         checkWriteHeaer()
     }

@@ -13,6 +13,8 @@ interface Writer<T> {
     @Throws(Exception::class)
     fun writeLine(line:String)
     @Throws(Exception::class)
+    fun writeDividingLine()
+    @Throws(Exception::class)
     fun writeFirstLine(protocol:String,code:Int,msg:String)
     @Throws(Exception::class)
     fun writeHeader(key:String,value:Any)

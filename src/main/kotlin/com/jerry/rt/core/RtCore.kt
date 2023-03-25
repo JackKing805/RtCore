@@ -346,8 +346,7 @@ fun main() {
 
                 override suspend fun onMessage(client: Client, request: Request, response: Response) {
                     "onMessage:${client.getClientId()},msg:${request.getBody()}".logInfo()
-                    response.setContentType(RtContentType.TEXT_HTML.content)
-                    response.write("hallo,wealcom to use gzip")
+                    response.writeFile(File("C:\\Users\\10720\\Downloads\\temp\\location.png"))
                 }
 
                 override fun onRtClientIn(client: Client,request: Request, response: Response) {

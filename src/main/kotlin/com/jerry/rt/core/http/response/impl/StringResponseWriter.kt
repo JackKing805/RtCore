@@ -51,9 +51,6 @@ class StringResponseWriter(outputStream: OutputStream): ResponseWriter<String>(o
     @Throws(Exception::class)
     override fun writeBody(content: String, offset: Int, size: Int) {
         super.writeBody(content, offset, size)
-        if (isFirstBody()){
-            writeLine("\r\n")
-        }
         printWriter.write(content,offset,size)
         printWriter.flush()
     }
@@ -61,10 +58,13 @@ class StringResponseWriter(outputStream: OutputStream): ResponseWriter<String>(o
     @Throws(Exception::class)
     override fun endWrite() {
         super.endWrite()
-        if (isFirstBody()){
-            writeLine("\r\n")
-        }
         printWriter.flush()
         reset()
+    }
+
+    override fun writeDividingLine() {
+        if (isFirstBody()){
+            writeDividingLine()
+        }
     }
 }

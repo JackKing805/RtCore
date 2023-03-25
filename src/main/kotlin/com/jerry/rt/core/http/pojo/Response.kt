@@ -165,14 +165,19 @@ class Response(
                     send({
                         removeHeader(RtHeader.CONTENT_LENGTH.content)
                         setHeader("Transfer-Encoding","chunked")
-                        setHeader("Content-Encoding","identity")//identity 表示未编码的数据
+//                        setHeader("Content-Encoding","identity")//identity 表示未编码的数据
+                        setHeader(RtHeader.CONNECTION.content,"keep-alive")
                     },{
                         val buffer = ByteArray(1024)
                         var len = 0
                         while (inputStream.read(buffer).also { len = it }!=-1 ){
+                            it.writeDividingLine()
+                            it.writeLine(Integer.toHexString(len))
                             it.writeBody(buffer,0,len)
+                            it.writeLine("\r\n")
                         }
                         it.writeLine("0")
+                        it.writeLine("\r\n")
                     }){
                         inputStream.close()
                     }

@@ -19,6 +19,12 @@ class ByteResponseWriter(outputStream: OutputStream): ResponseWriter<ByteArray>(
         writeLine("$protocol $code $msg")
     }
 
+    override fun writeDividingLine() {
+        if (isFirstBody()){
+            writeLine("\r\n")
+        }
+    }
+
     @Throws(Exception::class)
     override fun writeLine(line: String) {
         super.writeLine(line)
@@ -51,10 +57,6 @@ class ByteResponseWriter(outputStream: OutputStream): ResponseWriter<ByteArray>(
     @Throws(Exception::class)
     override fun writeBody(content: ByteArray, offset: Int, size: Int) {
         super.writeBody(content, offset, size)
-        if (isFirstBody()){
-            writeLine("\r\n")
-        }
-
         outputStream.write(content,offset,size)
         outputStream.flush()
     }
