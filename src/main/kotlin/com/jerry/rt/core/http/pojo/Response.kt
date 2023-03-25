@@ -165,8 +165,8 @@ class Response(
                     send({
                         removeHeader(RtHeader.CONTENT_LENGTH.content)
                         setHeader("Transfer-Encoding","chunked")
-//                        setHeader("Content-Encoding","identity")//identity 表示未编码的数据
-                        setHeader(RtHeader.CONNECTION.content,"keep-alive")
+                        setHeader("Content-Encoding","identity")//identity 表示未编码的数据
+//                        setHeader(RtHeader.CONNECTION.content,"keep-alive")
                     },{
                         val buffer = ByteArray(1024)
                         var len = 0
