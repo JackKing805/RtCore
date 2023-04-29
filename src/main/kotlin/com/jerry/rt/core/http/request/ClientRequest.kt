@@ -17,6 +17,7 @@ import com.jerry.rt.extensions.rtContentTypeIsHeartbeat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.net.InetAddress
 import java.net.Socket
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
@@ -31,6 +32,7 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
     private var isAlive = AtomicBoolean(false)
     private var isInit = false
     private lateinit var socket: Socket
+    private lateinit var inetAddress: InetAddress
     private val scope = createStandCoroutineScope {
         clientListener?.onException(it)
     }
@@ -49,7 +51,7 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
 
 
         override suspend fun onMessage(socketData: SocketData) {
-            val request = Request(rtContext, socketData)
+            val request = Request(rtContext, socketData,inetAddress)
             if (request.getPackage().isRtConnect()) {
                 receiverHeartbeatTime = System.currentTimeMillis()
                 val rtResponse = Response(rtContext, socketData.getSocketBody().getOutputStream(),request.getPackage())
@@ -107,6 +109,7 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
             val timeOutConfig = rtContext.getRtConfig().rtTimeOutConfig
             this@ClientRequest.socket = s
             this@ClientRequest.socket.soTimeout = timeOutConfig.soTimeout
+            this@ClientRequest.inetAddress = this@ClientRequest.socket.inetAddress
             isInit = true
             isAlive.set(true)
             val socketListener = rtContext.getRtConfig().socketListener.newInstance()
@@ -159,7 +162,7 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
         }
         isCheckHeartbeatStart = true
         scope.launch(Dispatchers.IO) {
-            val interval = rtContext.getRtConfig().heartbeatReceiverIntervalTime.toMillis()
+            val interval = rtContext.getRtConfig().rtTimeOutConfig.heartbeatReceiverIntervalTime.toMillis()
             while (isAlive.get()) {
                 delay(5000)
                 val get = receiverHeartbeatTime

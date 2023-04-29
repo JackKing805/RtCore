@@ -51,9 +51,9 @@ internal class Server(private val rtContext: RtContext, private val onException:
             context.init(keyManagerFactory.keyManagers, null, null)
 
             val sslSocketFactory = context.serverSocketFactory
-            sslSocketFactory.createServerSocket(rtConfig.port) as ServerSocket
+            sslSocketFactory.createServerSocket(rtConfig.rtInitConfig.port) as ServerSocket
         }else{
-            ServerSocket(rtConfig.port)
+            ServerSocket(rtConfig.rtInitConfig.port)
         }
     }
 

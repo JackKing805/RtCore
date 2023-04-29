@@ -331,7 +331,6 @@ class RtCore private constructor() {
 
 fun main() {
     RtCore.instance.run(rtConfig = RtConfig(
-        port = 8080,
         rtFileConfig = RtFileConfig(
             tempFileDir = "C:\\Users\\10720\\Downloads\\key\\temp",
             saveFileDir = "C:\\Users\\10720\\Downloads\\key"
@@ -345,7 +344,7 @@ fun main() {
 
 
                 override suspend fun onMessage(client: Client, request: Request, response: Response) {
-                    "onMessage:${client.getClientId()},msg:${request.getBody()}".logInfo()
+                    "onMessage:${client.getClientId()},msg:${request.getPackage().getHeader().getIpAddress()}".logInfo()
                     response.writeFile(File("C:\\Users\\10720\\Downloads\\temp\\location.png"))
                 }
 

@@ -15,7 +15,7 @@ object RtUtils {
     //获取局域网ip加端口
     fun getLocalHost(rtContext: RtContext):String{
         return try {
-            InetAddress.getLocalHost().hostAddress + ":" + rtContext.getRtConfig().port
+            InetAddress.getLocalHost().hostAddress + ":" + rtContext.getRtConfig().rtInitConfig.port
         }catch (e:Exception){
             e.printStackTrace()
             ""
