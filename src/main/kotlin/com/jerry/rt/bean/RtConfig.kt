@@ -5,8 +5,6 @@ import com.jerry.rt.core.http.interfaces.IDataConverter
 import com.jerry.rt.core.http.interfaces.ISessionManager
 import com.jerry.rt.core.http.other.SessionManager
 import com.jerry.rt.core.http.request.impl.SocketListenerImpl
-import com.jerry.rt.impl.DefaultRtSotimeCalculate
-import com.jerry.rt.interfaces.IRtSotimeCalculate
 import java.io.File
 import java.time.Duration
 
@@ -67,7 +65,6 @@ data class RtFileConfig(
 
 data class RtTimeOutConfig(
     val defaultSoTimeout: Int = 1000 * 5,//毫秒，后续数据传输会根据文件大小动态计算，rt协议该值为0，且无法修改
-    val soTimeoutCalculate: Class<out IRtSotimeCalculate> = DefaultRtSotimeCalculate::class.java,
     val heartbeatReceiverIntervalTime: Duration = Duration.ofSeconds(60),//收到心跳包最大间隔时间
 )
 

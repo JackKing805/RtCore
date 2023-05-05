@@ -108,9 +108,9 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
                 return@launch
             }
             val timeOutConfig = rtContext.getRtConfig().rtTimeOutConfig
-            val timeOutCalculate = timeOutConfig.soTimeoutCalculate.newInstance()
             this@ClientRequest.socket = s
             this@ClientRequest.inetAddress = this@ClientRequest.socket.inetAddress
+            this@ClientRequest.socket.soTimeout = timeOutConfig.defaultSoTimeout
             isInit = true
             isAlive.set(true)
             val socketListener = rtContext.getRtConfig().socketListener.newInstance()
@@ -119,12 +119,7 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
                     if (it.isRtConnect()){
                         this@ClientRequest.socket.soTimeout = 0
                     }else{
-                        val timeOut = if (timeOutConfig.defaultSoTimeout!=-1){
-                            timeOutConfig.defaultSoTimeout
-                        }else{
-                            timeOutCalculate.calculateSoTimeout(rtContext,it.getMessageRtProtocol())
-                        }
-                        this@ClientRequest.socket.soTimeout = timeOut
+                        this@ClientRequest.socket.soTimeout = timeOutConfig.defaultSoTimeout
                     }
                     localMessageListener.onMessage(it)
                 }
@@ -197,6 +192,16 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
             } catch (e: Exception) {
                 clientListener?.onException(e)
             }
+        }
+        try {
+            socket.shutdownInput()
+        }catch (e:Exception){
+            e.printStackTrace()
+        }
+        try {
+            socket.shutdownOutput()
+        }catch (e:Exception){
+            e.printStackTrace()
         }
         try {
             socket.close()
