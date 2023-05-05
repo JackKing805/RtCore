@@ -14,6 +14,7 @@ import com.jerry.rt.extensions.createStandCoroutineScope
 import com.jerry.rt.extensions.isRtConnect
 import com.jerry.rt.extensions.logError
 import com.jerry.rt.extensions.rtContentTypeIsHeartbeat
+import com.jerry.rt.utils.RtUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -107,8 +108,9 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
                 return@launch
             }
             val timeOutConfig = rtContext.getRtConfig().rtTimeOutConfig
+            val timeOutCalculate = timeOutConfig.soTimeoutCalculate.newInstance()
             this@ClientRequest.socket = s
-            this@ClientRequest.socket.soTimeout = timeOutConfig.soTimeout
+            this@ClientRequest.socket.soTimeout = timeOutConfig.defaultSoTimeout
             this@ClientRequest.inetAddress = this@ClientRequest.socket.inetAddress
             isInit = true
             isAlive.set(true)
@@ -118,7 +120,7 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
                     if (it.isRtConnect()){
                         this@ClientRequest.socket.soTimeout = 0
                     }else{
-                        this@ClientRequest.socket.soTimeout = timeOutConfig.soTimeout
+                        this@ClientRequest.socket.soTimeout = timeOutCalculate.calculateSoTimeout(rtContext,it.getMessageRtProtocol())
                     }
                     localMessageListener.onMessage(it)
                 }

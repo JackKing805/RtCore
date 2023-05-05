@@ -10,11 +10,15 @@ import java.io.OutputStream
  * @date: 2023/2/12:13:50
  **/
 class SocketData(
-    val messageRtProtocol: MessageRtProtocol,
+    private val messageRtProtocol: MessageRtProtocol,
     inputStream: InputStream,
     outputStream: OutputStream
 ) :DataReadListener{
     private val socketBody = SocketBody(messageRtProtocol.getContentLength(),inputStream,outputStream)
+
+    fun getContentLength() = messageRtProtocol.getContentLength()
+
+    fun getMessageRtProtocol() = messageRtProtocol
 
     fun getSocketBody() = socketBody
 

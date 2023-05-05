@@ -45,5 +45,4 @@ object RtUtils {
 
         return ip
     }
-
 }

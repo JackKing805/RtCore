@@ -22,9 +22,10 @@ data class Request(
     private val inetAddress: InetAddress
 ) {
     private val protocolPackage = ProtocolPackage(
-        rtContext, socketData.messageRtProtocol.method, socketData.messageRtProtocol.url, socketData.messageRtProtocol.protocolString,
-        ProtocolPackage.Header(socketData.messageRtProtocol.header.toMutableMap(),inetAddress),
+        rtContext, socketData.getMessageRtProtocol().method, socketData.getMessageRtProtocol().url, socketData.getMessageRtProtocol().protocolString,
+        ProtocolPackage.Header(socketData.getMessageRtProtocol().header.toMutableMap(),inetAddress),
     )
+
 
     private var bodyCache:ByteArray? = null
 
