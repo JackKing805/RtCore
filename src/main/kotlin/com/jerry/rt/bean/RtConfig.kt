@@ -66,7 +66,7 @@ data class RtFileConfig(
 )
 
 data class RtTimeOutConfig(
-    val defaultSoTimeout: Int = 1000 * 5,//毫秒，建议不要低于1秒，不然rt协议会直接中止,只在socket第一次链接时生效，后续数据传输会根据文件大小动态计算，rt协议该值为0，且无法修改
+    val defaultSoTimeout: Int = 1000 * 5,//毫秒，后续数据传输会根据文件大小动态计算，rt协议该值为0，且无法修改
     val soTimeoutCalculate: Class<out IRtSotimeCalculate> = DefaultRtSotimeCalculate::class.java,
     val heartbeatReceiverIntervalTime: Duration = Duration.ofSeconds(60),//收到心跳包最大间隔时间
 )
