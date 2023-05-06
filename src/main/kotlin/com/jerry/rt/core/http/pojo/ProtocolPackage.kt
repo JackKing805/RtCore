@@ -76,6 +76,11 @@ class ProtocolPackage(
 
     fun getRequestURIQuery() = requestURI.query
 
+    fun isMultipart():Boolean{
+        val contentType = getHeader().getContentType().lowercase()
+        return contentType.startsWith("multipart/")
+    }
+
 
     private var session:ISession?=null
 

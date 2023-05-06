@@ -19,12 +19,9 @@ import java.nio.charset.Charset
 data class Request(
     private val rtContext: RtContext,
     private val socketData: SocketData,
-    private val inetAddress: InetAddress
+    private val protocolPackage: ProtocolPackage,
+    private val multipartFormData: MultipartFormData?
 ) {
-    private val protocolPackage = ProtocolPackage(
-        rtContext, socketData.getMessageRtProtocol().method, socketData.getMessageRtProtocol().url, socketData.getMessageRtProtocol().protocolString,
-        ProtocolPackage.Header(socketData.getMessageRtProtocol().header.toMutableMap(),inetAddress),
-    )
 
 
     private var bodyCache:ByteArray? = null
@@ -63,17 +60,12 @@ data class Request(
 
 
     fun getMultipartFormData():MultipartFormData?{
-        if (isMultipart()){
-            return MultipartFormData(rtContext,protocolPackage,socketData.getSocketBody(),getCharset())
-        }
-        return null
+        return multipartFormData
     }
 
     private fun isMultipart():Boolean{
-        val contentType = protocolPackage.getHeader().getContentType().lowercase()
-        return contentType.startsWith("multipart/")
+        return protocolPackage.isMultipart()
     }
-
 
     /**
      * resources请求判断

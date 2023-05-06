@@ -7,6 +7,7 @@ import com.jerry.rt.core.http.pojo.ProtocolPackage
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
 import com.jerry.rt.core.http.protocol.RtContentType
+import com.jerry.rt.core.http.request.model.MultipartFormData
 import com.jerry.rt.core.http.request.model.SocketData
 import com.jerry.rt.core.thread.Looper
 import com.jerry.rt.extensions.*
@@ -52,7 +53,13 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
 
 
         override suspend fun onMessage(socketData: SocketData) {
-            val request = Request(rtContext, socketData,inetAddress)
+            val protocolPackage = ProtocolPackage(
+                rtContext, socketData.getMessageRtProtocol().method, socketData.getMessageRtProtocol().url, socketData.getMessageRtProtocol().protocolString,
+                ProtocolPackage.Header(socketData.getMessageRtProtocol().header.toMutableMap(),inetAddress),
+            )
+            val multipartFormData = MultipartFormData(rtContext, socketData.getSocketBody(), protocolPackage.getCharset())
+            multipartFormData.init()
+            val request = Request(rtContext, socketData,protocolPackage,multipartFormData)
             if (request.getPackage().isRtConnect()) {
                 receiverHeartbeatTime = System.currentTimeMillis()
                 val rtResponse = Response(rtContext, socketData.getSocketBody().getOutputStream(),request.getPackage())

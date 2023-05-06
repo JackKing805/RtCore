@@ -2,7 +2,10 @@ package com.jerry.rt.core.http.request.model
 
 import com.jerry.rt.core.RtContext
 import com.jerry.rt.core.http.pojo.ProtocolPackage
+import com.jerry.rt.extensions.logInfo
 import com.jerry.rt.jva.utils.MultipartRequestInputStream
+import kotlinx.coroutines.withTimeoutOrNull
+import sun.rmi.runtime.Log
 import java.io.IOException
 import java.nio.charset.Charset
 
@@ -26,10 +29,9 @@ This is the file content.
 
  */
 class MultipartFormData(
-    context: RtContext,
-    private val protocolPackage: ProtocolPackage,
-    socketBody: SocketBody,
-    charset: Charset
+    private val context: RtContext,
+    private val socketBody: SocketBody,
+    private val charset: Charset
 ) {
     /**
      *
@@ -68,7 +70,10 @@ class MultipartFormData(
     private val parameters = mutableMapOf<String,String>()
     private val files = mutableMapOf<String,MultipartFile>()
 
-    init {
+    private val readWaitTime = getWaitTime()
+
+
+    suspend fun init() {
         val rtFileConfig = context.getRtConfig().rtFileConfig
         val input = MultipartRequestInputStream(socketBody.getInputStream())
         input.readBoundary()
@@ -81,28 +86,43 @@ class MultipartFormData(
             }?: break
             if (header.isFile()) {
                 // 文件类型的表单项
-                val fileName = header.getFileName()!!
-                if (fileName.isNotEmpty() && header.getContentType()!!.contains("application/x-macbinary")) {
+                val fileName = header.getFileName()
+                if (fileName.isNotEmpty() && header.getContentType().contains("application/x-macbinary")) {
                     input.skipBytes(128)
                 }
                 val newFile = MultipartFile(rtFileConfig,header)
                 if (newFile.processStream(input)) {
-                    files[header.getFormFieldName()!!] = newFile
+                    files[header.getFormFieldName()] = newFile
                 }
             } else {
                 // 标准表单项
-                parameters[header.getFormFieldName()!!] = input.readString(charset)
+                parameters[header.getFormFieldName()] = input.readString(charset)
             }
             input.skipBytes(1)
             input.mark(1)
 
             // read byte, but may be end of stream
-            val nextByte: Int = input.read()
+            val nextByte: Int? = withTimeoutOrNull(readWaitTime){
+                input.read()
+            }
+            if (nextByte==null){
+                input.reset()
+                break
+            }
             if (nextByte == -1 || nextByte == '-'.code) {
                 input.reset()
                 break
             }
             input.reset()
+        }
+    }
+
+    private fun getWaitTime():Long{
+        val defaultSoTimeout = context.getRtConfig().rtTimeOutConfig.defaultSoTimeout
+        return if (defaultSoTimeout<1000L){
+            defaultSoTimeout.toLong()
+        }else{
+            defaultSoTimeout-1000L
         }
     }
 

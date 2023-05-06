@@ -346,7 +346,11 @@ fun main() {
                 override suspend fun onMessage(client: Client, request: Request, response: Response) {
                     "onMessage:${client.getClientId()},msg:${request.getPackage().getHeader().getIpAddress()}".logInfo()
 //                    response.writeFile(File("C:\\Users\\10720\\Downloads\\temp\\location.png"))
-                    response.write("hallo",RtContentType.TEXT_HTML.content)
+                    val multipartFormData = request.getMultipartFormData()
+                    multipartFormData?.getFiles()?.forEach { t, u ->
+                        u.save("C:\\Users\\10720\\Downloads\\temp\\${u.getHeader().getFileName()}")
+                    }
+                    response.write("success",RtContentType.TEXT_HTML.content)
                 }
 
                 override fun onRtClientIn(client: Client,request: Request, response: Response) {
