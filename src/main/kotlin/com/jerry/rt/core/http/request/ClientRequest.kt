@@ -53,12 +53,13 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
 
 
         override suspend fun onMessage(socketData: SocketData) {
+            val messageRtProtocol = socketData.getMessageRtProtocol()
             val protocolPackage = ProtocolPackage(
-                rtContext, socketData.getMessageRtProtocol().method, socketData.getMessageRtProtocol().url, socketData.getMessageRtProtocol().protocolString,
-                ProtocolPackage.Header(socketData.getMessageRtProtocol().header.toMutableMap(),inetAddress),
+                rtContext, messageRtProtocol.method, messageRtProtocol.url, messageRtProtocol.protocolString,
+                ProtocolPackage.Header(messageRtProtocol.header.toMutableMap(),inetAddress),
             )
-            val multipartFormData = MultipartFormData(rtContext, socketData.getSocketBody(), protocolPackage.getCharset())
-            multipartFormData.init()
+            val multipartFormData = if (protocolPackage.isMultipart()) MultipartFormData(rtContext, socketData.getSocketBody(), protocolPackage.getCharset()) else null
+            multipartFormData?.init()
             val request = Request(rtContext, socketData,protocolPackage,multipartFormData)
             if (request.getPackage().isRtConnect()) {
                 receiverHeartbeatTime = System.currentTimeMillis()
