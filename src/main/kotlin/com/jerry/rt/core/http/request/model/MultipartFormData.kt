@@ -70,8 +70,6 @@ class MultipartFormData(
     private val parameters = mutableMapOf<String,String>()
     private val files = mutableMapOf<String,MultipartFile>()
 
-    private val readWaitTime = getWaitTime()
-
 
     suspend fun init() {
         val rtFileConfig = context.getRtConfig().rtFileConfig
@@ -102,27 +100,12 @@ class MultipartFormData(
             input.mark(1)
 
             // read byte, but may be end of stream
-            val nextByte: Int? = withTimeoutOrNull(readWaitTime){
-                input.read()
-            }
-            if (nextByte==null){
-                input.reset()
-                break
-            }
-            if (nextByte == -1 || nextByte == '-'.code) {
+            val nextByte: Int =input.read()
+            if (nextByte == -1 || nextByte == 13 || nextByte == '-'.code) {
                 input.reset()
                 break
             }
             input.reset()
-        }
-    }
-
-    private fun getWaitTime():Long{
-        val defaultSoTimeout = context.getRtConfig().rtTimeOutConfig.defaultSoTimeout
-        return if (defaultSoTimeout<1000L){
-            defaultSoTimeout.toLong()
-        }else{
-            defaultSoTimeout-1000L
         }
     }
 
