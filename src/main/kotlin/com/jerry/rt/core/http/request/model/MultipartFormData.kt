@@ -1,11 +1,7 @@
 package com.jerry.rt.core.http.request.model
 
 import com.jerry.rt.core.RtContext
-import com.jerry.rt.core.http.pojo.ProtocolPackage
-import com.jerry.rt.extensions.logInfo
 import com.jerry.rt.jva.utils.MultipartRequestInputStream
-import kotlinx.coroutines.withTimeoutOrNull
-import sun.rmi.runtime.Log
 import java.io.IOException
 import java.nio.charset.Charset
 
@@ -101,7 +97,7 @@ class MultipartFormData(
 
             // read byte, but may be end of stream
             val nextByte: Int =input.read()
-            if (nextByte == -1 || nextByte == 13 || nextByte == '-'.code) {
+            if (nextByte == -1 || nextByte == '-'.code) {
                 input.reset()
                 break
             }
