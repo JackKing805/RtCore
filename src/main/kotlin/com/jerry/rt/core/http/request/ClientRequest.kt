@@ -58,9 +58,7 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
                 rtContext, messageRtProtocol.method, messageRtProtocol.url, messageRtProtocol.protocolString,
                 ProtocolPackage.Header(messageRtProtocol.header.toMutableMap(),inetAddress),
             )
-            val multipartFormData = if (protocolPackage.isMultipart()) MultipartFormData(rtContext, socketData.getSocketBody(), protocolPackage.getCharset()) else null
-            multipartFormData?.init()
-            val request = Request(rtContext, socketData,protocolPackage,multipartFormData)
+            val request = Request(rtContext, socketData,protocolPackage)
             if (request.getPackage().isRtConnect()) {
                 receiverHeartbeatTime = System.currentTimeMillis()
                 val rtResponse = Response(rtContext, socketData.getSocketBody().getOutputStream(),request.getPackage())

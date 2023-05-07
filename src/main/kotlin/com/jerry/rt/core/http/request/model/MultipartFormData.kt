@@ -67,7 +67,7 @@ class MultipartFormData(
     private val files = mutableMapOf<String,MultipartFile>()
 
 
-    suspend fun init() {
+    init {
         val rtFileConfig = context.getRtConfig().rtFileConfig
         val input = MultipartRequestInputStream(socketBody.getInputStream())
         input.readBoundary()

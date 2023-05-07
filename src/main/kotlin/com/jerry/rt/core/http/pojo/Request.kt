@@ -20,9 +20,9 @@ data class Request(
     private val rtContext: RtContext,
     private val socketData: SocketData,
     private val protocolPackage: ProtocolPackage,
-    private val multipartFormData: MultipartFormData?
 ) {
 
+    private var multipartFormData: MultipartFormData? = null
 
     private var bodyCache:ByteArray? = null
 
@@ -60,7 +60,14 @@ data class Request(
 
 
     fun getMultipartFormData():MultipartFormData?{
-        return multipartFormData
+        return if (protocolPackage.isMultipart()) {
+            if (multipartFormData==null){
+                multipartFormData = MultipartFormData(rtContext, socketData.getSocketBody(), protocolPackage.getCharset())
+            }
+            multipartFormData
+        }else{
+            null
+        }
     }
 
     private fun isMultipart():Boolean{
