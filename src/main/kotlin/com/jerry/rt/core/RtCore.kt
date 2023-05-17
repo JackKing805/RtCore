@@ -7,6 +7,7 @@ import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.interfaces.ClientListener
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
+import com.jerry.rt.core.http.pojo.RtClient
 import com.jerry.rt.core.http.protocol.RtContentType
 import com.jerry.rt.core.thread.Looper
 import com.jerry.rt.extensions.createExceptionCoroutineScope
@@ -329,53 +330,53 @@ class RtCore private constructor() {
 
 
 
-fun main() {
-    RtCore.instance.run(rtConfig = RtConfig(
-        rtFileConfig = RtFileConfig(
-            tempFileDir = "C:\\Users\\10720\\Downloads\\key\\temp",
-            saveFileDir = "C:\\Users\\10720\\Downloads\\key"
-        )
-    ),statusListener = object :RtCoreListener{
-        override fun onClientIn(client: Client) {
-            client.listen(object : ClientListener {
-                override fun onException(exception: Exception) {
-                    exception.printStackTrace()
-                }
-
-
-                override suspend fun onMessage(client: Client, request: Request, response: Response) {
-                    "onMessage:${client.getClientId()},msg:${request.getPackage().getHeader().getIpAddress()}".logInfo()
-//                    response.writeFile(File("C:\\Users\\10720\\Downloads\\temp\\location.png"))
-                    val multipartFormData = request.getMultipartFormData()
-                    multipartFormData?.getFiles()?.forEach { t, u ->
-                        u.save("C:\\Users\\10720\\Downloads\\temp\\${u.getHeader().getFileName()}")
-                    }
-                    response.write("success",RtContentType.TEXT_HTML.content)
-                }
-
-                override fun onRtClientIn(client: Client,request: Request, response: Response) {
-                    "onRtClientIn:${client.getClientId()}".logInfo()
-                }
-
-                override fun onRtClientOut(client: Client) {
-                    "onRtClientOut:${client.getClientId()}".logInfo()
-
-                }
-
-                override suspend fun onRtHeartbeat(client: Client) {
-                }
-
-                override suspend fun onRtMessage(request: Request, response: Response) {
-                    "onRtMessage:${client.getClientId()},msg:${request.getBody()}".logInfo()
-                    response.setContentType(RtContentType.TEXT_PLAIN.content)
-                    response.write(request.getPackage().getSession().getId())
-                }
-
-            })
-        }
-
-        override fun onRtCoreException(exception: Exception) {
-            exception.printStackTrace()
-        }
-    })
-}
+//fun main() {
+//    RtCore.instance.run(rtConfig = RtConfig(
+//        rtFileConfig = RtFileConfig(
+//            tempFileDir = "C:\\Users\\10720\\Downloads\\key\\temp",
+//            saveFileDir = "C:\\Users\\10720\\Downloads\\key"
+//        )
+//    ),statusListener = object :RtCoreListener{
+//        override fun onClientIn(client: Client) {
+//            client.listen(object : ClientListener {
+//                override fun onException(exception: Exception) {
+//                    exception.printStackTrace()
+//                }
+//
+//
+//                override suspend fun onMessage(client: RtClient, request: Request, response: Response) {
+//                    "onMessage:${client.getClientId()},msg:${request.getPackage().getHeader().getIpAddress()}".logInfo()
+////                    response.writeFile(File("C:\\Users\\10720\\Downloads\\temp\\location.png"))
+//                    val multipartFormData = request.getMultipartFormData()
+//                    multipartFormData?.getFiles()?.forEach { t, u ->
+//                        u.save("C:\\Users\\10720\\Downloads\\temp\\${u.getHeader().getFileName()}")
+//                    }
+//                    response.write("success",RtContentType.TEXT_HTML.content)
+//                }
+//
+//                override fun onRtClientIn(client: RtClient,request: Request, response: Response) {
+//                    "onRtClientIn:${client.getClientId()}".logInfo()
+//                }
+//
+//                override fun onRtClientOut(client: RtClient) {
+//                    "onRtClientOut:${client.getClientId()}".logInfo()
+//
+//                }
+//
+//                override suspend fun onRtHeartbeat(client: RtClient) {
+//                }
+//
+//                override suspend fun onRtMessage(request: Request, response: Response) {
+//                    "onRtMessage:${client.getClientId()},msg:${request.getBody()}".logInfo()
+//                    response.setContentType(RtContentType.TEXT_PLAIN.content)
+//                    response.write(request.getPackage().getSession().getId())
+//                }
+//
+//            })
+//        }
+//
+//        override fun onRtCoreException(exception: Exception) {
+//            exception.printStackTrace()
+//        }
+//    })
+//}

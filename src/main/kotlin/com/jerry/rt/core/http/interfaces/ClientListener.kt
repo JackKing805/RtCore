@@ -4,6 +4,7 @@ import com.jerry.rt.core.http.Client
 import com.jerry.rt.core.http.converter.DataConverter
 import com.jerry.rt.core.http.pojo.Request
 import com.jerry.rt.core.http.pojo.Response
+import com.jerry.rt.core.http.pojo.RtClient
 
 /**
  * @className: ClientListener
@@ -12,13 +13,13 @@ import com.jerry.rt.core.http.pojo.Response
  * @date: 2023/1/2:13:19
  **/
 interface ClientListener {
-    suspend fun onRtHeartbeat(client: Client)
+    suspend fun onRtHeartbeat(client: RtClient)
 
-    fun onRtClientIn(client: Client,request: Request,response: Response)
+    fun onRtClientIn(client: RtClient,request: Request,response: Response)
     suspend fun onRtMessage(request: Request,response: Response)
-    fun onRtClientOut(client: Client)
+    fun onRtClientOut(client: RtClient)
 
-    suspend fun onMessage(client: Client,request: Request,response: Response)
+    suspend fun onMessage(client: RtClient,request: Request,response: Response)
 
     fun onException(exception: Exception)
 }
