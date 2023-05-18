@@ -67,9 +67,12 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
                 rtContext,
                 client.getClientId(),
                 isRt,
-                response
+                response,
+                {
+                    isAlive()
+                }
             ) {
-                isAlive()
+                tryClose()
             }
         }
 
