@@ -8,6 +8,7 @@ class RtClient(
     private val isRtClient: Boolean,
     private val response: Response,
     private val isAlive:()->Boolean,
+    private val callClose: ()->Unit
 ) {
     fun isRt() = isRtClient
 
@@ -18,4 +19,8 @@ class RtClient(
     fun getResponse() = response
 
     fun isClientAlive() = isAlive()
+    
+    fun close() {
+        callClose()
+    }
 }
