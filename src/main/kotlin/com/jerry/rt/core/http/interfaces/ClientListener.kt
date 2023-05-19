@@ -13,13 +13,13 @@ import com.jerry.rt.core.http.pojo.RtClient
  * @date: 2023/1/2:13:19
  **/
 interface ClientListener {
-    suspend fun onRtHeartbeat(client: RtClient)
+    fun onRtHeartbeat(client: RtClient)
 
     fun onRtClientIn(client: RtClient,request: Request,response: Response)
-    suspend fun onRtMessage(request: Request,response: Response)
+    fun onRtMessage(client: RtClient,request: Request,response: Response)
     fun onRtClientOut(client: RtClient)
 
-    suspend fun onMessage(client: RtClient,request: Request,response: Response)
+    fun onMessage(client: RtClient,request: Request,response: Response)
 
     fun onException(exception: Exception)
 }
