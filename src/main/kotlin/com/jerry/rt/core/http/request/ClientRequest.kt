@@ -106,7 +106,7 @@ internal class ClientRequest(private val rtContext: RtContext, private val clien
                     return
                 }
                 try {
-                    clientListener?.onRtMessage(request, rtResponse!!)
+                    clientListener?.onRtMessage(rtClient!!,request, rtResponse!!)
                 } catch (e: Exception) {
                     clientListener?.onException(e)
                 }
