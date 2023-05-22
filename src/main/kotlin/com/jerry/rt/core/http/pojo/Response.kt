@@ -73,7 +73,7 @@ class Response(
             if (contentType.contains(";")) {
                 contentType
             } else {
-                contentType + ";" + charset.name()
+                contentType + "; charset=" + charset.name()
             }
         } else {
             contentType
